@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>VDJManager Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.slate.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">VDJManager</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Database.html">Database</a></li><li><a href="Infos.html">Infos</a></li><li><a href="loadPlaylist.html">loadPlaylist</a></li><li><a href="Playlist.html">Playlist</a></li><li><a href="Poi.html">Poi</a></li><li><a href="Scan.html">Scan</a></li><li><a href="Song.html">Song</a></li><li><a href="Tags.html">Tags</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section class="readme-section">
+        <article><h1>vdj-data</h1>
+<p><a href="https://virtualdj.com/"><img src="https://i.imgur.com/4jQVHVi.png" alt="Made for VirtualDJ"></a></p>
+<p>Scripting engine for VirtualDJ to handle databases, playlists, cue files as
+well as backup and restore, path validation, cleaning and more.</p>
+<p>This package is a building block component that can be used to make software
+that handles VirtualDJ information, or simply to write quick scripts for
+specific tasks that is not possible or easy to do within VirtualDJ itself.</p>
+<h2>Prerequisites</h2>
+<p>You will need <a href="https://nodejs.org/en/">Node.js</a> for this package.
+It is assumed you already know how to use Node.js and NPM if you plan to
+integrate this package with your software.</p>
+<p>While the package should theoretically run on any platform where Node.js can
+run, it has only been tested and developed (so far) on Windows.</p>
+<p>It would also be a big advantage to have the VirtualDJ software installed.
+If you don't have already, you can use their free version <a href="https://virtualdj.com/download/index.html">from here</a>.</p>
+<h2>Install</h2>
+<p>Run the following command in CLI to install this package into your project:</p>
+<pre><code>npm i silverspex/vdj-data
+</code></pre>
+<h2>Development</h2>
+<p>To run demos or to create PRs, clone this repo using git in the current directory:</p>
+<pre><code>git clone https://github.com/silverspex/vdj-data.git
+</code></pre>
+<p>Or SSH if you prefer. Then cd into <code>vdj-data/</code>.</p>
+<h2>Examples</h2>
+<p>Examples showing some of the functions the package offers.</p>
+<p>Always included in your projects:</p>
+<pre class="prettyprint source lang-javascript"><code>// Import and use in your projects
+const vdj = require('vdj-data');
+
+// VDJ Data API can now be used ..
+</code></pre>
+<p>Various ways to load and handle databases:</p>
+<pre class="prettyprint source lang-javascript"><code>const path = require('path');
+
+// Get home folder of VirtualDJ
+const homeFolder = vdj.getVDJFolders().homeFolder;
+const mainDatabasePath = path.join(homeFolder, 'database.xml');
+
+// Load and parse a single database
+const database = vdj.loadDatabase(mainDatabasePath);
+if (database) {
+  // use here...
+}
+
+// Load all available databases from various drives (Windows only for now)
+const databases = vdj.loadAllDatabases();
+
+// Merge all databases into a single instance for simplified use:
+const merged = vdj.Database.merge(databases);
+
+// Split them out using ignoreDrives (Windows) and available drives:
+const split = vdj.Database.split(merged);
+
+// Export a database back to disk as XML:
+database.export(mainDatabasePath);
+</code></pre>
+<p>Various ways using a database:</p>
+<pre class="prettyprint source lang-javascript"><code>// iterate over all Song objects
+database.songs.forEach(song => { /* do something with a song here */ });
+
+// search returning array of matching Song objects
+const results = database.search(&quot;talla world&quot;, {artist: true, title: true});
+
+// load a song initializing path and size
+const song = database.loadSong('path/to/song.mp3');
+
+// load a song and parse tags if any (uses Promise)
+const songAndTags = await database.loadSongAndTags('path/to/song.flac');
+
+// add to database
+database.add(song);
+database.add(songAndTags);
+
+// remove a song
+const oldSong = database.remove(song);
+
+// remove a song using an index
+const oldSong2 = database.remove(7);
+
+// verify song paths - unavailable songs returned as an Array of Song objects:
+const unavailables = database.verifyPaths();
+
+// convert to XML - REMEMBER TO BACKUP YOUR DATA FIRST (see below)
+const xml = database.toXML();
+</code></pre>
+<p>Various ways using Song objects:</p>
+<pre class="prettyprint source lang-javascript"><code>// Get first song in database assuming there is one
+const song = database.songs[0];
+
+// convert to strings
+const txt = song.toString();     // -> &quot;artist - title (remix)&quot;
+const tx7 = song.toString('%title - %artist (%remix) [%year]');
+
+// get artist, title and remix from filename:
+song.filenameToTag();
+
+// top-level information
+const path = song.filePath;
+const size = song.fileSize;
+
+// using tags:
+const artist = song.tags.artist;
+const title = song.tags.title;
+
+// using infos
+const playCount = song.infos.playCount;
+
+// using scan
+const bpm = song.scan.bpm;
+
+// verify path
+const success = song.verifyPath();
+
+// update comment
+song.comment = 'Edited via VDJ Data API!';
+</code></pre>
+<p>Using Playlists:</p>
+<pre class="prettyprint source lang-javascript"><code>// Load a Playlist
+const pl = vdj.loadPlaylist('path/to/playlist.m3u');
+
+// number of Song objects with valid paths
+const plSongCount = pl.songs.length;
+
+// array with path strings of missing files
+const plMissing = pl.verifyPaths();
+
+// compile to string that can be saved as new playlist
+const newPlaylist = pl.compile();
+</code></pre>
+<p>Backup:</p>
+<p>Using backup will backup databases from all available VirtualDJ drives, playlists,
+folders, mappings, history, settings, samples etc. You can also define a custom
+list as a 3. argument if you prefer.</p>
+<p>The backup zip files may be both one created by VirtualDJ itself, or the one
+created using this package's <code>backup()</code> method as shown below.</p>
+<pre class="prettyprint source lang-javascript"><code>// get list of all database paths except main as backup() includes that
+const databasePaths = isWin 
+  ? vdj.getDrivePaths(true, false).map(p => path.join(p, 'database.xml'))
+  : undefined; // getDrivePaths() not currently supported on Mac
+
+// backup() uses Promise
+vdj
+  .backup(`vdj-backup-${ Date.now() }.zip`, databasePaths)
+  .then(success => { /* next step from here */ })
+  .catch(error => { /* an error occurred */ })
+
+// or use async/await
+(async () => {
+  try {
+    const success = await vdj.backup(`vdj-backup-${ Date.now() }.zip`, databasePaths);
+  }
+  catch(err) { /* an error occurred */ }
+})();
+</code></pre>
+<p>Restore:</p>
+<p>Using restore will restore anything found in a zip backup file, whether it was
+created by VirtualDJ or via <code>backup()</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>// Caution: Will overwrite anything in its way...
+(async () => {
+  const homeFolder = vdj.getDrivePaths().homeFolder;
+  const status = await vdj.restore('path/to/backup.zip', homeFolder);
+  //...
+})();
+</code></pre>
+<p>System functions:</p>
+<pre class="prettyprint source lang-javascript"><code>// check if VirtualDJ is running to block reading/writing database.xml files
+(async () => {
+  const running = await vdj.isRunning();
+  if (!running) { /* do yar thang... */ }
+})();
+
+// list all drives with VirtualDJ databases and get basic drive info
+const drives = vdj.getDrives();
+
+// always a main home drive if VirtualDJ is installed
+console.log(drives);
+/* =>
+[
+  {
+    root: 'D:\\',
+    folder: 'D:\\docs\\VirtualDJ',
+    size: 1000203087872,
+    free: 569048289280,
+    type: 'Local Fixed Disk',
+    main: true
+  },
+  ...
+*/
+
+// globally available after importing 'vdj-data'
+if (isWin) { /* Windows version */ }
+if (isMac) { /* OSX version */ }
+
+// or use global.isWin / global.isMac
+</code></pre>
+<h2>Demos</h2>
+<p>The folder demos/ contains some demo scripts. To run, open CLI, &quot;cd&quot; to root folder
+and type:</p>
+<pre><code>node demos\name-of-demo &lt;args-if-any&gt;
+</code></pre>
+<p>See content of each file for details.</p>
+<h2>Documentation</h2>
+<p>The package comes (eventually) with full API documentation which you find in the
+docs/ folder.</p>
+<h2>Performance</h2>
+<p>Currently load and parse about 25,000 - 30,000 song entries in less than a second,
+depending on system configuration and database details (this result with a slow
+spinning disk, 23 mb database, i7).</p>
+<p>The code base is not fully optimized so expect even better performance over time.</p>
+<h2>Issues</h2>
+<p>NOTE: The development is currently in ALPHA. The API may change without prior
+notice. Many features are not yet implemented.</p>
+<p>Known issues:</p>
+<ul>
+<li>Possible issue with double encoded entities (e.g. &quot;&amp;amp;amp;&quot;).</li>
+<li>Documentation is currently incomplete.</li>
+<li>Needs refactoring</li>
+<li>Currently system calls (detection of folder paths etc.) only works with Windows.</li>
+</ul>
+<p>Feel free to use the issue tracker to report issues, feature requests.</p>
+<h2>License</h2>
+<p>There is currently no license available. You may download and evaluate the package
+and use it in your personal non-commercial projects. Future licenses will be made
+available for personal as well as commercial use.</p>
+<p>(c) Silverspex 2019</p></article>
+    </section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+	<span class="jsdoc-message"><b><a href='https://silverspex.com/'>Silverspex</a></b></span>
+
+
+	<span class="copyright">
+	Copyright &copy; 2019 Silverspex
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
+	
+		on Wed Nov 20th 2019
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

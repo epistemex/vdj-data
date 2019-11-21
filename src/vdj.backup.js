@@ -23,11 +23,11 @@ const info = require('../package.json');
  * @param {string} dstPath - where to save the backup zip file
  * @param {Array} [dbList] - array of additional paths to the database.xml files.
  * The main database.xml is automatically included.
- * @param {Array} [list=[ 'Folders', 'History', 'Mappers', 'Playlists', 'Sampler', 'Cloudlists', 'settings.xml' ]] - folder and file list to backup.
+ * @param {Array} [list=[ 'Folders', 'History', 'Mappers', 'Playlists', 'Cloudlists', 'settings.xml' ]] - folder and file list to backup.
  * Note that database.xml is handled separately.
  * @returns {Promise<boolean>} true if zip was created and saved successfully
  */
-async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mappers', 'Playlists', 'Sampler', 'Cloudlists', 'settings.xml' ]) {
+async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mappers', 'Playlists', 'Cloudlists', 'settings.xml' ]) {
   const backupList = list.filter(e => e.toLowerCase() !== 'database.xml');
   const vdjPath = vdj.getVDJFolders().homeFolder;
   if ( !vdjPath ) throw 'Unable to locate VirtualDJ home folder. Make sure to have VirtualDJ installed.';
@@ -73,5 +73,25 @@ async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mapp
     return false;
   }
 }
+
+backup.TYPE = {
+  CACHE      : 'Cache',
+  CACHECOVERS: 'Cache\\Covers',
+  DEVICES    : 'Devices',
+  FOLDERS    : 'Folders',
+  HISTORY    : 'History',
+  MAPPERS    : 'Mappers',
+  PADS       : 'Pads',
+  PLAYLISTS  : 'Playlists',
+  PLUGINS    : 'Plugins',
+  PLUGINS64  : 'Plugins64',
+  CLOUDLISTS : 'Cloudlists',
+  SAMPLER    : 'Sampler',
+  SKINS      : 'Skins',
+  TOOLS      : 'Tools',
+  VIDEOSKINS : 'videoskins',
+  SETTINGS   : 'settings.xml',
+  LICENSE    : 'license.dat'
+};
 
 module.exports = backup;

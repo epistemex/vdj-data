@@ -169,5 +169,7 @@ function parseDatabaseXML(path) {
 }
 
 module.exports = {
-  parseDatabaseXML, parseTags, compileTags
+  parseDatabaseXML,
+  parseTags,
+  compileTags
 };

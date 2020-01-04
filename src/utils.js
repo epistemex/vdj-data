@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const Path = require('path');
+//const he = require('he');
 
 const entityTable = {
   '&' : '&amp;',
@@ -31,12 +32,44 @@ const entityRX = new RegExp(`[${ Object.keys(entityTable).join('') }]`, 'g');
 const entityRXFrom = new RegExp(`&(${ Object.keys(entityTableFrom).join('|') });`, 'gi');
 
 function toEntities(kw) {
-  //todo won't handle text that is suppose to be "&amp;" (i.e. "&amp;amp;") already
+  //return he.encode(kw, {useNamedReferences: true})
   return kw.replace(entityRX, w => entityTable[ w ]);
-  //return kw.replace(/&/g, '#AMP#').replace(entityRX, w => entityTable[ w ]).replace(/#AMP#/g, '&')
 }
 
 function fromEntities(kw) {
+  //  if (typeof kw === 'string') {
+  //    let start = 0;
+  //    let amp = kw.indexOf('&');
+  //    if (amp < 0) return kw;
+  //
+  //    let str = [kw.substring(0, amp)];
+  //
+  //    while(amp >= 0) {
+  //      const semi = kw.indexOf(';', start + 1);
+  //      if (semi < 0 || semi > 4) {
+  //        str.push(kw.substr(amp));
+  //        start = kw.length;
+  //      }
+  //      else {
+  //        const ent = kw.substring(amp + 1, semi);
+  //        const char = entityTableFrom[ent];
+  //        if (char) {
+  //          str.push(char);
+  //          start = semi + 1;
+  //        }
+  //        else {
+  //          start = semi + 1;
+  //          str.push('&', kw.substring(start, amp + 1));
+  //        }
+  //      }
+  //      amp = kw.indexOf('&', start);
+  //      if (amp < 0) str.push(kw.substr(start));
+  //      else str.push(kw.substring(start, amp))
+  //    }
+  //    return str.join('')
+  //  }
+  //  else return null;
+  //return he.decode(kw, {useNamedReferences: true})
   return kw ? kw.replace(entityRXFrom, (w, i) => entityTableFrom[ i ]) : null;
 }
 
@@ -86,6 +119,15 @@ function toColor(o) {
 }
 
 function fromColor(o) {return (o.a << 24 | o.r << 16 | o.g << 8 | o.b) >>> 0;}
+
+/**
+ * Compare floating point numbers to be the same using epsilon margin.
+ * @param {number} a - first number to compare
+ * @param {number} b - second number to compare
+ */
+function eq(a, b) {
+  return Math.abs(a - b) < 0.000000001
+}
 
 /**
  * Lookup list of paths in the database list.
@@ -221,6 +263,7 @@ module.exports = {
   fromBPM,
   toColor,
   fromColor,
+  eq,
   lookupPaths,
   getRoot,
   getAttrList,

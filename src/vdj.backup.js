@@ -29,7 +29,7 @@ const info = require('../package.json');
  */
 async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mappers', 'Playlists', 'Cloudlists', 'settings.xml' ]) {
   const backupList = list.filter(e => e.toLowerCase() !== 'database.xml');
-  const vdjPath = vdj.getVDJFolders().homeFolder;
+  const vdjPath = vdj.getVDJHome();
   if ( !vdjPath ) throw 'Unable to locate VirtualDJ home folder. Make sure to have VirtualDJ installed.';
 
   const JSZip = require('jszip');
@@ -73,25 +73,5 @@ async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mapp
     return false;
   }
 }
-
-backup.TYPE = {
-  CACHE      : 'Cache',
-  CACHECOVERS: 'Cache\\Covers',
-  DEVICES    : 'Devices',
-  FOLDERS    : 'Folders',
-  HISTORY    : 'History',
-  MAPPERS    : 'Mappers',
-  PADS       : 'Pads',
-  PLAYLISTS  : 'Playlists',
-  PLUGINS    : 'Plugins',
-  PLUGINS64  : 'Plugins64',
-  CLOUDLISTS : 'Cloudlists',
-  SAMPLER    : 'Sampler',
-  SKINS      : 'Skins',
-  TOOLS      : 'Tools',
-  VIDEOSKINS : 'videoskins',
-  SETTINGS   : 'settings.xml',
-  LICENSE    : 'license.dat'
-};
 
 module.exports = backup;

@@ -1,6 +1,6 @@
 /**************************************
  *
- *  VDJ specific functions
+ *  VDJ Top-Level & System functions
  *
  *  Copyright (c) 2019 Silverspex
  *
@@ -11,13 +11,62 @@
 const fs = require('fs');
 const Path = require('path');
 
-const sys = require(global.isWin ? './sys32' : './sysOSX');
+//const sys = require(global.isWin ? './sys32' : './sysOSX');
+const sys = global.isWin ? require('./sys32') : require('./sysOSX');
 const xml = require('./xml');
 const utils = require('./utils');
-const Database = require('./vdj.database');
+//const Database = require('./vdj.database');
 const Playlist = require('./vdj.playlist');
 
+/**
+ * Folder type enums for getSubFolder().
+ * @readonly
+ * @enum {string}
+ */
+const FOLDER = {
+  BACKUP             : 'Backup',
+  CACHE              : 'Cache',
+  CACHECOVERS        : 'Cache/Covers',
+  CACHEPLUGINS       : 'Cache/Plugins',
+  CLOUDLISTS         : 'Cloudlists',
+  DEVICES            : 'Devices',
+  FOLDERS            : 'Folders',
+  HISTORY            : 'History',
+  MAPPERS            : 'Mappers',
+  PADS               : 'Pads',
+  PLAYLISTS          : 'Playlists',
+  PLUGINS            : 'Plugins',
+  PLUGINSAUTOSTART   : 'Plugins/AutoStart',
+  PLUGINSSOUNDFX     : 'Plugins/SoundEffect',
+  PLUGINSVIDEOFX     : 'Plugins/VideoEffect',
+  PLUGINSVIDEOTRANS  : 'Plugins/VideoTransition',
+  PLUGINSVIZ         : 'Plugins/Visualisations',
+  PLUGINS64          : 'Plugins64',
+  PLUGINSAUTOSTART64 : 'Plugins64/AutoStart',
+  PLUGINSSOUNDFX64   : 'Plugins64/SoundEffect',
+  PLUGINSVIDEOFX64   : 'Plugins64/VideoEffect',
+  PLUGINSVIDEOTRANS64: 'Plugins64/VideoTransition',
+  PLUGINSVIZ64       : 'Plugins64/Visualisations',
+  PULSELOCKER        : 'pulselocker',
+  SAMPLER            : 'Sampler',
+  SKINS              : 'Skins',
+  TOOLS              : 'Tools',
+  VIDEOSKINS         : 'videoskins'
+};
+
+/**
+ * File type enums for getSubFolder().
+ * @readonly
+ * @enum {string}
+ */
+const FILE = {
+  DATABASEFILE: 'database.xml',
+  SETTINGSFILE: 'settings.xml',
+  LICENSEFILE : 'license.dat'
+};
+
 let _settings;
+let _rootFolder;
 
 /**
  * Check if VirtualDJ software is running. It's critical as to write operations
@@ -54,6 +103,17 @@ function getVDJFolders() {
     result.homeFolder = Path.join(process.env.HOME, 'Documents', 'VirtualDJ'); //fs.existsSync(path1) ? path1 : (fs.existsSync(path2) ? path2 : null);
   }
   return result;
+}
+
+/**
+ * Get VirtualDJ's home folder. The value is cached.
+ * It's recommended you use this if you only need the home
+ * folder.
+ * @returns {string} - absolute path to VirtualDJ's home folder
+ */
+function getVDJHome() {
+  if ( !_rootFolder ) _rootFolder = getVDJFolders().homeFolder;
+  return _rootFolder
 }
 
 /**
@@ -95,7 +155,7 @@ function getIgnoredDrives() {
 
 /**
  * Loads a XML database file and parses it into objects (Song list).
- * @param {string} path - path to VirtualDJ (v8+) database.xml file
+ * @param {string} path - path to VirtualDJ (v8+) database.xml file, or XML as string.
  * @returns {null|Database} - if something went wrong, null is returned.
  */
 function loadDatabase(path) {
@@ -183,7 +243,7 @@ function getDrives(listAll = false, includeHome = true) {
     for(let drive of drives) {
       if ( drive.DeviceID === vdjRootShort ) {
         mainFolder = {
-          root  : vdjRoot,
+          root  : vdjRoot.toUpperCase(),
           folder: vdjHome,
           size  : drive.Size,
           free  : drive.FreeSpace,
@@ -203,7 +263,7 @@ function getDrives(listAll = false, includeHome = true) {
     .filter(drive => fs.existsSync(Path.join(drive.DeviceID, 'VirtualDJ', 'database.xml')))
     .map(drive => {
       return {
-        root  : utils.getRoot(Path.join(drive.DeviceID, 'VirtualDJ')),
+        root  : utils.getRoot(Path.join(drive.DeviceID, 'VirtualDJ')).toUpperCase(),
         folder: Path.join(drive.DeviceID, 'VirtualDJ'),
         size  : drive.Size,
         free  : drive.FreeSpace,
@@ -233,6 +293,29 @@ function getDrivePaths(listAll = false, includeHome = true) {
   return getDrives(listAll, includeHome).map(drive => drive.folder);
 }
 
+/**
+ * Get path string with absolute path to chosen folder or file. Folder type is
+ * a sub-folder of the system folder, such as "plugins64/", "backup/", "sampler/" etc.
+ *
+ * @param {FOLDER} folderType - folder to get path for. See the vdj.FOLDER enum.
+ * @returns {string} - absolute path to folder
+ */
+function getSubFolder(folderType) {
+  return Path.resolve(getVDJFolders().homeFolder, folderType);
+}
+
+/**
+ * Get path string with absolute path to chosen file. File type is
+ * a sub-file directly in the VirtualDJ system (docs) folder, such as "database.xml",
+ * "settings.xml" etc.
+ *
+ * @param {FILE} fileType - file to get path for. See the vdj.FILE enum.
+ * @returns {string} - absolute path to folder
+ */
+function getSubFile(fileType) {
+  return Path.resolve(getVDJFolders().homeFolder, fileType);
+}
+
 // Mac/PC ... kept here for evaluation
 function fromMacToPC() {
   // todo replace all paths (database, playlists etc.) and save to new folder
@@ -245,10 +328,15 @@ function fromPCToMac() {
 module.exports = {
   isRunning,
   getVDJFolders,
+  getVDJHome,
   getIgnoredDrives,
   loadDatabase,
   loadAllDatabases,
   loadPlaylist,
   getDrives,
-  getDrivePaths
+  getDrivePaths,
+  getSubFolder,
+  getSubFile,
+  FOLDER,
+  FILE
 };

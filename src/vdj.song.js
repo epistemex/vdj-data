@@ -10,6 +10,7 @@
 
 const Path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const utils = require('./utils');
 const Tags = require('./vdj.tags');
@@ -43,6 +44,8 @@ function Song(json = {}) {
   this.comment = utils.toStr(json.Comment);
   this.customMix = utils.toStr(json.CustomMix);
   this.link = json.Link ? utils.toStr(json.Link.Cover) : null;
+
+  this.hash = null;
 }
 
 /* -----------------------------------------------------------------------------
@@ -138,7 +141,7 @@ Song.prototype = {
     }
 
     //internal control
-    //console.log(`"${artist}"`, `"${title}"`, `"${remix}"`, `"${Path.basename(this.filePath)}"`);
+    //console.log(`"${artists}"`, `"${title}"`, `"${remix}"`, `"${Path.basename(this.filePath)}"`);
 
     if ( artist ) this.tags.artist = artist;
     if ( title ) this.tags.title = title;
@@ -152,7 +155,7 @@ Song.prototype = {
   /**
    * Produces a string based on given formatting. The default formatting is:
    *
-   *     %artist - %title (%remix)
+   *     %artists - %title (%remix)
    *
    * The information is extracted from the tags stored in the database. If a tag
    * is empty an empty string is returned.
@@ -161,7 +164,7 @@ Song.prototype = {
    *
    * Keywords that can be used:
    *
-   *     %artist
+   *     %artists
    *     %title
    *     %remix
    *     %year
@@ -177,10 +180,10 @@ Song.prototype = {
    *     %user1
    *     %user2
    *
-   * @param {string} [format="%artist - %title (%remix)"] - formatting string
+   * @param {string} [format="%artists - %title (%remix)"] - formatting string
    * @returns {string}
    */
-  toString: function(format = '%artist - %title (%remix)') {
+  toString: function(format = '%artists - %title (%remix)') {
     const regexp = /%artist|%title|%remix|%year|%album|%label|%trackNumber|%genre|%composer|%bpm|%key|%grouping|%stars|%user1|%user2/g;
     return format.replace(regexp, kw => this.tags[ kw.substr(1) ] || '').replace('()', '').trim();
   },
@@ -207,6 +210,28 @@ Song.prototype = {
 
   tagsToFilename: function(options) {
 
+  },
+
+  sortPOIs: function() {
+    this.pois = this.pois.sort((a, b) => {
+      return utils.eq(a.pos, b.pos) ? 0 : (a.pos < b.pos ? -1 : 1)
+    })
+  },
+
+  calcMD5Hash: function(max = -1) {
+    // todo consider different strategy only loading first 1 or 2 Mbs
+    max = max >>> 0;
+    if ( fs.existsSync(this.filePath) && fs.statSync(this.filePath).size < max ) {
+      try {
+        const hash = crypto.createHash('md5').update(fs.readFileSync(this.filePath)).digest('hex');
+        return this.hash = hash
+      }
+      catch(err) {
+        debug(err);
+        return this.hash = null
+      }
+    }
+    else return this.hash = null
   }
 
 };

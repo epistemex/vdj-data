@@ -19,7 +19,7 @@ const info = require('../package.json');
  * CAUTION: all files in destination will be overwritten! Use the optional
  * `dstPath` argument to test folder structure and content first.
  *
- * @param {string} zipPath - path to VirtualDJ or vdjdataapi zip file to restore.
+ * @param {string} zipPath - path to VirtualDJ or vdj-data zip file to restore.
  * @param {string} dstPath - path to restore to, Normally the home folder (getVDJFolders().homeFolder).
  * @returns {Promise<Boolean>}
  */

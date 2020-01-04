@@ -9,7 +9,7 @@
 'use strict';
 
 const drives = require('./sys32.drives');
-const { exec, execSync, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 /* *****************************************************************************
   REGISTRY
@@ -57,5 +57,7 @@ function getRegSync(key) {
 *******************************************************************************/
 
 module.exports = {
-  getRegSync, listDrivesSync: drives.listSync, driveType: drives.type
+  getRegSync,
+  listDrivesSync: drives.listSync,
+  driveType     : drives.type
 };

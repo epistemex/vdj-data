@@ -13,7 +13,9 @@ specific tasks that is not possible or easy to do within VirtualDJ itself.
 Prerequisites
 -------------
 
-You will need [Node.js](https://nodejs.org/en/) for this package.
+You will need [Node.js](https://nodejs.org/en/) v12+ (it may work with older
+versions, but this has not been tested) for this package.
+
 It is assumed you already know how to use Node.js and NPM if you plan to
 integrate this package with your software.
 
@@ -56,11 +58,8 @@ const vdj = require('vdj-data');
 Various ways to load and handle databases:
 
 ```javascript
-const path = require('path');
-
-// Get home folder of VirtualDJ
-const homeFolder = vdj.getVDJFolders().homeFolder;
-const mainDatabasePath = path.join(homeFolder, 'database.xml');
+// Get main VirtualDJ database.xml
+const mainDatabasePath = vdj.getSubFile(vdj.FILE.DATABASE);
 
 // Load and parse a single database
 const database = vdj.loadDatabase(mainDatabasePath);
@@ -88,7 +87,7 @@ Various ways using a database:
 database.songs.forEach(song => { /* do something with a song here */ });
 
 // search returning array of matching Song objects
-const results = database.search("talla world", {artist: true, title: true});
+const results = database.search("talla world", {artists: true, title: true});
 
 // load a song initializing path and size
 const song = database.loadSong('path/to/song.mp3');
@@ -120,10 +119,9 @@ Various ways using Song objects:
 const song = database.songs[0];
 
 // convert to strings
-const txt = song.toString();     // -> "artist - title (remix)"
-const tx7 = song.toString('%title - %artist (%remix) [%year]');
+const txt = song.toString();     // -> artists - title (remix)
+const tx7 = song.toString('%title - %artist [%remix] [%year]');
 
-// get artist, title and remix from filename:
 song.filenameToTag();
 
 // top-level information
@@ -201,7 +199,7 @@ created by VirtualDJ or via `backup()`.
 ```javascript
 // Caution: Will overwrite anything in its way...
 (async () => {
-  const homeFolder = vdj.getDrivePaths().homeFolder;
+  const homeFolder = vdj.getVDJHome();
   const status = await vdj.restore('path/to/backup.zip', homeFolder);
   //...
 })();

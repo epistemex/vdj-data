@@ -54,7 +54,7 @@ Cue.prototype = {
           duration = stamp2time(line.substr(line.lastIndexOf(' ') + 1).replace(/"/g, ''));
         }
       }
-      else if ( track && line.startsWith('PERFORMER ') ) {  // track artist
+      else if ( track && line.startsWith('PERFORMER ') ) {  // track artists
         track.artist = line.substr(line.indexOf(' ') + 1).replace(/"/g, '');
       }
       else if ( track && line.startsWith('INDEX ') ) {  // time stamp (VDJ seem to always set last segment to 00...)

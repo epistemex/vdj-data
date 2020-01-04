@@ -8,7 +8,6 @@
 
 'use strict';
 
-const Path = require('path');
 const fs = require('fs');
 const utils = require('./utils');
 const Song = require('./vdj.song');
@@ -189,7 +188,7 @@ Database.prototype = {
 
   /**
    * Search the database for keywords. Multiple keywords may be provided separated
-   * by a space. By default options has artist, title and remix from tags enabled.
+   * by a space. By default options has artists, title and remix from tags enabled.
    * @param {string} keywords - keyword or keywords separated with space
    * @param {*} [options] - options enable or disable fields to search in.
    * @returns []
@@ -277,11 +276,23 @@ Database.prototype = {
  * IMPORTANT: use the split() function to separate the database entries back to
  * single database files before saving!
  * @param {Array} list - list of Database objects
- * @param {Boolean} [clone=false] clone instead of reference each Song object.
+ * @param {*} [options={}] option object
+ * @param {boolean} [options.clone=false] clone each Song entry instead of referencing.
+ * Use this if you plan to make changes to Songs and don't want the changes applied
+ * to the original database objects.
+ * @param {boolean} [options.removeDuplicates=true] - when merging several database sources there
+ * is a risk of duplicate entries (if the ignoreDrive setting is ignored for example). This will
+ * parse through and remove any duplicate entries based on the file path to the song.
  */
-Database.merge = function(list, clone = false) {
+Database.merge = function(list, options = {}) {
   const mdb = new Database();
-  if ( clone ) {
+
+  options = Object.assign({
+    clone           : false,
+    removeDuplicates: true
+  }, options);
+
+  if ( options.clone ) {
     list.forEach(db => {
       db.songs.forEach(song => mdb.songs.push(new Song(song.toJSON())));
     });
@@ -289,6 +300,20 @@ Database.merge = function(list, clone = false) {
   else {
     list.forEach(db => {db ? mdb.songs.push(...db.songs) : null;});
   }
+
+  if ( options.removeDuplicates ) {
+    const temp = [];
+    for(let i = 0; i < this.songs.length - 1; i++) {
+      for(let t = i + 1; t < this.songs.length; t++) {
+        // todo there is a risk a path is relative to actual drive vs. network path to local disk and won't match... this will req. disk serial no. or hashing of content (slow) to determine.
+        if ( this.songs[ i ].filePath.toLowerCase() !== this.songs[ t ].filePath.toLowerCase() ) {
+          temp.push(this.songs[ i ]);
+        }
+      }
+    }
+    this.songs = temp;
+  }
+
   return mdb;
 };
 

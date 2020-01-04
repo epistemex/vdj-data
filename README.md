@@ -55,6 +55,9 @@ const vdj = require('vdj-data');
 // VDJ Data API can now be used ..
 ````
 
+(You can also use the newer import * from ... syntax - in a future refactoring the internal
+modules will likely move to this syntax to make bundling easier).
+
 Various ways to load and handle databases:
 
 ```javascript
@@ -161,7 +164,7 @@ const plMissing = pl.verifyPaths();
 const newPlaylist = pl.compile();
 ```
 
-Backup:
+**Backup**:
 
 Using backup will backup databases from all available VirtualDJ drives, playlists,
 folders, mappings, history, settings, samples etc. You can also define a custom
@@ -191,13 +194,13 @@ vdj
 })();
 ```
 
-Restore:
+**Restore**:
 
 Using restore will restore anything found in a zip backup file, whether it was
 created by VirtualDJ or via `backup()`. 
 
 ```javascript
-// Caution: Will overwrite anything in its way...
+// Caution: Will overwrite anything in its path...
 (async () => {
   const homeFolder = vdj.getVDJHome();
   const status = await vdj.restore('path/to/backup.zip', homeFolder);

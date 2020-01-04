@@ -285,7 +285,8 @@ Issues
 ------
 
 NOTE: The development is currently in ALPHA. The API may change without prior
-notice. Many features are not yet implemented.
+notice. Many features are not yet implemented. However, most of what you would
+need to read, write and maintain database information is ready for use.
 
 Known issues:
 

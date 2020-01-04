@@ -1,10 +1,16 @@
 vdj-data
 ========
 
-[![Made for VirtualDJ](https://i.imgur.com/4jQVHVi.png)](https://virtualdj.com/)
-
 Scripting engine for VirtualDJ to handle databases, playlists, cue files as
 well as backup and restore, path validation, cleaning and more.
+
+You can also use it to easily import to or export from VDJ into other software,
+databases. It has a built-in file tag extractor exposing extra data that
+can be converted automatically.
+
+Use it to build complex workflow and pipelines (e.g. automatic file format conversion,
+file/folder organizing, mass custom tagging, metadata extraction and syncing,
+interaction with external services and so forth).
 
 This package is a building block component that can be used to make software
 that handles VirtualDJ information, or simply to write quick scripts for
@@ -22,8 +28,9 @@ integrate this package with your software.
 While the package should theoretically run on any platform where Node.js can
 run, it has only been tested and developed (so far) on Windows. 
 
-It would also be a big advantage to have the VirtualDJ software installed.
-If you don't have already, you can use their free version [from here](https://virtualdj.com/download/index.html).
+It would also be an advantage to have the VirtualDJ software installed unless
+you just want to work directly with the database XML files. They have a free
+version that can be obtained on their web site.
 
 Install
 -------
@@ -55,8 +62,15 @@ const vdj = require('vdj-data');
 // VDJ Data API can now be used ..
 ````
 
-(You can also use the newer import * from ... syntax - in a future refactoring the internal
-modules will likely move to this syntax to make bundling easier).
+If you cloned the repo you would want to import the `index.js` file. Just make
+sure the relative or absolute path resolved to the file:
+
+```javascript
+// Import using demo folder
+const vdj = require('../index');
+
+// VDJ Data API can now be used ..
+````
 
 Various ways to load and handle databases:
 
@@ -285,5 +299,7 @@ License
 There is currently no license available. You may download and evaluate the package
 and use it in your personal non-commercial projects. Future licenses will be made
 available for personal as well as commercial use.
+
+Disclaimer: this project is unofficial and not affiliated with Atomix.
 
 (c) Silverspex 2019-2020

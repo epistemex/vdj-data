@@ -94,6 +94,7 @@ const merged = vdj.Database.merge(databases);
 const split = vdj.Database.split(merged);
 
 // Export a database back to disk as XML:
+// convert to XML - REMEMBER TO BACKUP YOUR DATA FIRST (see below)
 database.export(mainDatabasePath);
 ````
 

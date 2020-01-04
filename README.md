@@ -276,8 +276,6 @@ notice. Many features are not yet implemented.
 Known issues:
 
 - Possible issue with double encoded entities (e.g. "&amp;amp;amp;").
-- Documentation is currently incomplete.
-- Needs refactoring
 - Currently system calls (detection of folder paths etc.) only works with Windows.
 
 Feel free to use the issue tracker to report issues, feature requests.

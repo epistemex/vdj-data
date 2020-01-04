@@ -288,4 +288,4 @@ There is currently no license available. You may download and evaluate the packa
 and use it in your personal non-commercial projects. Future licenses will be made
 available for personal as well as commercial use.
 
-(c) Silverspex 2019
+(c) Silverspex 2019-2020

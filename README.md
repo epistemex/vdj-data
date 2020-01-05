@@ -42,11 +42,45 @@ Run the following command in CLI to install this package into your project:
 Development
 -----------
 
-To run demos or to create PRs, clone this repo using git in the current directory:
+This step is only needed if you'd like to run the demos, fix bugs (PRs) or browse
+around. You can alternatively download the demos manually. It requires a [git command](https://git-scm.com/downloads)
+installed on your system. CD into a root folder where you want to clone, and run:
 
     git clone https://github.com/silverspex/vdj-data.git
 
 Or SSH if you prefer. Then cd into `vdj-data/`.
+
+Real world usage
+----------------
+
+If you are new to Node.js development, here are a few tips to get you started. You
+will have to use the CLI, or command line during development.
+
+- Create a folder on your disk where you want to write and store your scripts.
+- CD into that folder via command line (cmd) and run `npm init -y` (Node.js must already
+be installed, see link above). This will create a `package.json` file in that folder.
+- Now install `vdj-data` from the command line: `npm i silverspex/vdj-data`
+- You are now ready to go. Go to [npmjs.com](https://www.npmjs.com/) to see other cool 
+packages you can optionally add to your project.
+
+Create your main JavaScript file:
+
+- Use a text editor, or run `touch index.js`, or your favorite IDE (VS Code, WebStorm etc.) to
+create the main `index.js` file (or name it whatever you want).
+- To import, write this line in your script: `const vdj = require('vdj-data);`
+- You are now ready to use vdj-data; see examples below to get you started.
+- To try, from command line run: `node .` (The dot indicates `index.js`, but you can use a
+file name if your main JS file is called something else).
+
+To turn this into a global command which can be run using the name you choose, look
+at the [NPM documentation](https://docs.npmjs.com/packages-and-modules/).
+
+If you don't like the command line, and since Node.js can be used as a web server,
+you can easily create a web based user interface, or use something like electron.js
+to build installable front-ends (make sure to read the license note below).
+
+Or just make simple singleton scripts if that's all you need that you can run from
+occasion to occasion. 
 
 Examples
 --------
@@ -62,11 +96,11 @@ const vdj = require('vdj-data');
 // VDJ Data API can now be used ..
 ````
 
-If you cloned the repo you would want to import the `index.js` file. Just make
-sure the relative or absolute path resolved to the file:
+If you only cloned the repo you would want to import the `index.js` file instead.
+Just make sure the relative or absolute path resolves to the index.js file:
 
 ```javascript
-// Import using demo folder
+// Import from the demo folder would look like this
 const vdj = require('../index');
 
 // VDJ Data API can now be used ..
@@ -291,7 +325,6 @@ need to read, write and maintain database information is ready for use.
 
 Known issues:
 
-- Possible issue with double encoded entities (e.g. "&amp;amp;amp;") in file names.
 - Currently system calls (detection of folder paths etc.) only works with Windows.
 
 Feel free to use the issue tracker to report issues, feature requests.

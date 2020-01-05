@@ -2,7 +2,7 @@
  *
  *  VDJ Data API
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
@@ -27,7 +27,7 @@ global.isMac = process.platform === 'darwin';
 const vdj = require('./src/vdj.js');
 
 module.exports = {
-  vdj,
+  //vdj,
   isRunning       : vdj.isRunning,
   getVDJFolders   : vdj.getVDJFolders,
   getVDJHome      : vdj.getVDJHome,

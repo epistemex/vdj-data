@@ -67,7 +67,7 @@ Create your main JavaScript file:
 
 - Use a text editor, or run `touch index.js`, or your favorite IDE (VS Code, WebStorm etc.) to
 create the main `index.js` file (or name it whatever you want).
-- To import, write this line in your script: `const vdj = require('vdj-data);`
+- To import, write this line in your script: `const vdj = require('vdj-data');`
 - You are now ready to use vdj-data; see examples below to get you started.
 - To try, from command line run: `node .` (The dot indicates `index.js`, but you can use a
 file name if your main JS file is called something else).

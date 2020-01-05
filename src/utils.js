@@ -196,6 +196,28 @@ function camelCase(s) {
   return s[ 0 ].toLowerCase() + s.substr(1);
 }
 
+/**
+ * Extract a meta tag object from a supported media file.
+ * If invalid path or unsupported type, a null is returned.
+ * @param path
+ * @returns {Promise<*|null>}
+ */
+async function getFileTags(path) {
+  const mm = require('music-metadata-browser');
+  let meta = null;
+  let rs;
+
+  try {
+    rs = fs.createReadStream(path);
+    meta = await mm.parseNodeStream(rs);
+  }
+  catch(err) {
+    debug(err)
+  }
+  if ( rs ) rs.close();
+  return meta
+}
+
 module.exports = {
   toEntities,
   fromEntities,
@@ -219,5 +241,6 @@ module.exports = {
   fnEncoder,
   readDirectory,
   readDirectoryRecursive,
-  camelCase
+  camelCase,
+  getFileTags
 };

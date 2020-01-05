@@ -2,7 +2,7 @@
  *
  *  Database object
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
@@ -78,24 +78,24 @@ Database.prototype = {
   },
 
   /**
-   * Loads a music or video file and attempt to extract tags information from it
-   * including bitrate and duration.
+   * Load a supported media file and attempts to extract tags information from it
+   * including bitrate and duration. A Song object is returned regardless, but
+   * in case or error a null is returned (invalid path, file type etc.).
    *
-   * @param {string} path - path to file
-   * @returns {Promise<Song>} - resolves with the initialized Song object
+   * @param {string} path - path to supported media file
+   * @returns {Promise<Song|null>} - resolves with the initialized Song object
    * @see loadSong()
    * @async
    */
   loadSongAndTags: async function(path) {
-    const mm = require('music-metadata-browser');
     const song = this.loadSong(path);
-    const rs = fs.createReadStream(path);
 
     try {
-      const meta = await mm.parseNodeStream(rs);
-      rs.close();
+      const meta = await utils.getFileTags(path);
+      if ( !meta ) return song;
 
       const info = meta.format;
+
       if ( info.bitrate ) {
         song.infos.bitrate = Math.round(info.bitrate * 0.001).toString();
       }
@@ -121,7 +121,6 @@ Database.prototype = {
       return song;
     }
     catch(err) {
-      rs.close();
       debug(err);
     }
 

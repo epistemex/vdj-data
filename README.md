@@ -219,16 +219,15 @@ const newPlaylist = pl.compile();
 Getting AcoustID fingerprints (Windows/Mac (latter untested)):
 
 ```javascript
-// import the utilities library
-const utils = require('src/utils');
+const vdj = require('vdj-data');
 
 // The resulting fingerprint can be used with AcoustID etc.
-const json = utils.getAudioFingerprint(pathToAudioFile);
+const json = vdj.utils.getAudioFingerprint(pathToAudioFile);
 console.log(json.fingerprint);    // AQADtEkyccoWCYmiF1P-DNeHY43xJvlxKsOTK0...
 console.log(json.duration);       // meta data
 
 // or raw integer values for your own database or lookups:
-const jsonRaw = utils.getAudioFingerprint(pathToAudioFile, true);  // request raw data
+const jsonRaw = vdj.utils.getAudioFingerprint(pathToAudioFile, true);  // request raw data
 console.log(jsonRaw.fingerprint); // [723947855, 1764135188, ... ]
 console.log(jsonRaw.duration);    // meta data
 ```

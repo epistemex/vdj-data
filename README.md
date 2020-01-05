@@ -214,15 +214,15 @@ const plMissing = pl.verifyPaths();
 const newPlaylist = pl.compile();
 ```
 
-**Audio Fingerprint (AudioID)**
+**Audio Fingerprint (AcoustID)**
 
-Getting AudioID fingerprints (Windows/Mac (latter untested)):
+Getting AcoustID fingerprints (Windows/Mac (latter untested)):
 
 ```javascript
 // import the utilities library
 const utils = require('src/utils');
 
-// The resulting fingerprint can be used with Musicbrainz, AudioId etc.
+// The resulting fingerprint can be used with AcoustID etc.
 const json = utils.getAudioFingerprint(pathToAudioFile);
 console.log(json.fingerprint);    // AQADtEkyccoWCYmiF1P-DNeHY43xJvlxKsOTK0...
 console.log(json.duration);       // meta data

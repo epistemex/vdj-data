@@ -218,6 +218,11 @@ async function getFileTags(path) {
   return meta
 }
 
+function getAudioFingerprint(path, raw = false) {
+  const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
+  return sys.getAudioFingerprint(path, raw)
+}
+
 module.exports = {
   toEntities,
   fromEntities,
@@ -242,5 +247,6 @@ module.exports = {
   readDirectory,
   readDirectoryRecursive,
   camelCase,
-  getFileTags
+  getFileTags,
+  getAudioFingerprint
 };

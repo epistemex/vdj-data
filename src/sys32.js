@@ -8,6 +8,7 @@
 
 'use strict';
 
+const Path = require('path');
 const drives = require('./sys32.drives');
 const { execFileSync } = require('child_process');
 
@@ -40,16 +41,23 @@ function getRegSync(key) {
       .map(line => line.trim().split('    '));
   }
 
-  function _execSync(cmd, args, timeout = 5) {
-    try {
-      return execFileSync(cmd, args, { timeout: timeout * 1000 });
-    }
-    catch {
-      return null;
-    }
-  }
-
   return result;
+}
+
+function getAudioFingerprint(audioPath, raw) {
+  const exePath = Path.join(__dirname, `../bin/${ process.platform }/fpcalc.exe`);
+  const args = [ '-json', audioPath ];
+  if ( raw ) args.push('-raw');
+  return JSON.parse(_execSync(exePath, args).toString());
+}
+
+function _execSync(cmd, args, timeout = 5) {
+  try {
+    return execFileSync(cmd, args, { timeout: timeout * 1000 });
+  }
+  catch {
+    return null;
+  }
 }
 
 /* *****************************************************************************
@@ -58,6 +66,7 @@ function getRegSync(key) {
 
 module.exports = {
   getRegSync,
+  getAudioFingerprint,
   listDrivesSync: drives.listSync,
   driveType     : drives.type
 };

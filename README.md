@@ -1,15 +1,15 @@
 vdj-data
 ========
 
-Scripting engine for VirtualDJ to handle databases, playlists, cue files as
-well as backup and restore, path validation, cleaning, calculate audio fingerprint
+Scripting engine for VirtualDJ to handle **databases**, **playlists**, **cue files** as
+well as **backup and restore**, **path validation**, **cleaning**, **calculate audio fingerprint**
 that can be used to find duplicates based on content, and more.
 
-You can also use it to easily import to or export from VDJ into other software,
-databases. It has a built-in file tag extractor exposing extra data that
+You can also use it to easily **import/export** to/from from VDJ into other software,
+databases. It has a built-in **file tag extractor** exposing extra data that
 can be converted automatically.
 
-Use it to build complex workflow and pipelines (e.g. automatic file format conversion,
+Use it to build **complex workflow and pipelines** (e.g. automatic file format conversion,
 file/folder organizing, mass custom tagging, metadata extraction and syncing,
 interaction with external services and so forth).
 

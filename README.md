@@ -2,7 +2,8 @@ vdj-data
 ========
 
 Scripting engine for VirtualDJ to handle databases, playlists, cue files as
-well as backup and restore, path validation, cleaning and more.
+well as backup and restore, path validation, cleaning, calculate audio fingerprint
+that can be used to find duplicates based on content, and more.
 
 You can also use it to easily import to or export from VDJ into other software,
 databases. It has a built-in file tag extractor exposing extra data that
@@ -65,7 +66,7 @@ packages you can optionally add to your project.
 
 Create your main JavaScript file:
 
-- Use a text editor, or run `touch index.js`, or your favorite IDE (VS Code, WebStorm etc.) to
+- Use a text editor, or run `touch index.js`, or your favorite IDE (VSCode, WebStorm etc.) to
 create the main `index.js` file (or name it whatever you want).
 - To import, write this line in your script: `const vdj = require('vdj-data');`
 - You are now ready to use vdj-data; see examples below to get you started.
@@ -211,6 +212,25 @@ const plMissing = pl.verifyPaths();
 
 // compile to string that can be saved as new playlist
 const newPlaylist = pl.compile();
+```
+
+**Audio Fingerprint (AudioID)**
+
+Getting AudioID fingerprints (Windows/Mac (latter untested)):
+
+```javascript
+// import the utilities library
+const utils = require('src/utils');
+
+// The resulting fingerprint can be used with Musicbrainz, AudioId etc.
+const json = utils.getAudioFingerprint(pathToAudioFile);
+console.log(json.fingerprint);    // AQADtEkyccoWCYmiF1P-DNeHY43xJvlxKsOTK0...
+console.log(json.duration);       // meta data
+
+// or raw integer values for your own database or lookups:
+const jsonRaw = utils.getAudioFingerprint(pathToAudioFile, true);  // request raw data
+console.log(jsonRaw.fingerprint); // [723947855, 1764135188, ... ]
+console.log(jsonRaw.duration);    // meta data
 ```
 
 **Backup**:

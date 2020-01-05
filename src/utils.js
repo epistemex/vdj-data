@@ -2,7 +2,7 @@
  *
  *  Utilities
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
@@ -10,7 +10,6 @@
 
 const fs = require('fs');
 const Path = require('path');
-//const he = require('he');
 
 const entityTable = {
   '&' : '&amp;',
@@ -32,44 +31,10 @@ const entityRX = new RegExp(`[${ Object.keys(entityTable).join('') }]`, 'g');
 const entityRXFrom = new RegExp(`&(${ Object.keys(entityTableFrom).join('|') });`, 'gi');
 
 function toEntities(kw) {
-  //return he.encode(kw, {useNamedReferences: true})
   return kw.replace(entityRX, w => entityTable[ w ]);
 }
 
 function fromEntities(kw) {
-  //  if (typeof kw === 'string') {
-  //    let start = 0;
-  //    let amp = kw.indexOf('&');
-  //    if (amp < 0) return kw;
-  //
-  //    let str = [kw.substring(0, amp)];
-  //
-  //    while(amp >= 0) {
-  //      const semi = kw.indexOf(';', start + 1);
-  //      if (semi < 0 || semi > 4) {
-  //        str.push(kw.substr(amp));
-  //        start = kw.length;
-  //      }
-  //      else {
-  //        const ent = kw.substring(amp + 1, semi);
-  //        const char = entityTableFrom[ent];
-  //        if (char) {
-  //          str.push(char);
-  //          start = semi + 1;
-  //        }
-  //        else {
-  //          start = semi + 1;
-  //          str.push('&', kw.substring(start, amp + 1));
-  //        }
-  //      }
-  //      amp = kw.indexOf('&', start);
-  //      if (amp < 0) str.push(kw.substr(start));
-  //      else str.push(kw.substring(start, amp))
-  //    }
-  //    return str.join('')
-  //  }
-  //  else return null;
-  //return he.decode(kw, {useNamedReferences: true})
   return kw ? kw.replace(entityRXFrom, (w, i) => entityTableFrom[ i ]) : null;
 }
 
@@ -104,21 +69,6 @@ function fromBool(b) {return b ? '1' : '0';}
 function toBPM(o) {return isDef(o) ? 1 / toFloat(o) * 60 : null;}
 
 function fromBPM(bpm) {return 1 / (bpm / 60);}
-
-function toColor(o) {
-  if ( isDef(o) ) {
-    const argb = o >>> 0;
-    return {
-      a: argb >>> 24,
-      r: argb >>> 16 & 0xff,
-      g: argb >>> 8 & 0xff,
-      b: argb & 0xff
-    };
-  }
-  else return null;
-}
-
-function fromColor(o) {return (o.a << 24 | o.r << 16 | o.g << 8 | o.b) >>> 0;}
 
 /**
  * Compare floating point numbers to be the same using epsilon margin.
@@ -261,8 +211,6 @@ module.exports = {
   fromBool,
   toBPM,
   fromBPM,
-  toColor,
-  fromColor,
   eq,
   lookupPaths,
   getRoot,

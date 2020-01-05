@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const Path = require('path');
+const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
 
 const entityTable = {
   '&' : '&amp;',
@@ -219,7 +220,6 @@ async function getFileTags(path) {
 }
 
 function getAudioFingerprint(path, raw = false) {
-  const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
   return sys.getAudioFingerprint(path, raw)
 }
 

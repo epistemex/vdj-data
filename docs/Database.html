@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getSubFile">getSubFile</a></li><li><a href="global.html#getSubFolder">getSubFolder</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
 				</ul>
 			</li>
 			
@@ -299,7 +299,7 @@ If no database object is given, a new empty database is created.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id=".merge"><span class="type-signature">&lt;static> </span>merge(list [, clone])</h4>
+    <h4 class="name" id=".merge"><span class="type-signature">&lt;static> </span>merge(list [, options])</h4>
     
     
 </dt>
@@ -385,13 +385,76 @@ single database files before saving!</p>
 
         <tr>
             
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>option object</p>
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
                 <td class="name"><code>clone</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">boolean</span>
 
 
 
@@ -418,7 +481,58 @@ single database files before saving!</p>
                 </td>
             
 
-            <td class="description last"><p>clone instead of reference each Song object.</p></td>
+            <td class="description last"><p>clone each Song entry instead of referencing.
+Use this if you plan to make changes to Songs and don't want the changes applied
+to the original database objects.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>removeDuplicates</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>when merging several database sources there
+is a risk of duplicate entries (if the ignoreDrive setting is ignored for example). This will
+parse through and remove any duplicate entries based on the file path to the song.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -1327,8 +1441,9 @@ This call will only initialize path and file size.</p>
 
     
     <div class="description">
-        <p>Loads a music or video file and attempt to extract tags information from it
-including bitrate and duration.</p>
+        <p>Load a supported media file and attempts to extract tags information from it
+including bitrate and duration. A Song object is returned regardless, but
+in case or error a null is returned (invalid path, file type etc.).</p>
     </div>
     
 
@@ -1380,7 +1495,7 @@ including bitrate and duration.</p>
 
             
 
-            <td class="description last"><p>path to file</p></td>
+            <td class="description last"><p>path to supported media file</p></td>
         </tr>
 
     
@@ -1464,7 +1579,7 @@ including bitrate and duration.</p>
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;<a href="Song.html">Song</a>></span>
+<span class="param-type">Promise.&lt;(<a href="Song.html">Song</a>|null)></span>
 
 
 
@@ -1648,7 +1763,7 @@ including bitrate and duration.</p>
     
     <div class="description">
         <p>Search the database for keywords. Multiple keywords may be provided separated
-by a space. By default options has artist, title and remix from tags enabled.</p>
+by a space. By default options has artists, title and remix from tags enabled.</p>
     </div>
     
 
@@ -2065,7 +2180,7 @@ path on removable drives etc. which may not be currently available.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Wed Nov 20th 2019
+		on Sun Jan 5th 2020
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

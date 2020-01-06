@@ -287,10 +287,10 @@ function compareFingerprints(fp1, fp2) {
  * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
  */
 function compareFingerprintsOffset(fp1, fp2, maxOffset) {
-  const _a = new Uint32Array(fp1.fingerprint);
-  const _b = new Uint32Array(fp2.fingerprint);
-  let a = _a.subarray(0);
-  let b = _b.subarray(0);
+  let a = new Uint32Array(fp1.fingerprint);
+  let b = new Uint32Array(fp2.fingerprint);
+  //  let a = _a.subarray(0);
+  //  let b = _b.subarray(0);
   let aSize = a.length;
   let bSize = b.length;
 
@@ -328,11 +328,13 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
 
   minSize = Math.min(aSize, bSize) & ~1;
   if ( topOffset < 0 ) {
-    b = _b.subarray(-topOffset);
+    //b = _b.subarray(-topOffset);
+    b = b.subarray(-topOffset);
     bSize = Math.max(0, bSize + topOffset);
   }
   else {
-    a = _a.subarray(topOffset);
+    //a = _a.subarray(topOffset);
+    a = a.subarray(topOffset);
     aSize = Math.max(0, aSize - topOffset);
   }
 

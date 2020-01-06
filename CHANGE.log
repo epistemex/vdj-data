@@ -1,10 +1,14 @@
 Change log for vdj-data
 -----------------------
 
+0.7.0-alpha
+-----------
+- Add: compareFingerprint() and compareFingerprintOffset() to match audio content (see getAudioFingerprint()
+
 0.6.0-alpha
 -----------
-- vdj.utils.getFileTags() will load raw tags object from a supported media file.
-- Audio fingerprinting (AcoustID) available via vdj.utils.getAudioFingerprint() for Windows/Mac
-- meta tagger updated to v2.0.0
+- Add: vdj.utils.getFileTags() will load raw tags object from a supported media file.
+- Add: Audio fingerprinting (AcoustID) available via vdj.utils.getAudioFingerprint() for Windows/Mac
+- Upd: meta tagger updated to v2.0.0
 
 (c) 2019-2020 silverspex

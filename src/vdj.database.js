@@ -249,11 +249,11 @@ Database.prototype = {
   },
 
   /**
-   * Export this instance as a database XML file that can be used by VirtualDJ.
+   * Write this instance as a database XML file that can be used by VirtualDJ.
    * @param {string} path - where the database file will be saved.
    * @returns {boolean}
    */
-  export: function(path) {
+  write: function(path) {
     try {
       fs.writeFileSync(path, this.toXML(), 'utf-8');
       return true;
@@ -262,6 +262,11 @@ Database.prototype = {
       debug(err);
       return false;
     }
+  },
+
+  // todo
+  writeStream: function(ws) {
+
   }
 };
 

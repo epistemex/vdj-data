@@ -46,6 +46,6 @@ db.songs.forEach(song => {
 
 console.log('Saving...');
 
-db.export(path);
+db.write(path);
 
 console.log(`Done. Cleaned ${ count } songs...`);

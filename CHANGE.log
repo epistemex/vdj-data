@@ -1,6 +1,11 @@
 Change log for vdj-data
 -----------------------
 
+0.7.1-alpha
+-----------
+- Chg: vdj.getSubFile() renamed to vdj.getFilePath()
+- Chg: vdj.getSubFolder() renamed to vdj.getFolderPath()
+
 0.7.0-alpha
 -----------
 - Add: compareFingerprint() and compareFingerprintOffset() to match audio content (see getAudioFingerprint()

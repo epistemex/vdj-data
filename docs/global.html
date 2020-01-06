@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getSubFile">getSubFile</a></li><li><a href="global.html#getSubFolder">getSubFolder</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFilePath">getFilePath</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getFolderPath">getFolderPath</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
 				</ul>
 			</li>
 			
@@ -2686,249 +2686,7 @@ this is optional. Set to false to ignore this drive (e.g. for backup()/restore()
             
 <hr>
 <dt>
-    <h4 class="name" id="getFileTags"><span class="type-signature">&lt;async> </span>getFileTags(path)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Extract a meta tag object from a supported media file.
-If invalid path or unsupported type, a null is returned.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>path</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;(*|null)></span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getIgnoredDrives"><span class="type-signature"></span>getIgnoredDrives()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Get non-ignored drive letters (Windows only for now).
-See settings ignoreDrives for details.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getSubFile"><span class="type-signature"></span>getSubFile(fileType)</h4>
+    <h4 class="name" id="getFilePath"><span class="type-signature"></span>getFilePath(fileType)</h4>
     
     
 </dt>
@@ -3084,7 +2842,150 @@ a sub-file directly in the VirtualDJ system (docs) folder, such as &quot;databas
             
 <hr>
 <dt>
-    <h4 class="name" id="getSubFolder"><span class="type-signature"></span>getSubFolder(folderType)</h4>
+    <h4 class="name" id="getFileTags"><span class="type-signature">&lt;async> </span>getFileTags(path)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Extract a meta tag object from a supported media file.
+If invalid path or unsupported type, a null is returned.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(*|null)></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getFolderPath"><span class="type-signature"></span>getFolderPath(folderType)</h4>
     
     
 </dt>
@@ -3223,6 +3124,105 @@ a sub-folder of the system folder, such as &quot;plugins64/&quot;, &quot;backup/
     <dd>
         
 <span class="param-type">string</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getIgnoredDrives"><span class="type-signature"></span>getIgnoredDrives()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get non-ignored drive letters (Windows only for now).
+See settings ignoreDrives for details.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
 
 
 

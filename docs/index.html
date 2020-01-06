@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getSubFile">getSubFile</a></li><li><a href="global.html#getSubFolder">getSubFolder</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFilePath">getFilePath</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getFolderPath">getFolderPath</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
 				</ul>
 			</li>
 			
@@ -95,8 +95,7 @@
     <section class="readme-section">
         <article><h1>vdj-data</h1>
 <p>Scripting engine for VirtualDJ to handle <strong>databases</strong>, <strong>playlists</strong>, <strong>cue files</strong> as
-well as <strong>backup and restore</strong>, <strong>path validation</strong>, <strong>cleaning</strong>, <strong>calculate audio fingerprint</strong>
-that can be used to find duplicates based on content, and more.</p>
+well as <strong>backup and restore</strong>, <strong>path validation</strong>, <strong>cleaning</strong>, <strong>calculate audio fingerprint</strong> that can be used to find duplicates based on content, [vdj sample files], [vdj folder files], [vdj filter files] and more.</p>
 <p>You can also use it to easily <strong>import/export</strong> to/from from VDJ into other software,
 databases. It has a built-in <strong>file tag extractor</strong> exposing extra data that
 can be converted automatically.</p>
@@ -107,15 +106,16 @@ interaction with external services and so forth).</p>
 that handles VirtualDJ information, or simply to write quick scripts for
 specific tasks that is not possible or easy to do within VirtualDJ itself.</p>
 <h2>Prerequisites</h2>
-<p>You will need <a href="https://nodejs.org/en/">Node.js</a> v12+ (it may work with older
-versions, but this has not been tested) for this package.</p>
-<p>It is assumed you already know how to use Node.js and NPM if you plan to
-integrate this package with your software.</p>
+<p>You need <a href="https://nodejs.org/en/">Node.js</a> v12+ installed for this package (it
+may work with older versions, but this has not been tested).</p>
+<p>It is assumed you're already familiar with how Node.js and NPM works if you plan
+to integrate this package with your software.</p>
 <p>While the package should theoretically run on any platform where Node.js can
 run, it has only been tested and developed (so far) on Windows.</p>
 <p>It would also be an advantage to have the VirtualDJ software installed unless
-you just want to work directly with the database XML files. They have a free
-version that can be obtained on their web site.</p>
+you just want to work directly with the VDJ database XML files. They have a free
+version that can be obtained on their web site. Tip: You are also able to create
+database files from scratch using only this package.</p>
 <h2>Install</h2>
 <p>Run the following command in CLI to install this package into your project:</p>
 <pre><code>npm i silverspex/vdj-data
@@ -126,15 +126,16 @@ around. You can alternatively download the demos manually. It requires a <a href
 installed on your system. CD into a root folder where you want to clone, and run:</p>
 <pre><code>git clone https://github.com/silverspex/vdj-data.git
 </code></pre>
-<p>Or SSH if you prefer. Then cd into <code>vdj-data/</code>.</p>
+<p>Then cd into <code>vdj-data/</code>.</p>
 <h2>Real world usage</h2>
 <p>If you are new to Node.js development, here are a few tips to get you started. You
-will have to use the CLI, or command line during development.</p>
+will have to use the CLI (the command line) during development.</p>
 <ul>
+<li>Make sure Node.js has been installed correctly.</li>
 <li>Create a folder on your disk where you want to write and store your scripts.</li>
-<li>CD into that folder via command line (cmd) and run <code>npm init -y</code> (Node.js must already
-be installed, see link above). This will create a <code>package.json</code> file in that folder.</li>
-<li>Now install <code>vdj-data</code> from the command line: <code>npm i silverspex/vdj-data</code></li>
+<li>CD into that folder via command line and run <code>npm init -y</code>. This will create a <code>package.json</code> file in that folder.</li>
+<li>Now install <code>vdj-data</code> from the command line: <code>npm i silverspex/vdj-data</code> which is
+added to the mentioned package.json above.</li>
 <li>You are now ready to go. Go to <a href="https://www.npmjs.com/">npmjs.com</a> to see other cool
 packages you can optionally add to your project.</li>
 </ul>
@@ -171,7 +172,7 @@ const vdj = require('../index');
 </code></pre>
 <p>Various ways to load and handle databases:</p>
 <pre class="prettyprint source lang-javascript"><code>// Get main VirtualDJ database.xml
-const mainDatabasePath = vdj.getSubFile(vdj.FILE.DATABASE);
+const mainDatabasePath = vdj.getFilePath(vdj.FILE.DATABASE);
 
 // Load and parse a single database
 const database = vdj.loadDatabase(mainDatabasePath);

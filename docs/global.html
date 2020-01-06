@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getSubFile">getSubFile</a></li><li><a href="global.html#getSubFolder">getSubFolder</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getSubFile">getSubFile</a></li><li><a href="global.html#getSubFolder">getSubFolder</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
 				</ul>
 			</li>
 			
@@ -1524,6 +1524,386 @@ Note that database.xml is handled separately.</p></td>
     <dd>
         
 <span class="param-type">Promise.&lt;boolean></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="compareFingerprints"><span class="type-signature"></span>compareFingerprints(fp1, fp2)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Compare and score two raw fingerprints. A score would be between 0.0 and 1.0; you
+could say &gt; 0.9 is a natch and below is not, but there are no absolutes here. The
+score represents likeliness of match only.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fp1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fingerprint 1 (raw version)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fp2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fingerprint 2 (raw version)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>score between 0.0 and 1.0 where higher is more likely a match</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="compareFingerprintsOffset"><span class="type-signature"></span>compareFingerprintsOffset(fp1, fp2, maxOffset)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Same as compareFingerprints() but with support for offset where offset can be
+two similar tracks where one starts a bit later than the other or similar cases.
+The max offset represents fingerprints indices.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fp1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fingerprint 1 (raw version)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fp2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fingerprint 2 (raw version)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxOffset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>offset in number of indices of the raw fingerprint array</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>score between 0.0 and 1.0 where higher is more likely a match</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
 
 
 

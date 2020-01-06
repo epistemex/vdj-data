@@ -265,6 +265,15 @@ function getAudioFingerprint(path, raw = false) {
   return sys.getAudioFingerprint(path, raw)
 }
 
+/**
+ * Compare and score two raw fingerprints. A score would be between 0.0 and 1.0; you
+ * could say > 0.9 is a natch and below is not, but there are no absolutes here. The
+ * score represents likeliness of match only.
+ *
+ * @param {*} fp1 - fingerprint 1 (raw version)
+ * @param {*} fp2 - fingerprint 2 (raw version)
+ * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
+ */
 function compareFingerprints(fp1, fp2) {
   let offset = 0; // for alignment
 
@@ -285,7 +294,15 @@ function compareFingerprints(fp1, fp2) {
 /*
   Based on: https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/acoustid_compare.c?at=master#cl-119
  */
-
+/**
+ * Same as compareFingerprints() but with support for offset where offset can be
+ * two similar tracks where one starts a bit later than the other or similar cases.
+ * The max offset represents fingerprints indices.
+ * @param {*} fp1 - fingerprint 1 (raw version)
+ * @param {*} fp2 - fingerprint 2 (raw version)
+ * @param {number} maxOffset - offset in number of indices of the raw fingerprint array
+ * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
+ */
 function compareFingerprintsOffset(fp1, fp2, maxOffset) {
   let a = new Uint32Array(fp1.fingerprint);
   let b = new Uint32Array(fp2.fingerprint);

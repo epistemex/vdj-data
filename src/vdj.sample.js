@@ -1,21 +1,217 @@
-/**************************************
+/* ************************************
  *
  *  VDJSample object
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
 'use strict';
 
 const fs = require('fs');
+const Path = require('path');
+const utils = require('./utils');
+const Color = require('./vdj.color');
+
+const trackModes = {
+  0: 'audio',
+  1: 'audio+video',
+  2: 'video'
+};
+
+const sampleModes = {
+  0: 'drop',
+  1: 'loop'
+};
+
+const loopModes = {
+  0: 'flat',
+  1: 'pitched',
+  2: 'sync-start',
+  3: 'sync-lock'
+};
+
+const keyMatchTypes = {
+  0: 'do not match',
+  1: 'match compatible key',
+  2: 'match exact key'
+};
 
 function VDJSample(path) {
-  const buffer = fs.readFileSync(path);
-  // magic = 0x56444A00
+  let buffer;
+  try {
+    buffer = fs.readFileSync(path)
+  }
+  catch {throw 'Could not load vdjsample from path.'}
 
+  this.path = path;
+  this.basename = Path.parse(path).name;
+
+  const view = new DataView(buffer.buffer);
+  let pos = 0;
+
+  // 0x00 uint32 = magic => 0x56444A00 ("VDJ\0")
+  const magic = getUint32();
+  if ( magic !== 0x4a4456 ) throw 'Not a VDJ sample file.';
+
+  // 0x04 uint8  = 0x3E/0x3F/0x20 = distributable/linked/embedded? (0x20 has no file path string).
+  this.type = getUint8();
+  // 0x05 uint8  = 0x03 version?
+  this.version = getUint8();
+  // 0x06 ..       version minors?
+  // 0x07 ..
+  skip(2);
+  // 0x08 uint32 = total header size incl. magic/version (= offset to audio data from start of file)
+  this.offset = getUint32();
+  // 0x0C uint32 = size of embedded media file, an image may follow (total size - (offset + media size))
+  this.mediaSize = getUint32();
+  this.thumbSize = buffer.length - (this.offset + this.mediaSize);
+
+  // 0x10 ..     = file type? (0 = audio, 1 = a+v, 2 = v only ?)
+  this.mediaType = getUint32();
+  this.mediaTypeDesc = trackModes[ this.mediaType ];
+
+  // 0x14 uint8  = TRACK: 0x00 = Audio, 0x01 = Audio+Video, 0x02 = Video
+  this.track = getUint8();
+  this.trackDesc = trackModes[ this.track ];
+  skip(3);
+
+  // 0x18 uint8  = MODE: 0x00 = Drop, 0x01 = Loop
+  this.mode = getUint8();
+  this.modeDesc = sampleModes[ this.mode ];
+  skip(3);
+
+  // 0x1C uint8  = LOOP MODE: 0x00 = Flat, 0x01 = Pitched, 0x02 = sync-start, 0x03 = Sync-Lock, DROP MODE: 0x00 = Flat, 0x01 = Pitched
+  this.dropLoop = getUint8();
+  this.dropLoopDesc = loopModes[ this.dropLoop ];
+  skip(3);
+
+  // 0x20 f32    = BPM ( 1 / bpm * 60 )
+  this.bpm = utils.toBPM(getFloat32());
+  // 0x24 f32    = beat grid offset
+  this.beatGridOffset = getFloat32();
+  // 0x28 f64    = range start time (abs) (seconds)
+  this.startTime = getFloat64();
+  // 0x30 f64    = range time
+  this.duration = getFloat64();
+  // 0x38 f64    = total time
+  this.totalDuration = getFloat64();
+  // 0x40 f64    = range end time (abs)
+  this.endTime = getFloat64();
+  // 0x48 f32    = gain (normalized, 1 = 100% - min: 0.0974999964237213, max: 3.70749998092651) => dB = 20 x log10(n)?
+  this.gain = getFloat32();
+  this.gainDb = this.gain === 0 ? 0 : 20 * Math.log10(this.gain);
+
+  // 0x4c uint8  = Blue (color to use for transparency)
+  // 0x4d uint8  = Green
+  // 0x4e uint8  = Red
+  // 0x4f uint8  = Alpha/Transparency (video)
+  this.transparencyColor = new Color(getUint32());
+  // 0x50 uint32 = ??
+  skip(4);
+  // 0x54 uint8  = Blue, related to color/mask/threshold? (range?)
+  // 0x55 uint8  = Green
+  // 0x56 uint8  = Red
+  // 0x57 uint8  = Alpha? always 0 (so far)
+  this._unknownColor = new Color(getUint32());
+  // 0x58 uint32 = ??
+  skip(4);
+  // 0x5c uint32 = ?? (changes when key is defined, or key matching is changed)
+  skip(4);
+  // 0x60 uint32 = Length of path string
+  const pathLength = getUint32();
+  // 0x64-0x6f.. = ??
+  skip(12);
+  // 0x70 uint8  = key: 0x10 = C, 0x11 = C#, 0x12 = D, etc. (alt. uint32)
+  const key = getUint8();
+  this.key = key ? key : null;
+  //this.keyNote  todo: note table
+  skip(3);
+  // 0x74 uint8  = key type: 0x00 = don't match key, 0x01 = match comp. key, 0x02 = match exact key (alt. uint32)
+  this.keyMatchType = getUint8();
+  this.keyMatchTypeDesc = keyMatchTypes[ this.keyMatchType ];
+  skip(3);
+
+  // 0x78 string = path to original source
+  this.path = '';
+  if ( pathLength ) {
+    for(let i = 0; i < pathLength; i++) {
+      const n = getUint8();
+      if ( !n ) break;
+      this.path += String.fromCharCode(n);
+    }
+  }
+
+  if ( pos !== this.offset ) {
+    // correct offset
+    pos = this.offset;
+    //throw 'Error: offset does not match data content. May be corrupt or type.';
+  }
+
+  const media = new Uint8Array(buffer.buffer);
+  this.media = media.slice(pos, (pos += this.mediaSize));
+  this.thumb = pos < buffer.length ? media.slice(pos) : null;
+
+  // todo only for now.. in some versions path is at end... (check when actual thumb is used)
+  if ( !this.path.length && pathLength && pathLength === this.thumbSize && this.thumb ) {
+    for(let i = 0; i < this.thumb.length; i++) {
+      this.path += String.fromCharCode(this.thumb[ i ]);
+    }
+    this.thumb = null;
+    this.thumbSize = 0;
+  }
+
+  function getUint8() {
+    return view.getUint8(pos++);
+  }
+
+  //  function getUint16() {
+  //    const v = view.getUint16(pos, true);
+  //    pos += 2;
+  //    return v
+  //  }
+
+  function getUint32() {
+    const v = view.getUint32(pos, true);
+    pos += 4;
+    return v
+  }
+
+  function getFloat32() {
+    const v = view.getFloat32(pos, true);
+    pos += 4;
+    return v
+  }
+
+  function getFloat64() {
+    const v = view.getFloat64(pos, true);
+    pos += 8;
+    return v
+  }
+
+  function skip(n) {pos += n}
 }
 
-VDJSample.prototype = {};
+VDJSample.prototype = {
+  _save: function(path, data) {
+    try {
+      fs.writeFileSync(path, data);
+      return true
+    }
+    catch(err) {
+      debug(err);
+      return false
+    }
+  },
+
+  saveMedia: function(path) {
+    return this._save(path, this.media);
+  },
+
+  saveThumb: function(path) {
+    return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
+  }
+
+};
 
 module.exports = VDJSample;

@@ -8,6 +8,7 @@
 
 'use strict';
 
+const Path = require('path');
 const fs = require('fs');
 const utils = require('./utils');
 const Song = require('./vdj.song');
@@ -293,7 +294,7 @@ Database.merge = function(list, options = {}) {
 
   options = Object.assign({
     clone           : false,
-    removeDuplicates: true
+    removeDuplicates: false
   }, options);
 
   if ( options.clone ) {
@@ -305,17 +306,21 @@ Database.merge = function(list, options = {}) {
     list.forEach(db => {db ? mdb.songs.push(...db.songs) : null;});
   }
 
+  // todo needs optimization
   if ( options.removeDuplicates ) {
     const temp = [];
-    for(let i = 0; i < this.songs.length - 1; i++) {
-      for(let t = i + 1; t < this.songs.length; t++) {
-        // todo there is a risk a path is relative to actual drive vs. network path to local disk and won't match... this will req. disk serial no. or hashing of content (slow) to determine.
-        if ( this.songs[ i ].filePath.toLowerCase() !== this.songs[ t ].filePath.toLowerCase() ) {
-          temp.push(this.songs[ i ]);
+    for(let i = 0; i < mdb.songs.length; i++) {
+      const song = mdb.songs[ i ];
+      let exists = false;
+      for(let t = i + 1; t < mdb.songs.length; t++) {
+        if ( mdb.songs[ i ].filePath.toLowerCase() === mdb.songs[ t ].filePath.toLowerCase() ) {
+          exists = true;
+          break;
         }
       }
+      if ( !exists ) temp.push(song);
     }
-    this.songs = temp;
+    mdb.songs = temp;
   }
 
   return mdb;
@@ -333,7 +338,7 @@ Database.split = function(db, useIgnoreDrives = true) {
   const mainFolder = vdj.getVDJFolders().homeFolder;
   const mainRoot = utils.getRoot(mainFolder).toUpperCase();
   const ignoreDrives = useIgnoreDrives ? vdj.getIgnoredDrives().join('') : '';
-  const mainDb = new Database(null, mainFolder);
+  const mainDb = new Database(null, Path.join(mainFolder, 'database.xml'));
   const dbs = [ mainDb ];
   const roots = [ mainRoot ];
 
@@ -344,7 +349,7 @@ Database.split = function(db, useIgnoreDrives = true) {
     const root = _hasRoot(utils.getRoot(song.filePath));
 
     if ( !roots.includes(root) ) {
-      dbs.push(new Database(null, root));
+      dbs.push(new Database(null, Path.join(root, 'VirtualDJ/database.xml')));
       roots.push(root);
     }
 

@@ -1,13 +1,13 @@
 vdj-data
 ========
 
-JavaScript based scripting engine for VirtualDJ&reg; data files.
+JavaScript based scripting engine for VirtualDJ data files.
 
 Features
 --------
 
 - Databases:
-    - Load, parse or create new database.xml files for VirtualDJ&reg;
+    - Load, parse or create new database.xml files for VirtualDJ
     - Merge, split databases respecting ignoreDrives (Windows) and available drives
     - Search for songs by title, artist etc, or by file path
     - Verify song paths
@@ -20,7 +20,7 @@ Features
     - Verify song path
     - Change and update any property (infos, tags, scan etc.)
     - Add, change or remove POIs
-    - Extract every tag from a supported media file
+    - Extract every tag from a supported media file (cover art, user tags, native tags etc.)
 - AcoustID (WIP)
     - Produce AcoustID audio fingerprint for audio content independent of filename, type or encoding.
     - Compare audio fingerprints to find duplicate songs.
@@ -32,25 +32,21 @@ Features
     - Extract and save out media data
     - Extract and save out thumb image (if present)
     - Change ranges, beatgrid, loop/drop modes etc.
-    - todo - Repair malformed samples
-    - todo - Create new samples from scratch
-    - todo - Export with modifications
+    - (todo) Repair malformed samples
+    - (todo) Create new samples from scratch
+    - (todo) Export with modifications
 - Folders
-    - todo - create and modify filter folders
-- VDJScript pre-processor
-    - todo - enable writing more clean scripts and compile them into VDJScript format.
-- MIDI
-    - todo (mapping file handler)
-    - todo (MIDI setup using the MIDI controller)
+    - (todo) create and modify virtual folders
+    - (todo) create and modify filter folders
 - CUE files:
     - Load and parse cue files
     - Convert to SRT, playlists for cloud services etc.
 - Import/Export:
-    - todo - Import Serato data from file tags
-    - todo - Export as Serato file tags
-- System utilities:
+    - (todo) Import Serato data from file tags
+    - (todo) Export as Serato file tags
+- System utilities (Windows only for now):
     - Get all drives with VDJ database on them
-    - Check if VirtualDJ&reg; is running.
+    - Check if VirtualDJ is running.
 - Backup, restore databases (as well as optionally settings, samples, plugins ) 
 - Windows and MacOS (the latter does not enjoy full support at this time regarding
 auto-detection of paths etc., but should work on data level once loaded manually).
@@ -63,8 +59,9 @@ interaction with external services and so forth).
 This package can also be a building block to make software handling VDJ information.
 You can easily build graphical front-ends using HTML and local server, or Electron etc.
 
-It's free for your personal use (private or professionally), but feel free to consider
-[donating](https://issuehunt.io/r/silverspex) to the project to keep it going.
+It's free for your personal use (private or professionally). There are no obligations,
+but feel free to consider [donating](https://issuehunt.io/r/silverspex/vdj-data) to the
+project to keep it going.
 
 Prerequisites
 -------------

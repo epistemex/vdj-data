@@ -5,6 +5,13 @@ Change log for vdj-data
 -----------
 - Chg: vdj.getSubFile() renamed to vdj.getFilePath()
 - Chg: vdj.getSubFolder() renamed to vdj.getFolderPath()
+- Chg: Database.prototype.export() renamed to Database.prototype.write() to better correlate with the Node.js API naming.
+- Chg: findDuplicates option in Database.merge() disabled by default.
+- Chg: raw fingerprint array is now Uint32Array() by default (instead of Array).
+- Add: support for parsing vdjsample files.
+- Imp: simple fingerprint matcher improved.
+- Fix: incorrect paths in each database object from Database.split()
+- Fix: incorrect use of `this` in Database.split()
 
 0.7.0-alpha
 -----------

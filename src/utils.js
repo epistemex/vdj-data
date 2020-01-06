@@ -12,34 +12,23 @@ const fs = require('fs');
 const Path = require('path');
 const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
 
-const { popcntTable8, popcntTable16 } = require('./acoustid');
+const { popcntTable16 } = require('./acoustid');
+//const { popcntTable8, popcntTable16 } = require('./acoustid');
 
 /*
   from AcoustID: fingerprint matcher settings
   https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/?at=master
 */
-const ACOUSTID_MAX_BIT_ERROR = 2;
-const ACOUSTID_MAX_ALIGN_OFFSET = 120;
-const ACOUSTID_QUERY_START = 80;
-const ACOUSTID_QUERY_LENGTH = 120;
-const ACOUSTID_QUERY_BITS = 28;
-const ACOUSTID_QUERY_MASK = (((1 << ACOUSTID_QUERY_BITS) - 1) << (32 - ACOUSTID_QUERY_BITS));
-const ACOUSTID_QUERY_STRIP = x => x & ACOUSTID_QUERY_MASK;
-
 const MATCH_BITS = 14;
 const MATCH_MASK = ((1 << MATCH_BITS) - 1);
 const MATCH_STRIP = x => x >> (32 - MATCH_BITS);
 
-const UNIQ_BITS = 16;
-const UNIQ_MASK = ((1 << MATCH_BITS) - 1);
-const UNIQ_STRIP = x => x >> (32 - MATCH_BITS); // todo same as MATCH_STRIP..
-
-function popCount8(i) {
-  return popcntTable8[ (i >>> 0) & 0xff ] + popcntTable8[ (i >>> 8) & 0xff ] + popcntTable8[ (i >>> 16) & 0xff ] + popcntTable8[ (i >>> 24) & 0xff ]
-}
+//function popCount8(i) {
+//  return popcntTable8[ (i >>> 0) & 0xff ] + popcntTable8[ (i >>> 8) & 0xff ] + popcntTable8[ (i >>> 16) & 0xff ] + popcntTable8[ (i >>> 24) & 0xff ]
+//}
 
 function popCount16(i) {
-  return popcntTable16[ i & 0xffff ] + popcntTable16[ i >> 16 ];
+  return popcntTable16[ i & 0xffff ] + popcntTable16[ i >>> 16 ];
 }
 
 const entityTable = {
@@ -267,7 +256,7 @@ function getAudioFingerprint(path, raw = false) {
 
 /**
  * Compare and score two raw fingerprints. A score would be between 0.0 and 1.0; you
- * could say > 0.9 is a natch and below is not, but there are no absolutes here. The
+ * could assume > 0.9 is a match and below is not, but there are no absolutes here. The
  * score represents likeliness of match only.
  *
  * @param {*} fp1 - fingerprint 1 (raw version)
@@ -275,20 +264,14 @@ function getAudioFingerprint(path, raw = false) {
  * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
  */
 function compareFingerprints(fp1, fp2) {
-  let offset = 0; // for alignment
-
-  if ( Math.abs(fp1.duration - fp2.duration) > 0.5 ) { // 0.5 for now, use a better method in final
-    // todo find offset
-  }
-
-  const len = Math.min(fp1.fingerprint.length, fp1.fingerprint.length) - offset;
+  const len = Math.min(fp1.fingerprint.length, fp1.fingerprint.length);
   let score = 0.0;
 
-  for(let i = offset; i < len; i++) {
-    score += popCount8(fp1.fingerprint[ i ] ^ fp2.fingerprint[ i ]);
+  for(let i = 0; i < len; i++) {
+    score += popCount16(fp1.fingerprint[ i ] ^ fp2.fingerprint[ i ]);
   }
 
-  return 1 - (score / (len - offset) / 32);
+  return 1 - (score / len / 32);
 }
 
 /*
@@ -304,8 +287,10 @@ function compareFingerprints(fp1, fp2) {
  * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
  */
 function compareFingerprintsOffset(fp1, fp2, maxOffset) {
-  let a = new Uint32Array(fp1.fingerprint);
-  let b = new Uint32Array(fp2.fingerprint);
+  const _a = new Uint32Array(fp1.fingerprint);
+  const _b = new Uint32Array(fp2.fingerprint);
+  let a = _a.subarray(0);
+  let b = _b.subarray(0);
   let aSize = a.length;
   let bSize = b.length;
 
@@ -343,11 +328,11 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
 
   minSize = Math.min(aSize, bSize) & ~1;
   if ( topOffset < 0 ) {
-    b = b.subarray(-topOffset);
+    b = _b.subarray(-topOffset);
     bSize = Math.max(0, bSize + topOffset);
   }
   else {
-    a = a.subarray(topOffset);
+    a = _a.subarray(topOffset);
     aSize = Math.max(0, aSize - topOffset);
   }
 
@@ -356,18 +341,18 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
     return 0.0
   }
 
-  seen[ 0 ] = UNIQ_MASK;
+  seen[ 0 ] = MATCH_MASK;
   for(i = 0; i < aSize; i++) {
-    let key = UNIQ_STRIP(a[ i ]);
+    let key = MATCH_STRIP(a[ i ]);
     if ( !seen[ key ] ) {
       aUniq++;
       seen[ key ] = 1;
     }
   }
 
-  seen[ 0 ] = UNIQ_MASK;
+  seen[ 0 ] = MATCH_MASK;
   for(i = 0; i < bSize; i++) {
-    let key = UNIQ_STRIP(b[ i ]);
+    let key = MATCH_STRIP(b[ i ]);
     if ( !seen[ key ] ) {
       bUniq++;
       seen[ key ] = 1;
@@ -381,7 +366,7 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
   }
 
   for(i = 0; i < size; i++) {
-    bitError += popCount8(a[ i ] ^ b[ i ]);
+    bitError += popCount16(a[ i ] ^ b[ i ]);
   }
 
   score = (size * 2.0 / minSize) * (1.0 - 2.0 * bitError / (32 * size));

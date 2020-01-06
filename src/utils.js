@@ -12,24 +12,16 @@ const fs = require('fs');
 const Path = require('path');
 const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
 
-const { popcntTable16 } = require('./acoustid');
-//const { popcntTable8, popcntTable16 } = require('./acoustid');
-
 /*
   from AcoustID: fingerprint matcher settings
   https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/?at=master
 */
+const ACOUSTID_MAX_BIT_ERROR = 2;
+const ACOUSTID_MAX_ALIGN_OFFSET = 120;
+
 const MATCH_BITS = 14;
 const MATCH_MASK = ((1 << MATCH_BITS) - 1);
-const MATCH_STRIP = x => x >> (32 - MATCH_BITS);
-
-//function popCount8(i) {
-//  return popcntTable8[ (i >>> 0) & 0xff ] + popcntTable8[ (i >>> 8) & 0xff ] + popcntTable8[ (i >>> 16) & 0xff ] + popcntTable8[ (i >>> 24) & 0xff ]
-//}
-
-function popCount16(i) {
-  return popcntTable16[ i & 0xffff ] + popcntTable16[ i >>> 16 ];
-}
+const MATCH_STRIP = x => x >>> (32 - MATCH_BITS);
 
 const entityTable = {
   '&' : '&amp;',
@@ -76,6 +68,7 @@ function toInt(o) {return isDef(o) ? parseInt(o, 10) : null;}
 function toFloat(o) {return isDef(o) ? parseFloat(o) : null;}
 
 function toStr(o) {return isDef(o) ? o : null;} // is decoded in XML parser (optional)
+
 function fromStr(o) {return typeof o === 'string' ? toEntities(o) : null;}
 
 function toDate(o) {return isDef(o) ? new Date(parseInt(o, 10) * 1000) : null;}
@@ -264,19 +257,35 @@ function getAudioFingerprint(path, raw = false) {
  * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
  */
 function compareFingerprints(fp1, fp2) {
-  const len = Math.min(fp1.fingerprint.length, fp1.fingerprint.length);
-  let score = 0.0;
+  // Based on: https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/acoustid_compare.c?at=master#cl-87
+  // MIT license - Copyright (C) 2010-2016 Lukas Lalinsky
+  const a = fp1.fingerprint;
+  const b = fp2.fingerprint;
 
-  for(let i = 0; i < len; i++) {
-    score += popCount16(fp1.fingerprint[ i ] ^ fp2.fingerprint[ i ]);
+  let numCounts = a.length + b.length + 1;
+  let counts = new Uint16Array(numCounts << 1);
+  let i, j, topCount;
+
+  for(i = 0; i < a.length; i++) {
+    const jBegin = Math.max(0, i - ACOUSTID_MAX_ALIGN_OFFSET);
+    const jEnd = Math.min(b.length, i + ACOUSTID_MAX_ALIGN_OFFSET);
+    for(j = jBegin; j < jEnd; j++) {
+      let bitError = bitCount(a[ i ] ^ b[ j ]);
+      if ( bitError <= ACOUSTID_MAX_BIT_ERROR ) {
+        let offset = i - j + b.length;
+        counts[ offset ]++;
+      }
+    }
   }
 
-  return 1 - (score / len / 32);
+  topCount = 0;
+  for(i = 0; i < numCounts; i++) {
+    if ( counts[ i ] > topCount ) topCount = counts[ i ];
+  }
+
+  return topCount / Math.min(a.length, b.length);
 }
 
-/*
-  Based on: https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/acoustid_compare.c?at=master#cl-119
- */
 /**
  * Same as compareFingerprints() but with support for offset where offset can be
  * two similar tracks where one starts a bit later than the other or similar cases.
@@ -287,8 +296,10 @@ function compareFingerprints(fp1, fp2) {
  * @returns {number} score between 0.0 and 1.0 where higher is more likely a match
  */
 function compareFingerprintsOffset(fp1, fp2, maxOffset) {
-  let a = new Uint32Array(fp1.fingerprint);
-  let b = new Uint32Array(fp2.fingerprint);
+  // Based on: https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/acoustid_compare.c?at=master#cl-119
+  // MIT license - Copyright (C) 2010-2016 Lukas Lalinsky
+  let a = fp1.fingerprint;
+  let b = fp2.fingerprint;
   //  let a = _a.subarray(0);
   //  let b = _b.subarray(0);
   let aSize = a.length;
@@ -368,7 +379,7 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
   }
 
   for(i = 0; i < size; i++) {
-    bitError += popCount16(a[ i ] ^ b[ i ]);
+    bitError += bitCount(a[ i ] ^ b[ i ]);
   }
 
   score = (size * 2.0 / minSize) * (1.0 - 2.0 * bitError / (32 * size));
@@ -379,6 +390,12 @@ function compareFingerprintsOffset(fp1, fp2, maxOffset) {
   }
 
   return score;
+}
+
+function bitCount(n) {
+  n = n - ((n >>> 1) & 0x55555555);
+  n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
+  return ((n + (n >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24;
 }
 
 module.exports = {

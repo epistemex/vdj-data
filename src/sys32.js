@@ -51,6 +51,7 @@ function getAudioFingerprint(audioPath, raw) {
   let json = null;
   try {
     json = JSON.parse(_execSync(exePath, args).toString());
+    json.fingerprint = new Uint32Array(json.fingerprint);
   }
   catch {}
   return json;

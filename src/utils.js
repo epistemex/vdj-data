@@ -12,6 +12,36 @@ const fs = require('fs');
 const Path = require('path');
 const sys = process.platform === 'win32' ? require('./sys32') : require('./sysOSX');
 
+const { popcntTable8, popcntTable16 } = require('./acoustid');
+
+/*
+  from AcoustID: fingerprint matcher settings
+  https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/?at=master
+*/
+const ACOUSTID_MAX_BIT_ERROR = 2;
+const ACOUSTID_MAX_ALIGN_OFFSET = 120;
+const ACOUSTID_QUERY_START = 80;
+const ACOUSTID_QUERY_LENGTH = 120;
+const ACOUSTID_QUERY_BITS = 28;
+const ACOUSTID_QUERY_MASK = (((1 << ACOUSTID_QUERY_BITS) - 1) << (32 - ACOUSTID_QUERY_BITS));
+const ACOUSTID_QUERY_STRIP = x => x & ACOUSTID_QUERY_MASK;
+
+const MATCH_BITS = 14;
+const MATCH_MASK = ((1 << MATCH_BITS) - 1);
+const MATCH_STRIP = x => x >> (32 - MATCH_BITS);
+
+const UNIQ_BITS = 16;
+const UNIQ_MASK = ((1 << MATCH_BITS) - 1);
+const UNIQ_STRIP = x => x >> (32 - MATCH_BITS); // todo same as MATCH_STRIP..
+
+function popCount8(i) {
+  return popcntTable8[ (i >>> 0) & 0xff ] + popcntTable8[ (i >>> 8) & 0xff ] + popcntTable8[ (i >>> 16) & 0xff ] + popcntTable8[ (i >>> 24) & 0xff ]
+}
+
+function popCount16(i) {
+  return popcntTable16[ i & 0xffff ] + popcntTable16[ i >> 16 ];
+}
+
 const entityTable = {
   '&' : '&amp;',
   '"' : '&quot;',
@@ -219,8 +249,132 @@ async function getFileTags(path) {
   return meta
 }
 
+/**
+ * Calculate a fingerprint for a given audio file. By default this produces
+ * a base-64 encoded compressed version which you can use with AcoustID's own
+ * web API services.
+ *
+ * You can however use the raw version to compare and find duplicates locally
+ * using the raw flag.
+ *
+ * @param {string} path - path to supported media file to fingerprint
+ * @param {boolean} [raw=false] - if true, output the raw uncompressed fingerprint as an array of 32-bit unsigned integers.
+ * @returns {*}
+ */
 function getAudioFingerprint(path, raw = false) {
   return sys.getAudioFingerprint(path, raw)
+}
+
+function compareFingerprints(fp1, fp2) {
+  let offset = 0; // for alignment
+
+  if ( Math.abs(fp1.duration - fp2.duration) > 0.5 ) { // 0.5 for now, use a better method in final
+    // todo find offset
+  }
+
+  const len = Math.min(fp1.fingerprint.length, fp1.fingerprint.length) - offset;
+  let score = 0.0;
+
+  for(let i = offset; i < len; i++) {
+    score += popCount8(fp1.fingerprint[ i ] ^ fp2.fingerprint[ i ]);
+  }
+
+  return 1 - (score / (len - offset) / 32);
+}
+
+/*
+  Based on: https://bitbucket.org/acoustid/acoustid-server/src/efb787c16ea1a0f6daf38611d12c85376d971b08/postgresql/acoustid_compare.c?at=master#cl-119
+ */
+
+function compareFingerprintsOffset(fp1, fp2, maxOffset) {
+  let a = new Uint32Array(fp1.fingerprint);
+  let b = new Uint32Array(fp2.fingerprint);
+  let aSize = a.length;
+  let bSize = b.length;
+
+  const numCounts = aSize + bSize + 1;
+  const counts = new Uint16Array(numCounts);
+
+  const aOffsets = new Uint16Array(MATCH_MASK << 1);
+  const bOffsets = aOffsets.subarray(MATCH_MASK);
+  const seen = new Uint8Array(aOffsets.buffer);
+
+  let i, topCount, topOffset, size, bitError = 0, minSize, aUniq = 0, bUniq = 0;
+  let score, diversity;
+
+  for(i = 0; i < aSize; i++) aOffsets[ MATCH_STRIP(a[ i ]) ] = i;
+  for(i = 0; i < bSize; i++) bOffsets[ MATCH_STRIP(b[ i ]) ] = i;
+
+  topCount = 0;
+  topOffset = 0;
+
+  for(i = 0; i < MATCH_MASK; i++) {
+    if ( aOffsets[ i ] && bOffsets[ i ] ) {
+      let offset = aOffsets[ i ] - bOffsets[ i ];
+      if ( maxOffset === 0 || (-maxOffset <= offset && offset <= maxOffset) ) {
+        offset += bSize;
+        counts[ offset ]++;
+        if ( counts[ offset ] > topCount ) {
+          topCount = counts[ offset ];
+          topOffset = offset;
+        }
+      }
+    }
+  }
+
+  topOffset -= bSize;
+
+  minSize = Math.min(aSize, bSize) & ~1;
+  if ( topOffset < 0 ) {
+    b = b.subarray(-topOffset);
+    bSize = Math.max(0, bSize + topOffset);
+  }
+  else {
+    a = a.subarray(topOffset);
+    aSize = Math.max(0, aSize - topOffset);
+  }
+
+  size = Math.min(aSize, bSize) * 0.5;
+  if ( !size || !minSize ) {
+    return 0.0
+  }
+
+  seen[ 0 ] = UNIQ_MASK;
+  for(i = 0; i < aSize; i++) {
+    let key = UNIQ_STRIP(a[ i ]);
+    if ( !seen[ key ] ) {
+      aUniq++;
+      seen[ key ] = 1;
+    }
+  }
+
+  seen[ 0 ] = UNIQ_MASK;
+  for(i = 0; i < bSize; i++) {
+    let key = UNIQ_STRIP(b[ i ]);
+    if ( !seen[ key ] ) {
+      bUniq++;
+      seen[ key ] = 1;
+    }
+  }
+
+  diversity = Math.min(Math.min(1.0, (aUniq + 10) / aSize + 0.5), Math.min(1.0, (bUniq + 10) / bSize + 0.5));
+
+  if ( topCount < Math.max(aUniq, bUniq) * 0.02 ) {
+    return 0.0
+  }
+
+  for(i = 0; i < size; i++) {
+    bitError += popCount8(a[ i ] ^ b[ i ]);
+  }
+
+  score = (size * 2.0 / minSize) * (1.0 - 2.0 * bitError / (32 * size));
+  if ( score < 0.0 ) score = 0.0;
+
+  if ( diversity < 1.0 ) {
+    score = Math.pow(score, 8.0 - 7.0 * diversity);
+  }
+
+  return score;
 }
 
 module.exports = {
@@ -248,5 +402,7 @@ module.exports = {
   readDirectoryRecursive,
   camelCase,
   getFileTags,
-  getAudioFingerprint
+  getAudioFingerprint,
+  compareFingerprints,
+  compareFingerprintsOffset
 };

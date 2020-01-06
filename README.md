@@ -20,18 +20,19 @@ specific tasks that is not possible or easy to do within VirtualDJ itself.
 Prerequisites
 -------------
 
-You will need [Node.js](https://nodejs.org/en/) v12+ (it may work with older
-versions, but this has not been tested) for this package.
+You need [Node.js](https://nodejs.org/en/) v12+ installed for this package (it 
+may work with older versions, but this has not been tested).
 
-It is assumed you already know how to use Node.js and NPM if you plan to
-integrate this package with your software.
+It is assumed you're already familiar with how Node.js and NPM works if you plan
+to integrate this package with your software.
 
 While the package should theoretically run on any platform where Node.js can
 run, it has only been tested and developed (so far) on Windows. 
 
 It would also be an advantage to have the VirtualDJ software installed unless
-you just want to work directly with the database XML files. They have a free
-version that can be obtained on their web site.
+you just want to work directly with the VDJ database XML files. They have a free
+version that can be obtained on their web site. Tip: You are also able to create
+database files from scratch using only this package.
 
 Install
 -------
@@ -49,18 +50,19 @@ installed on your system. CD into a root folder where you want to clone, and run
 
     git clone https://github.com/silverspex/vdj-data.git
 
-Or SSH if you prefer. Then cd into `vdj-data/`.
+Then cd into `vdj-data/`.
 
 Real world usage
 ----------------
 
 If you are new to Node.js development, here are a few tips to get you started. You
-will have to use the CLI, or command line during development.
+will have to use the CLI (the command line) during development.
 
+- Make sure Node.js has been installed correctly.
 - Create a folder on your disk where you want to write and store your scripts.
-- CD into that folder via command line (cmd) and run `npm init -y` (Node.js must already
-be installed, see link above). This will create a `package.json` file in that folder.
-- Now install `vdj-data` from the command line: `npm i silverspex/vdj-data`
+- CD into that folder via command line and run `npm init -y`. This will create a `package.json` file in that folder.
+- Now install `vdj-data` from the command line: `npm i silverspex/vdj-data` which is
+added to the mentioned package.json above.
 - You are now ready to go. Go to [npmjs.com](https://www.npmjs.com/) to see other cool 
 packages you can optionally add to your project.
 
@@ -111,7 +113,7 @@ Various ways to load and handle databases:
 
 ```javascript
 // Get main VirtualDJ database.xml
-const mainDatabasePath = vdj.getSubFile(vdj.FILE.DATABASE);
+const mainDatabasePath = vdj.getFilePath(vdj.FILE.DATABASE);
 
 // Load and parse a single database
 const database = vdj.loadDatabase(mainDatabasePath);

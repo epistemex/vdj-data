@@ -1,20 +1,70 @@
 vdj-data
 ========
 
-Scripting engine for VirtualDJ to handle **databases**, **playlists**, **cue files** as
-well as **backup and restore**, **path validation**, **cleaning**, **calculate audio fingerprint** that can be used to find duplicates based on content, [vdj sample files], [vdj folder files], [vdj filter files] and more.
+JavaScript based scripting engine for VirtualDJ&reg; data files.
 
-You can also use it to easily **import/export** to/from from VDJ into other software,
-databases. It has a built-in **file tag extractor** exposing extra data that
-can be converted automatically.
+Features
+--------
 
-Use it to build **complex workflow and pipelines** (e.g. automatic file format conversion,
+- Databases:
+    - Load, parse or create new database.xml files for VirtualDJ&reg;
+    - Merge, split databases respecting ignoreDrives (Windows) and available drives
+    - Search for songs by title, artist etc, or by file path
+    - Verify song paths
+    - Export as XML or JSON
+    - Import, export, update using scripting
+    - Remove duplicate paths
+- Songs:
+    - Parse, add, remove Song objects
+    - Load new songs from disk optionally including parsing tag information
+    - Verify song path
+    - Change and update any property (infos, tags, scan etc.)
+    - Add, change or remove POIs
+    - Extract every tag from a supported media file
+- AcoustID (WIP)
+    - Produce AcoustID audio fingerprint for audio content independent of filename, type or encoding.
+    - Compare audio fingerprints to find duplicate songs.
+- Playlists
+    - Load, update and create playlists (m3u)
+    - Validate song paths
+- VDJSample (WIP):
+    - Load VDJ samples
+    - Extract and save out media data
+    - Extract and save out thumb image (if present)
+    - Change ranges, beatgrid, loop/drop modes etc.
+    - todo - Repair malformed samples
+    - todo - Create new samples from scratch
+    - todo - Export with modifications
+- Folders
+    - todo - create and modify filter folders
+- VDJScript pre-processor
+    - todo - enable writing more clean scripts and compile them into VDJScript format.
+- MIDI
+    - todo (mapping file handler)
+    - todo (MIDI setup using the MIDI controller)
+- CUE files:
+    - Load and parse cue files
+    - Convert to SRT, playlists for cloud services etc.
+- Import/Export:
+    - todo - Import Serato data from file tags
+    - todo - Export as Serato file tags
+- System utilities:
+    - Get all drives with VDJ database on them
+    - Check if VirtualDJ&reg; is running.
+- Backup, restore databases (as well as optionally settings, samples, plugins ) 
+- Windows and MacOS (the latter does not enjoy full support at this time regarding
+auto-detection of paths etc., but should work on data level once loaded manually).
+
+You can use this from simple singleton scripts, or to make complex workflow and
+pipelines (e.g. automatic file format conversion, chart list playlist creation,
 file/folder organizing, mass custom tagging, metadata extraction and syncing,
 interaction with external services and so forth).
 
-This package is a building block component that can be used to make software
-that handles VirtualDJ information, or simply to write quick scripts for
-specific tasks that is not possible or easy to do within VirtualDJ itself.
+This package can also be a building block to make software handling VDJ information.
+You can easily build graphical front-ends using HTML and local server, or Electron etc.
+
+It's free for your personal use (private or professionally), but feel free to consider
+[donating](https://issuehunt.io/r/silverspex) to the project to keep it going.
 
 Prerequisites
 -------------
@@ -44,45 +94,17 @@ Development
 -----------
 
 This step is only needed if you'd like to run the demos, fix bugs (PRs) or browse
-around. You can alternatively download the demos manually. It requires a [git command](https://git-scm.com/downloads)
+around (you can alternatively download the demos manually). It requires a [git command](https://git-scm.com/downloads)
 installed on your system. CD into a root folder where you want to clone, and run:
 
     git clone https://github.com/silverspex/vdj-data.git
 
 Then cd into `vdj-data/`.
 
-Real world usage
-----------------
+New to Node development?
+------------------------
 
-If you are new to Node.js development, here are a few tips to get you started. You
-will have to use the CLI (the command line) during development.
-
-- Make sure Node.js has been installed correctly.
-- Create a folder on your disk where you want to write and store your scripts.
-- CD into that folder via command line and run `npm init -y`. This will create a `package.json` file in that folder.
-- Now install `vdj-data` from the command line: `npm i silverspex/vdj-data` which is
-added to the mentioned package.json above.
-- You are now ready to go. Go to [npmjs.com](https://www.npmjs.com/) to see other cool 
-packages you can optionally add to your project.
-
-Create your main JavaScript file:
-
-- Use a text editor, or run `touch index.js`, or your favorite IDE (VSCode, WebStorm etc.) to
-create the main `index.js` file (or name it whatever you want).
-- To import, write this line in your script: `const vdj = require('vdj-data');`
-- You are now ready to use vdj-data; see examples below to get you started.
-- To try, from command line run: `node .` (The dot indicates `index.js`, but you can use a
-file name if your main JS file is called something else).
-
-To turn this into a global command which can be run using the name you choose, look
-at the [NPM documentation](https://docs.npmjs.com/packages-and-modules/).
-
-If you don't like the command line, and since Node.js can be used as a web server,
-you can easily create a web based user interface, or use something like electron.js
-to build installable front-ends (make sure to read the license note below).
-
-Or just make simple singleton scripts if that's all you need that you can run from
-occasion to occasion. 
+See [this small write-up](./new-to-node-dev.md) to get you started.
 
 Examples
 --------
@@ -124,15 +146,20 @@ if (database) {
 const databases = vdj.loadAllDatabases();
 
 // Merge all databases into a single instance for simplified use:
+// NOTICE: these are STATIC methods on the Database object itself.
 const merged = vdj.Database.merge(databases);
 
 // Split them out using ignoreDrives (Windows) and available drives:
 const split = vdj.Database.split(merged);
 
+// NOTE: REMEMBER TO BACKUP YOUR DATA FIRST FOR THE FOLLOWING:
+
 // Export a database back to disk as XML:
-// convert to XML - REMEMBER TO BACKUP YOUR DATA FIRST (see below)
-database.export(mainDatabasePath);
-````
+database.write(mainDatabasePath);
+
+// write back the array of databases from loadAllDatabases() or split();
+split.forEach(db => db.write(db.path));
+```
 
 Various ways using a database:
 
@@ -142,6 +169,9 @@ database.songs.forEach(song => { /* do something with a song here */ });
 
 // search returning array of matching Song objects
 const results = database.search("talla world", {artists: true, title: true});
+
+// find a Song using a path:
+const songFromPath = database.findSongByPath('full/path/to/my/song.wav');
 
 // load a song initializing path and size
 const song = database.loadSong('path/to/song.mp3');
@@ -162,8 +192,11 @@ const oldSong2 = database.remove(7);
 // verify song paths - unavailable songs returned as an Array of Song objects:
 const unavailables = database.verifyPaths();
 
-// convert to XML - REMEMBER TO BACKUP YOUR DATA FIRST (see below)
+// convert to XML (string)
 const xml = database.toXML();
+
+// convert to JSON (object)
+const json = database.toJSON();
 ```
 
 Various ways using Song objects:
@@ -182,15 +215,23 @@ song.filenameToTag();
 const path = song.filePath;
 const size = song.fileSize;
 
-// using tags:
+// using tags (all fields from the db is available; just showing a couple in the examples):
 const artist = song.tags.artist;
 const title = song.tags.title;
+// ...
 
 // using infos
 const playCount = song.infos.playCount;
+// ...
 
 // using scan
 const bpm = song.scan.bpm;
+// ...
+
+// using POIs
+song.pois.forEach(poi => { /* do something with a POI */ });
+// or directly (here assuming there is one):
+const firstPoiPosition = song.pois[0].pos;
 
 // verify path
 const success = song.verifyPath();

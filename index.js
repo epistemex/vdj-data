@@ -17,8 +17,8 @@
 
 //global.DEBUG = true;
 
-global.debug = msg => {
-  if ( global.DEBUG ) console.log(msg);
+global.debug = function() {
+  if ( global.DEBUG ) console.log(...arguments);
 };
 
 global.isWin = process.platform === 'win32';
@@ -37,8 +37,8 @@ module.exports = {
   loadDatabase    : vdj.loadDatabase,
   loadAllDatabases: vdj.loadAllDatabases,
   loadPlaylist    : vdj.loadPlaylist,
-  getSubFolder    : vdj.getSubFolder,
-  getSubFile      : vdj.getSubFile,
+  getFolderPath   : vdj.getFolderPath,
+  getFilePath     : vdj.getFilePath,
   backup          : require('./src/vdj.backup'),
   restore         : require('./src/vdj.restore'),
   utils           : require('./src/utils'),

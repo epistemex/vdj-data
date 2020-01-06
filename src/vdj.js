@@ -300,7 +300,7 @@ function getDrivePaths(listAll = false, includeHome = true) {
  * @param {FOLDER} folderType - folder to get path for. See the vdj.FOLDER enum.
  * @returns {string} - absolute path to folder
  */
-function getSubFolder(folderType) {
+function getFolderPath(folderType) {
   return Path.resolve(getVDJFolders().homeFolder, folderType);
 }
 
@@ -312,7 +312,7 @@ function getSubFolder(folderType) {
  * @param {FILE} fileType - file to get path for. See the vdj.FILE enum.
  * @returns {string} - absolute path to folder
  */
-function getSubFile(fileType) {
+function getFilePath(fileType) {
   return Path.resolve(getVDJFolders().homeFolder, fileType);
 }
 
@@ -335,8 +335,8 @@ module.exports = {
   loadPlaylist,
   getDrives,
   getDrivePaths,
-  getSubFolder,
-  getSubFile,
+  getFolderPath,
+  getFilePath,
   FOLDER,
   FILE
 };

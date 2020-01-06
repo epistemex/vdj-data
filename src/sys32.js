@@ -48,7 +48,12 @@ function getAudioFingerprint(audioPath, raw) {
   const exePath = Path.join(__dirname, `../bin/${ process.platform }/fpcalc.exe`);
   const args = [ '-json', audioPath ];
   if ( raw ) args.push('-raw');
-  return JSON.parse(_execSync(exePath, args).toString());
+  let json = null;
+  try {
+    json = JSON.parse(_execSync(exePath, args).toString());
+  }
+  catch {}
+  return json;
 }
 
 function _execSync(cmd, args, timeout = 5) {

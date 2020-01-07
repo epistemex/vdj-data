@@ -67,7 +67,7 @@ function VDJSample(path) {
   this.offsetData = getUint32();                    // 0x08 - offset to data (or abs. header size)
   this.mediaSize = getUint32();                     // 0x0C
   this.mediaType = getUint32() & 0xff;              // 0x10
-  this.track = getUint32() & 0xff;                  // 0x14
+  this.tracks = getUint32() & 0xff;                 // 0x14
   this.mode = getUint32() & 0xff;                   // 0x18
   this.dropLoop = getUint32() & 0xff;               // 0x1C
   this.bpm = utils.toBPM(getFloat32());             // 0x20
@@ -105,7 +105,7 @@ function VDJSample(path) {
   /* ---  Utility props-------------------------------------------------------*/
 
   _getter('mediaTypeDesc', () => trackModes[ this.mediaType ]);
-  _getter('trackDesc', () => trackModes[ this.track ]);
+  _getter('tracksDesc', () => trackModes[ this.tracks ]);
   _getter('modeDesc', () => sampleModes[ this.mode ]);
   _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
@@ -194,8 +194,107 @@ VDJSample.prototype = {
   },
 
   compile: function(removePath = false) {
-    const pathLength = removePath ? 0 : this.path.length;
+    const te = new TextEncoder();
+    const txt = te.encode(this.path);
+    const pathLength = removePath ? 0 : txt.length;
+    const size = 0x78 + pathLength + this.mediaSize + this.thumbSize;
 
+    const data = new Uint8Array(size);
+    const view = new DataView(data.buffer);
+    let pos = 0;
+
+    /*
+      this.version = getUint32() / 100;                 // 0x04
+      this.offsetData = getUint32();                    // 0x08 - offset to data (or abs. header size)
+      this.mediaSize = getUint32();                     // 0x0C
+      this.mediaType = getUint32() & 0xff;              // 0x10
+      this.track = getUint32() & 0xff;                  // 0x14
+      this.mode = getUint32() & 0xff;                   // 0x18
+      this.dropLoop = getUint32() & 0xff;               // 0x1C
+      this.bpm = utils.toBPM(getFloat32());             // 0x20
+      this.beatGridOffset = getFloat32();               // 0x24
+      this.startTime = getFloat64();                    // 0x28
+      this.duration = getFloat64();                     // 0x30
+      this.totalDuration = getFloat64();                // 0x38
+      this.endTime = getFloat64();                      // 0x40 (abs. time)
+      this.gain = getFloat32();                         // 0x48
+      this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength in this case
+      pos += 4;                                         // 0x50 ??? video rel?
+      this.offsetThumb = getUint32();                   // 0x54
+      this.thumbSize = getUint32();                     // 0x58
+      this.offsetPath = getUint32();                    // 0x5C
+      const pathLength = getUint32();                   // 0x60
+      pos += 12;                                        // 0x64-0x6f ??? reserved?
+      const key = getUint32() & 0xff;                   // 0x70
+      this.keyMatchType = getUint32() & 0xff;           // 0x74
+     */
+    setUint32(0x4a4456);               // 0x00 magic "VDJ\0"
+    setUint32(830);                    // 0x04 version 8.3
+    setUint32(0x78 + pathLength);      // 0x08 abs. offset to data
+    setUint32(this.mediaSize);            // 0x0C media size
+    setUint32(this.mediaType);            // 0x10 media type
+    setUint32(this.tracks);               // 0x14 tracks
+    setUint32(this.mode);                 // 0x18 mode
+    setUint32(this.dropLoop);             // 0x1C
+    setFloat32(utils.fromBPM(this.bpm));  // 0x20
+    setFloat32(this.beatGridOffset);      // 0x24
+    setFloat64(this.startTime);           // 0x28
+    setFloat64(this.duration);            // 0x30
+    setFloat64(this.totalDuration);       // 0x38
+    setFloat64(this.endTime);             // 0x40
+    setFloat32(this.gain);                // 0x48
+    setUint32(this.transparencyColor.toNumber()); // 0x4C
+    pos += 4;                             // 0x50 ??
+    setUint32(this.thumbSize ? 0x78 + pathLength + this.mediaSize : 0);  // 0x54
+    setUint32(this.thumbSize);            // 0x58
+    setUint32(0x78);                   // 0x5C offset path
+    setUint32(pathLength);                // 0x60
+    pos += 12;
+    setUint32(this.key);                  // 0x70
+    setUint32(this.keyMatchType);         // 0x74
+
+    // copy path
+    if ( pathLength ) {
+      data.set(txt, pos);
+      pos += pathLength;
+    }
+
+    // copy media
+    data.set(this.media, pos);
+    pos += this.mediaSize;
+
+    // copy thumb
+    if ( this.thumbSize && this.thumb ) {
+      data.set(this.thumb, pos)
+    }
+
+    function setUint32(v) {
+      view.setUint32(pos, v, true);
+      pos += 4;
+    }
+
+    function setFloat32(v) {
+      view.setFloat32(pos, v, true);
+      pos += 4;
+    }
+
+    function setFloat64(v) {
+      view.setFloat64(pos, v, true);
+      pos += 8;
+    }
+
+    // done
+    return data
+  },
+
+  write: function(path) {
+    try {
+      fs.writeFileSync(path, this.compile())
+    }
+    catch(err) {
+      debug(err);
+      throw 'Could not save sample to path.'
+    }
   }
 
 };

@@ -82,7 +82,7 @@ function VDJSample(path) {
 
   // 0x0C uint32 = size of embedded media file, an image may follow (total size - (offset + media size))
   this.mediaSize = getUint32();
-  this.thumbSize = buffer.length - (this.offset + this.mediaSize);
+  //this.thumbSize = buffer.length - (this.offset + this.mediaSize);
 
   // 0x10 ..     = file type? (0 = audio, 1 = a+v, 2 = v only ?)
   this.mediaType = getUint8();
@@ -160,9 +160,6 @@ function VDJSample(path) {
 
   // 0x5C uint32 = offset to path string
   this.offsetPath = getUint32();
-
-  // 0x5c uint32 = ?? (changes when key is defined, or key matching is changed, could be bug ref. structure changes/shows in VDJ (PNG header in path name etc.))
-  skip(4);
 
   // 0x60 uint32 = Length of path string
   const pathLength = getUint32();

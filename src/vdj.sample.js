@@ -37,10 +37,12 @@ const keyMatchTypes = {
   2: 'match exact key'
 };
 
-const keys = { // todo non-confirmed enums mod=0xC (Problem for now 0x00 = no key set)
-  0x00: 'Am', 0x01: 'A#m', 0x02: 'Bm', 0x03: 'Cm', 0x04: 'C#m', 0x05: 'Dm', 0x06: 'Ebm', 0x07: 'Em', 0x08: 'Fm', 0x09: 'F#m', 0x0A: 'Gm', 0x0B: 'G#m'
-  //  0x0C: 'Am', 0x0D: 'A#m', 0x0F: 'Bm', 0x10: 'Cm', 0x11: 'C#m', 0x12: 'Dm', 0x13: 'Ebm', 0x14: 'Em', 0x15: 'Fm', 0x16: 'F#m', 0x17: 'Gm', 0x18: 'G#m',
-  //  0x19: 'Am', 0x1A: 'A#m', 0x1B: 'Bm', 0x1C: 'Cm', 0x1D: 'C#m', 0x1E: 'Dm', 0x1F: 'Ebm', 0x20: 'Em', 0x21: 'Fm', 0x22: 'F#m', 0x23: 'Gm', 0x24: 'G#m'
+const keys = {
+  0x00: null,
+  0x01: 'Am', 0x02: 'A#m', 0x03: 'Bm', 0x04: 'Cm', 0x05: 'C#m', 0x06: 'Dm',
+  0x07: 'Ebm', 0x08: 'Em', 0x09: 'Fm', 0x0A: 'F#m', 0x0B: 'Gm', 0x0C: 'G#m',
+  0x0D: 'A', 0x0E: 'A#', 0x0F: 'B', 0x10: 'C', 0x11: 'C#', 0x12: 'D',
+  0x13: 'D#', 0x14: 'E', 0x15: 'F', 0x16: 'F#', 0x17: 'G', 0x18: 'G#'
 };
 
 function VDJSample(path) {
@@ -89,35 +91,19 @@ function VDJSample(path) {
 
   const file = new Uint8Array(buffer.buffer);
 
-  this.path = '';
   if ( pathLength ) {
     try {
-      this.path = td.decode(file.subarray(pos, (pos += pathLength)));
+      this.path = td.decode(file.subarray(this.offsetPath, this.offsetPath + pathLength));
     }
     catch(err) {debug(err)}
   }
+  else this.path = '';
 
-  // correct offset?
-  if ( pos !== this.offsetData ) {
-    pos = this.offsetData;
-    debug('Had to correct offset', pos, this.offsetData)
-  }
+  this.media = file.slice(this.offsetData, this.offsetData + this.mediaSize);
+  this.thumb = this.offsetThumb && this.thumbSize ? file.slice(this.offsetThumb, this.offsetThumb + this.thumbSize) : null;
 
-  this.media = file.slice(pos, (pos += this.mediaSize));
-  this.thumb = pos < buffer.length ? file.slice(pos) : null; // todo can use offsetThumb instead
+  /* ---  Utility props-------------------------------------------------------*/
 
-  // todo only for now.. in some versions path is at end - presumed due to bugs... (check when actual thumb is used)
-  if ( !this.path.length && pathLength && pathLength === this.thumbSize && this.thumb ) {
-    try {
-      this.path = td.decode(this.thumb);
-    }
-    catch(err) {debug(err)}
-
-    this.thumb = null;
-    this.thumbSize = 0;
-  }
-
-  // Utility props
   _getter('mediaTypeDesc', () => trackModes[ this.mediaType ]);
   _getter('trackDesc', () => trackModes[ this.track ]);
   _getter('modeDesc', () => sampleModes[ this.mode ]);
@@ -125,7 +111,7 @@ function VDJSample(path) {
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
 
   Object.defineProperty(this, 'keyDesc', {
-    get: () => this.key > 0 ? keys[ this.key % 0xc ] : null  // todo untested
+    get: () => keys[ this.key ]
     //set: (key) ...
   });
 
@@ -133,6 +119,19 @@ function VDJSample(path) {
     get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
     set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
   });
+
+  /* ---  Error checking -----------------------------------------------------*/
+
+  this.error = null;
+
+  // Checks
+  if ( this.offsetThumb && this.offsetThumb === this.offsetPath ) {
+    this.error = 'WARNING: vdjsample may have corrupted path data.';
+    this.path = '';
+    this.offsetPath = 0x78;
+  }
+
+  /* ---  Helpers  -----------------------------------------------------------*/
 
   function getUint8() {return view.getUint8(pos++)}
 
@@ -175,7 +174,16 @@ VDJSample.prototype = {
     return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
   },
 
+  setMedia: function(path) {
+    // todo consider ffmpeg for conversion? (flac, ogg / mkv, hap, webm?)
+  },
+
+  setThumb: function(path) {
+    // png
+  },
+
   compile: function(removePath = false) {
+    const pathLength = removePath ? 0 : this.path.length;
 
   }
 

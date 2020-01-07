@@ -108,6 +108,29 @@ Playlist.prototype = {
   },
 
   /**
+   * Remove an entry based on index.
+   * @param {number} i = index to remove. If out of bound the index will be ignored.
+   * @returns {Playlist}
+   */
+  removeAt: function(i) {
+    if ( i >= 0 && i < Math.min(this.songs.length, this.entries.length) ) {
+      this.songs.splice(i, 1);
+      this.entries.splice(i, 1);
+    }
+    return this
+  },
+
+  /**
+   * Remove an entry based on Song object.
+   * @param {Song} song = song to remove.
+   * @returns {Playlist}
+   */
+  remove: function(song) {
+    const i = this.songs.indexOf(song);
+    return this.removeAt(i)
+  },
+
+  /**
    * Creates a list of entries that don't exist anymore.
    * @returns []
    */

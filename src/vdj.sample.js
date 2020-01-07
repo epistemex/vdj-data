@@ -87,7 +87,7 @@ function VDJSample(path) {
   const key = getUint32() & 0xff;                   // 0x70
   this.keyMatchType = getUint32() & 0xff;           // 0x74
 
-  this.key = key ? key : null;
+  this.key = Math.max(0, Math.min(0x18, key));
 
   const file = new Uint8Array(buffer.buffer);
 
@@ -111,8 +111,12 @@ function VDJSample(path) {
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
 
   Object.defineProperty(this, 'keyDesc', {
-    get: () => keys[ this.key ]
-    //set: (key) ...
+    get: () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
+    set: (key) => {
+      const i = Object.values(keys).indexOf(this._frmKey(key));
+      if ( i < 0 ) throw 'Invalid key';
+      this.key = i;
+    }
   });
 
   Object.defineProperty(this, 'gainDb', {
@@ -133,7 +137,7 @@ function VDJSample(path) {
 
   /* ---  Helpers  -----------------------------------------------------------*/
 
-  function getUint8() {return view.getUint8(pos++)}
+  //function getUint8() {return view.getUint8(pos++)}
 
   function getUint32() {
     const v = view.getUint32(pos, true);
@@ -155,6 +159,13 @@ function VDJSample(path) {
 }
 
 VDJSample.prototype = {
+  _frmKey: function(key) {
+    if ( key.length === 1 ) return key.toUpperCase();
+    else if ( key.length === 2 ) return key[ 0 ].toUpperCase() + key[ 1 ].toLowerCase();
+    else if ( key.length === 3 ) return key[ 0 ].toUpperCase() + key[ 1 ].toLowerCase() + key[ 2 ].toLowerCase();
+    else throw 'Invalid key length';
+  },
+
   _save: function(path, data) {
     try {
       fs.writeFileSync(path, data);

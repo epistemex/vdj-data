@@ -50,61 +50,38 @@ function VDJSample(path) {
   }
   catch {throw 'Could not load vdjsample from path.'}
 
+  const _getter = (name, get) => {Object.defineProperty(this, name, { get })};
+
   this.path = path;
   this.basename = Path.parse(path).name;
 
   const view = new DataView(buffer.buffer);
   let pos = 0;
 
-  // 0x00 uint32 = magic => 0x56444A00 ("VDJ\0")
+  // 0x00 uint32 = magic => 0x56444A00LE ("VDJ\0")
   const magic = getUint32();
   if ( magic !== 0x4a4456 ) throw 'Not a VDJ sample file.';
 
-  // 0x04 uint8  = 0x3E/0x3F/0x20 = distributable/linked/embedded? (0x20 has no file path string).
-  this.type = getUint8();
-  // 0x05 uint8  = 0x03 version?
-  this.version = getUint8();
-  // 0x06 ..       version minors?
-  // 0x07 ..
-  skip(2);
-  // 0x08 uint32 = offset to data
+  // 0x04 uint32  = version (8.00, 8.30 etc.)
+  this.version = getUint32() / 100;
+
+  // 0x08 uint32 = offset to data (or abs. header length)
   this.offsetData = getUint32();
 
   // 0x0C uint32 = size of embedded media file, an image may follow (total size - (offset + media size))
   this.mediaSize = getUint32();
-  //this.thumbSize = buffer.length - (this.offset + this.mediaSize);
 
-  // 0x10 ..     = file type? (0 = audio, 1 = a+v, 2 = v only ?)
-  this.mediaType = getUint8();
-  skip(3);
+  // 0x10 ..     = media type? (0 = audio, 1 = a+v, 2 = v only ?) bit mask?
+  this.mediaType = getUint32() & 0xff;
 
-  Object.defineProperty(this, 'mediaTypeDesc', {
-    get: () => trackModes[ this.mediaType ]
-  });
+  // 0x14 uint8  = Tracks used: 0x00 = Audio, 0x01 = Audio+Video, 0x02 = Video, bit mask?
+  this.track = getUint32() & 0xff;
 
-  // 0x14 uint8  = TRACK: 0x00 = Audio, 0x01 = Audio+Video, 0x02 = Video
-  this.track = getUint8();
-  skip(3);
+  // 0x18 uint8  = MODE: 0x00 = Drop, 0x01 = Loop, bit mask?
+  this.mode = getUint32() & 0xff;
 
-  Object.defineProperty(this, 'trackDesc', {
-    get: () => trackModes[ this.track ]
-  });
-
-  // 0x18 uint8  = MODE: 0x00 = Drop, 0x01 = Loop
-  this.mode = getUint8();
-  skip(3);
-
-  Object.defineProperty(this, 'modeDesc', {
-    get: () => sampleModes[ this.mode ]
-  });
-
-  // 0x1C uint8  = LOOP MODE: 0x00 = Flat, 0x01 = Pitched, 0x02 = sync-start, 0x03 = Sync-Lock, DROP MODE: 0x00 = Flat, 0x01 = Pitched
-  this.dropLoop = getUint8();
-  skip(3);
-
-  Object.defineProperty(this, 'dropLoopDesc', {
-    get: () => loopModes[ this.dropLoop ]
-  });
+  // 0x1C uint8  = LOOP MODE: 0x00 = Flat, 0x01 = Pitched, 0x02 = sync-start, 0x03 = Sync-Lock, DROP MODE: 0x00 = Flat, 0x01 = Pitched. Bit mask?
+  this.dropLoop = getUint32() & 0xff;
 
   // 0x20 f32    = BPM ( 1 / bpm * 60 )
   this.bpm = utils.toBPM(getFloat32());
@@ -127,11 +104,6 @@ function VDJSample(path) {
   // 0x48 f32    = gain (normalized, 1 = 100% - min: 0.0974999964237213, max: 3.70749998092651) => dB = 20 x log10(n)?
   this.gain = getFloat32();
 
-  Object.defineProperty(this, 'gainDb', {
-    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
-    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
-  });
-
   // 0x4c uint32  = BGRA (LE) => ARGB
   this.transparencyColor = new Color(getUint32());
 
@@ -153,38 +125,45 @@ function VDJSample(path) {
   // 0x64-0x6f.. = ??
   skip(12);
 
-  // 0x70 uint8  = key: 0x10 = C, 0x11 = C#, 0x12 = D, etc. (alt. uint32)
+  // 0x70 uint8  = key: 0x10 = Cm, 0x11 = C#, 0x12 = Dm, etc. (alt. uint32)
   const key = getUint8();
   this.key = key ? key : null;
-  skip(3); // may be a full uint32 - how knows..
+  skip(3);
+
+  // 0x74 uint8  = key type: 0x00 = don't match key, 0x01 = match comp. key, 0x02 = match exact key (alt. uint32). Bit mask?
+  this.keyMatchType = getUint32() & 0xff;
+
+  // Utility props
+  _getter('mediaTypeDesc', () => trackModes[ this.mediaType ]);
+  _getter('trackDesc', () => trackModes[ this.track ]);
+  _getter('modeDesc', () => sampleModes[ this.mode ]);
+  _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
+  _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
 
   Object.defineProperty(this, 'keyDesc', {
     get: () => this.key > 0 ? keys[ this.key % 0xc ] : null  // todo untested
     //set: (key) ...
   });
 
-  // 0x74 uint8  = key type: 0x00 = don't match key, 0x01 = match comp. key, 0x02 = match exact key (alt. uint32)
-  this.keyMatchType = getUint8();
-  skip(3); // may be a full uint32 - how knows..
-
-  Object.defineProperty(this, 'keyMatchTypeDesc', {
-    get: () => keyMatchTypes[ this.keyMatchType ]
+  Object.defineProperty(this, 'gainDb', {
+    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
+    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
   });
 
   // 0x78 string = path to original source
   this.path = '';
   if ( pathLength ) {
     for(let i = 0; i < pathLength; i++) {
-      const n = getUint8();
-      if ( !n ) break;
-      this.path += String.fromCharCode(n);
+      const code = getUint8();
+      if ( !code ) break;
+      this.path += String.fromCharCode(code);
     }
   }
 
-  if ( pos !== this.offset ) {
-    // correct offset
-    pos = this.offset;
-    //throw 'Error: offset does not match data content. May be corrupt or type.';
+  // correct offset?
+  if ( pos !== this.offsetData ) {
+    pos = this.offsetData;
+    debug('Had to correct offset', pos, this.offsetData)
   }
 
   const media = new Uint8Array(buffer.buffer);
@@ -194,19 +173,15 @@ function VDJSample(path) {
   // todo only for now.. in some versions path is at end - presumed due to bugs... (check when actual thumb is used)
   if ( !this.path.length && pathLength && pathLength === this.thumbSize && this.thumb ) {
     for(let i = 0; i < this.thumb.length; i++) {
-      this.path += String.fromCharCode(this.thumb[ i ]);
+      const code = this.thumb[ i ];
+      if ( !code ) break;
+      this.path += String.fromCharCode(code);
     }
     this.thumb = null;
     this.thumbSize = 0;
   }
 
   function getUint8() {return view.getUint8(pos++)}
-
-  //  function getUint16() {
-  //    const v = view.getUint16(pos, true);
-  //    pos += 2;
-  //    return v
-  //  }
 
   function getUint32() {
     const v = view.getUint32(pos, true);
@@ -227,7 +202,6 @@ function VDJSample(path) {
   }
 
   function skip(n) {pos += n}
-
 }
 
 VDJSample.prototype = {
@@ -248,6 +222,10 @@ VDJSample.prototype = {
 
   saveThumb: function(path) {
     return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
+  },
+
+  compile: function(removePath = false) {
+
   }
 
 };

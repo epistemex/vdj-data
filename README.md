@@ -272,6 +272,16 @@ for(let i = 0; i < 50; i++) {
 pl.write('path/to/random-playlist.m3u');
 ```
 
+TIP: to write to VDJ's playlist folder, obtain path this way:
+
+```javascript
+const path = require('path');
+const plPath = vdj.getFolderPath(vdj.FOLDER.PLAYLISTS);
+
+// Then merge and write:
+pl.write(path.join(plPath, 'random-playlist.m3u'));
+```
+
 **Audio Fingerprint (AcoustID)**
 
 Getting AcoustID fingerprints (Windows/Mac (latter untested)):

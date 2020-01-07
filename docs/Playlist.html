@@ -91,7 +91,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Playlist"><span class="type-signature"></span>new Playlist(path [, databaseList])</h4>
+    <h4 class="name" id="Playlist"><span class="type-signature"></span>new Playlist( [path] [, databaseList])</h4>
     
     
 </dt>
@@ -155,6 +155,8 @@ a Song list (property `songs').</p>
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -198,7 +200,8 @@ a Song list (property `songs').</p>
 
             
 
-            <td class="description last"><p>optional array containing database objects.</p></td>
+            <td class="description last"><p>optional array containing database objects.
+This is required for the <code>songs</code> array to be populated.</p></td>
         </tr>
 
     
@@ -284,7 +287,7 @@ a Song list (property `songs').</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="compile"><span class="type-signature"></span>compile( [usePaths])</h4>
+    <h4 class="name" id="add"><span class="type-signature"></span>add(song)</h4>
     
     
 </dt>
@@ -292,10 +295,8 @@ a Song list (property `songs').</p>
 
     
     <div class="description">
-        <p>Creates a playlist string that can be saved out as new playlist.
-NOTE: Tracks are based on Song list so if a track was not found in
-the database during parsing, it won't be included in the new playlist.
-Use the <code>usePath</code> option to use paths instead.</p>
+        <p>Add a Song object to the playlist. The method will make it initializes the
+entries and song arrays correctly.</p>
     </div>
     
 
@@ -318,11 +319,7 @@ Use the <code>usePath</code> option to use paths instead.</p>
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -334,13 +331,13 @@ Use the <code>usePath</code> option to use paths instead.</p>
 
         <tr>
             
-                <td class="name"><code>usePaths</code></td>
+                <td class="name"><code>song</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type"><a href="Song.html">Song</a></span>
 
 
 
@@ -348,26 +345,10 @@ Use the <code>usePath</code> option to use paths instead.</p>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
 
-            <td class="description last"><p>use paths to generate playlist instead of Song list.</p></td>
+            <td class="description last"><p>Song object to add</p></td>
         </tr>
 
     
@@ -427,6 +408,400 @@ Use the <code>usePath</code> option to use paths instead.</p>
     
 
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Playlist.html">Playlist</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="compile"><span class="type-signature"></span>compile()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a playlist string that can be saved out as new playlist.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove(song)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Remove an entry based on Song object.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>song</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Song.html">Song</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>= song to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Playlist.html">Playlist</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="removeAt"><span class="type-signature"></span>removeAt(i)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Remove an entry based on index.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>i</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>= index to remove. If out of bound the index will be ignored.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Playlist.html">Playlist</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -520,6 +895,134 @@ Use the <code>usePath</code> option to use paths instead.</p>
     
 </dd>
 
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="write"><span class="type-signature"></span>write(path)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Write current playlist to path in VDJ m3u compatible format.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>path, filename and m3u extension to save playlist to</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
         </dl>
     
 
@@ -576,7 +1079,7 @@ Use the <code>usePath</code> option to use paths instead.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Mon Jan 6th 2020
+		on Tue Jan 7th 2020
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

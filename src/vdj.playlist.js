@@ -19,7 +19,7 @@ const xml = require('./xml');
  * When a list of Database objects is provided, the playlist can be parsed into
  * a Song list (property `songs').
  *
- * @param {string} path - path to playlist, history list
+ * @param {string} [path] - path to playlist, history list
  * @param {Array} [databaseList] - optional array containing database objects.
  * This is required for the `songs` array to be populated.
  * @constructor

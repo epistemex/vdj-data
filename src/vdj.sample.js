@@ -37,6 +37,22 @@ const keyMatchTypes = {
   2: 'match exact key'
 };
 
+const notes = { // todo can possibly use modulo for different octaves
+                //0x06: '..',
+  0x10: 'C',
+  0x11: 'Cm',
+  0x12: 'D',
+  0x13: 'Dm',
+  0x14: 'E',
+  0x15: 'F',
+  0x16: 'Fm',
+  0x17: 'G',
+  0x18: 'Gm',
+  0x19: 'A',
+  0x1a: 'Am',
+  0x1b: 'B'
+};
+
 function VDJSample(path) {
   let buffer;
   try {
@@ -68,69 +84,103 @@ function VDJSample(path) {
   this.thumbSize = buffer.length - (this.offset + this.mediaSize);
 
   // 0x10 ..     = file type? (0 = audio, 1 = a+v, 2 = v only ?)
-  this.mediaType = getUint32();
-  this.mediaTypeDesc = trackModes[ this.mediaType ];
+  this.mediaType = getUint8();
+  skip(3);
+
+  Object.defineProperty(this, 'mediaTypeDesc', {
+    get: () => trackModes[ this.mediaType ]
+  });
 
   // 0x14 uint8  = TRACK: 0x00 = Audio, 0x01 = Audio+Video, 0x02 = Video
   this.track = getUint8();
-  this.trackDesc = trackModes[ this.track ];
   skip(3);
+
+  Object.defineProperty(this, 'trackDesc', {
+    get: () => trackModes[ this.track ]
+  });
 
   // 0x18 uint8  = MODE: 0x00 = Drop, 0x01 = Loop
   this.mode = getUint8();
-  this.modeDesc = sampleModes[ this.mode ];
   skip(3);
+
+  Object.defineProperty(this, 'modeDesc', {
+    get: () => sampleModes[ this.mode ]
+  });
 
   // 0x1C uint8  = LOOP MODE: 0x00 = Flat, 0x01 = Pitched, 0x02 = sync-start, 0x03 = Sync-Lock, DROP MODE: 0x00 = Flat, 0x01 = Pitched
   this.dropLoop = getUint8();
-  this.dropLoopDesc = loopModes[ this.dropLoop ];
   skip(3);
+
+  Object.defineProperty(this, 'dropLoopDesc', {
+    get: () => loopModes[ this.dropLoop ]
+  });
 
   // 0x20 f32    = BPM ( 1 / bpm * 60 )
   this.bpm = utils.toBPM(getFloat32());
+
   // 0x24 f32    = beat grid offset
   this.beatGridOffset = getFloat32();
+
   // 0x28 f64    = range start time (abs) (seconds)
   this.startTime = getFloat64();
+
   // 0x30 f64    = range time
   this.duration = getFloat64();
+
   // 0x38 f64    = total time
   this.totalDuration = getFloat64();
+
   // 0x40 f64    = range end time (abs)
   this.endTime = getFloat64();
+
   // 0x48 f32    = gain (normalized, 1 = 100% - min: 0.0974999964237213, max: 3.70749998092651) => dB = 20 x log10(n)?
   this.gain = getFloat32();
-  this.gainDb = this.gain === 0 ? 0 : 20 * Math.log10(this.gain);
+  //this.gainDb = this.gain === 0 ? 0 : 20 * Math.log10(this.gain);
+
+  Object.defineProperty(this, 'gainDb', {
+    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
+    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
+  });
 
   // 0x4c uint8  = Blue (color to use for transparency)
   // 0x4d uint8  = Green
   // 0x4e uint8  = Red
   // 0x4f uint8  = Alpha/Transparency (video)
   this.transparencyColor = new Color(getUint32());
+
   // 0x50 uint32 = ??
   skip(4);
-  // 0x54 uint8  = Blue, related to color/mask/threshold? (range?)
+
+  // 0x54 uint8  = Blue, related to color/mask/threshold? (range? color at all??)
   // 0x55 uint8  = Green
   // 0x56 uint8  = Red
   // 0x57 uint8  = Alpha? always 0 (so far)
   this._unknownColor = new Color(getUint32());
+
   // 0x58 uint32 = ??
   skip(4);
-  // 0x5c uint32 = ?? (changes when key is defined, or key matching is changed)
+  // 0x5c uint32 = ?? (changes when key is defined, or key matching is changed, could be bug ref. structure changes/shows in VDJ (PNG header in path name etc.))
   skip(4);
+
   // 0x60 uint32 = Length of path string
   const pathLength = getUint32();
+
   // 0x64-0x6f.. = ??
   skip(12);
+
   // 0x70 uint8  = key: 0x10 = C, 0x11 = C#, 0x12 = D, etc. (alt. uint32)
   const key = getUint8();
   this.key = key ? key : null;
   //this.keyNote  todo: note table
+
   skip(3);
   // 0x74 uint8  = key type: 0x00 = don't match key, 0x01 = match comp. key, 0x02 = match exact key (alt. uint32)
   this.keyMatchType = getUint8();
-  this.keyMatchTypeDesc = keyMatchTypes[ this.keyMatchType ];
   skip(3);
+
+  Object.defineProperty(this, 'keyMatchTypeDesc', {
+    get: () => keyMatchTypes[ this.keyMatchType ]
+  });
 
   // 0x78 string = path to original source
   this.path = '';
@@ -152,7 +202,7 @@ function VDJSample(path) {
   this.media = media.slice(pos, (pos += this.mediaSize));
   this.thumb = pos < buffer.length ? media.slice(pos) : null;
 
-  // todo only for now.. in some versions path is at end... (check when actual thumb is used)
+  // todo only for now.. in some versions path is at end - presumed due to bugs... (check when actual thumb is used)
   if ( !this.path.length && pathLength && pathLength === this.thumbSize && this.thumb ) {
     for(let i = 0; i < this.thumb.length; i++) {
       this.path += String.fromCharCode(this.thumb[ i ]);
@@ -161,9 +211,7 @@ function VDJSample(path) {
     this.thumbSize = 0;
   }
 
-  function getUint8() {
-    return view.getUint8(pos++);
-  }
+  function getUint8() {return view.getUint8(pos++)}
 
   //  function getUint16() {
   //    const v = view.getUint16(pos, true);
@@ -190,6 +238,7 @@ function VDJSample(path) {
   }
 
   function skip(n) {pos += n}
+
 }
 
 VDJSample.prototype = {

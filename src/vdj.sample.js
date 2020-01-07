@@ -77,8 +77,9 @@ function VDJSample(path) {
   // 0x06 ..       version minors?
   // 0x07 ..
   skip(2);
-  // 0x08 uint32 = total header size incl. magic/version (= offset to audio data from start of file)
-  this.offset = getUint32();
+  // 0x08 uint32 = offset to data
+  this.offsetData = getUint32();
+
   // 0x0C uint32 = size of embedded media file, an image may follow (total size - (offset + media size))
   this.mediaSize = getUint32();
   this.thumbSize = buffer.length - (this.offset + this.mediaSize);
@@ -151,14 +152,15 @@ function VDJSample(path) {
   // 0x50 uint32 = ??
   skip(4);
 
-  // 0x54 uint8  = Blue, related to color/mask/threshold? (range? color at all??)
-  // 0x55 uint8  = Green
-  // 0x56 uint8  = Red
-  // 0x57 uint8  = Alpha? always 0 (so far)
-  this._unknownColor = new Color(getUint32());
+  // 0x54 uint32  = offset to thumb, maybe 0 initially
+  this.offsetThumb = getUint32();
 
-  // 0x58 uint32 = ??
-  skip(4);
+  // 0x58 uint32  = size of thumb
+  this.thumbSize = getUint32();
+
+  // 0x5C uint32 = offset to path string
+  this.offsetPath = getUint32();
+
   // 0x5c uint32 = ?? (changes when key is defined, or key matching is changed, could be bug ref. structure changes/shows in VDJ (PNG header in path name etc.))
   skip(4);
 
@@ -200,7 +202,7 @@ function VDJSample(path) {
 
   const media = new Uint8Array(buffer.buffer);
   this.media = media.slice(pos, (pos += this.mediaSize));
-  this.thumb = pos < buffer.length ? media.slice(pos) : null;
+  this.thumb = pos < buffer.length ? media.slice(pos) : null; // todo can use offsetThumb instead
 
   // todo only for now.. in some versions path is at end - presumed due to bugs... (check when actual thumb is used)
   if ( !this.path.length && pathLength && pathLength === this.thumbSize && this.thumb ) {

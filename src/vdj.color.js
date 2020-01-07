@@ -10,11 +10,11 @@
 
 function Color(color) {
   const argb = color >>> 0;
-  this.color = color;
-  this.a = argb >>> 24;
   this.r = argb >>> 16 & 0xff;
   this.g = argb >>> 8 & 0xff;
   this.b = argb & 0xff;
+  this.a = argb >>> 24;
+  this.color = color;
 }
 
 Color.prototype = {

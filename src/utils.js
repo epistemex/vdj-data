@@ -398,6 +398,16 @@ function bitCount(n) {
   return ((n + (n >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24;
 }
 
+function loadFile(path, type) {
+  try {
+    return fs.readFileSync(path, type);
+  }
+  catch(err) {
+    debug(err);
+    return null
+  }
+}
+
 module.exports = {
   toEntities,
   fromEntities,
@@ -425,5 +435,6 @@ module.exports = {
   getFileTags,
   getAudioFingerprint,
   compareFingerprints,
-  compareFingerprintsOffset
+  compareFingerprintsOffset,
+  loadFile
 };

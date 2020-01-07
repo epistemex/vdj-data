@@ -46,6 +46,11 @@ const keys = {
 };
 
 function VDJSample(path) {
+
+  // todo: init with defaults if no path.
+  // todo: lock some fields as getters only (version etc.)
+  // todo: add some checks via setters (time range limits, modes/flags etc.)
+
   let buffer;
   try {
     buffer = fs.readFileSync(path)
@@ -203,31 +208,6 @@ VDJSample.prototype = {
     const view = new DataView(data.buffer);
     let pos = 0;
 
-    /*
-      this.version = getUint32() / 100;                 // 0x04
-      this.offsetData = getUint32();                    // 0x08 - offset to data (or abs. header size)
-      this.mediaSize = getUint32();                     // 0x0C
-      this.mediaType = getUint32() & 0xff;              // 0x10
-      this.track = getUint32() & 0xff;                  // 0x14
-      this.mode = getUint32() & 0xff;                   // 0x18
-      this.dropLoop = getUint32() & 0xff;               // 0x1C
-      this.bpm = utils.toBPM(getFloat32());             // 0x20
-      this.beatGridOffset = getFloat32();               // 0x24
-      this.startTime = getFloat64();                    // 0x28
-      this.duration = getFloat64();                     // 0x30
-      this.totalDuration = getFloat64();                // 0x38
-      this.endTime = getFloat64();                      // 0x40 (abs. time)
-      this.gain = getFloat32();                         // 0x48
-      this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength in this case
-      pos += 4;                                         // 0x50 ??? video rel?
-      this.offsetThumb = getUint32();                   // 0x54
-      this.thumbSize = getUint32();                     // 0x58
-      this.offsetPath = getUint32();                    // 0x5C
-      const pathLength = getUint32();                   // 0x60
-      pos += 12;                                        // 0x64-0x6f ??? reserved?
-      const key = getUint32() & 0xff;                   // 0x70
-      this.keyMatchType = getUint32() & 0xff;           // 0x74
-     */
     setUint32(0x4a4456);               // 0x00 magic "VDJ\0"
     setUint32(830);                    // 0x04 version 8.3
     setUint32(0x78 + pathLength);      // 0x08 abs. offset to data
@@ -287,9 +267,9 @@ VDJSample.prototype = {
     return data
   },
 
-  write: function(path) {
+  write: function(path, removePath = false) {
     try {
-      fs.writeFileSync(path, this.compile())
+      fs.writeFileSync(path, this.compile(removePath))
     }
     catch(err) {
       debug(err);

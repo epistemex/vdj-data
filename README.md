@@ -253,6 +253,25 @@ const plMissing = pl.verifyPaths();
 const newPlaylist = pl.compile();
 ```
 
+Create playlists from scratch:
+
+```javascript
+// Load and merge all available VDJ databases for this demo
+const db = vdj.Database.merge(vdj.loadAllDatabases());
+
+// Create an empty playlist
+const pl = new vdj.Playlist();
+
+// add some random tracks (any track type in this example)
+for(let i = 0; i < 50; i++) {
+  const t = (Math.random() * db.songs.length)|0;
+  pl.add(db.songs[t]);
+}
+
+// save out list - voila!
+pl.write('path/to/random-playlist.m3u');
+```
+
 **Audio Fingerprint (AcoustID)**
 
 Getting AcoustID fingerprints (Windows/Mac (latter untested)):

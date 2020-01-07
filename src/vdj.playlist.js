@@ -68,13 +68,8 @@ Playlist.prototype = {
 
   /**
    * Creates a playlist string that can be saved out as new playlist.
-   * NOTE: Tracks are based on Song list so if a track was not found in
-   * the database during parsing, it won't be included in the new playlist.
-   * Use the `usePath` option to use paths instead.
-   *
-   * @param {Boolean} [usePaths=false] use paths to generate playlist instead of Song list.
    */
-  compile: function(usePaths = false) {
+  compile: function() {
     const pl = [];
     this.entries.forEach(e => {
       e = JSON.parse(JSON.stringify(e));  // clone!
@@ -86,6 +81,21 @@ Playlist.prototype = {
     });
     pl.push('');
     return pl.join('\r\n');
+  },
+
+  /**
+   * Write current playlist to path in VDJ m3u compatible format.
+   * @param {string} path - path, filename and m3u extension to save playlist to
+   */
+  write: function(path) {
+    try {
+      const pl = this.compile();
+      fs.writeFileSync(path, pl, 'utf-8');
+    }
+    catch(err) {
+      debug(err);
+      throw 'Could not save playlist to this path.';
+    }
   },
 
   /**

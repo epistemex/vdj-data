@@ -21,6 +21,7 @@ const xml = require('./xml');
  *
  * @param {string} path - path to playlist, history list
  * @param {Array} [databaseList] - optional array containing database objects.
+ * This is required for the `songs` array to be populated.
  * @constructor
  */
 function Playlist(path, databaseList) {
@@ -85,6 +86,25 @@ Playlist.prototype = {
     });
     pl.push('');
     return pl.join('\r\n');
+  },
+
+  /**
+   * Add a Song object to the playlist. The method will make it initializes the
+   * entries and song arrays correctly.
+   * @param {Song} song - Song object to add
+   * @returns {Playlist}
+   */
+  add: function(song) {
+    this.songs.push(song);
+    this.entries.push({
+      path      : song.filePath,
+      filesize  : song.fileSize,
+      artist    : song.tags.artist,
+      title     : song.tags.title,
+      remix     : song.tags.remix,
+      songlength: song.infos.songLength
+    });
+    return this
   },
 
   /**

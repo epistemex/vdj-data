@@ -58,7 +58,14 @@ function compileTags(json) {
   const xml = [];
   Object.keys(json).forEach(key => {
     const str = json[ key ];
-    xml.push('<' + key + '>' + str.toString().replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</' + key + '>');
+    if ( str ) {
+      xml.push(`<${ key }>`
+        + str.toString()
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+        + `</${ key }>`
+      );
+    }
   });
   return xml.join('');
 }

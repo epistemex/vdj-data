@@ -1,7 +1,7 @@
 vdj-data
 ========
 
-JavaScript based scripting engine for VirtualDJ data files.
+JavaScript based scripting API for a variety of VirtualDJ data files.
 
 Features
 --------
@@ -256,16 +256,16 @@ const newPlaylist = pl.compile();
 Create playlists from scratch:
 
 ```javascript
-// Load and merge all available VDJ databases for this demo
-const db = vdj.Database.merge(vdj.loadAllDatabases());
+// Load and merge all available VDJ databases, and we only need the songs array:
+const songs = vdj.Database.merge(vdj.loadAllDatabases()).songs;
 
 // Create an empty playlist
 const pl = new vdj.Playlist();
 
-// add some random tracks (any track type in this example)
-for(let i = 0; i < 50; i++) {
-  const t = (Math.random() * db.songs.length)|0;
-  pl.add(db.songs[t]);
+// add 100 random tracks (any track type in this example)
+for(let i = 0; i < 100; i++) {
+  const t = (Math.random() * songs.length)|0;
+  pl.add(songs[t]);
 }
 
 // save out list - voila!

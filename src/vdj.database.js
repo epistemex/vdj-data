@@ -141,12 +141,21 @@ Database.prototype = {
   },
 
   /**
-   * Remove a Song from the database using either an index or a Song object.
-   * @param {Song|number} song - index or Song object to remove
+   * Remove a Song from the database using a Song object.
+   * @param {Song} song - Song object to remove. If out of range a null will be returned.
    * @returns {Song|null} the removed Song object, or null if out of range or not found
    */
   remove: function(song) {
-    let i = typeof song === 'number' ? song : this.songs.indexOf(song);
+    let i = this.songs.indexOf(song);
+    return this.removeAt(i);
+  },
+
+  /**
+   * Remove a Song from the database using an index.
+   * @param {number} i - index to remove. If out of range a null will be returned.
+   * @returns {Song|null} the removed Song object, or null if out of range or not found
+   */
+  removeAt: function(i) {
     return i >= 0 && i < this.songs.length ? this.songs.splice(i, 1)[ 0 ] : null;
   },
 

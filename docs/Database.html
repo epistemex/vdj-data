@@ -1456,7 +1456,7 @@ in case or error a null is returned (invalid path, file type etc.).</p>
 
     
     <div class="description">
-        <p>Remove a Song from the database using either an index or a Song object.</p>
+        <p>Remove a Song from the database using a Song object.</p>
     </div>
     
 
@@ -1498,8 +1498,160 @@ in case or error a null is returned (invalid path, file type etc.).</p>
             
                 
 <span class="param-type"><a href="Song.html">Song</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Song object to remove. If out of range a null will be returned.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>the removed Song object, or null if out of range or not found</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Song.html">Song</a></span>
 |
 
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="removeAt"><span class="type-signature"></span>removeAt(i)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Remove a Song from the database using an index.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>i</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">number</span>
 
 
@@ -1511,7 +1663,7 @@ in case or error a null is returned (invalid path, file type etc.).</p>
 
             
 
-            <td class="description last"><p>index or Song object to remove</p></td>
+            <td class="description last"><p>index to remove. If out of range a null will be returned.</p></td>
         </tr>
 
     

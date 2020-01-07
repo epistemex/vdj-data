@@ -184,7 +184,7 @@ database.add(songAndTags);
 const oldSong = database.remove(song);
 
 // remove a song using an index
-const oldSong2 = database.remove(7);
+const oldSong2 = database.removeAt(7);
 
 // verify song paths - unavailable songs returned as an Array of Song objects:
 const unavailables = database.verifyPaths();
@@ -312,8 +312,8 @@ const score = vdj.utils.compareFingerprints(fp1, fp2);
 console.log('Score:', score);
 console.log(score > 0.9 ? 'Likely a match.' : 'Unlikely a match.');
 
-// use matcher supporting offset
-const score2 = vdj.utils.compareFingerprintsOffset(fp1, fp2, 15);
+// use matcher supporting larger offsets (max offset)
+const score2 = vdj.utils.compareFingerprintsOffset(fp1, fp2, 200);
 //...
 ```
 You can use this in combination with for example a database to fingerprint all

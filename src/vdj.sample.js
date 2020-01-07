@@ -37,20 +37,10 @@ const keyMatchTypes = {
   2: 'match exact key'
 };
 
-const notes = { // todo can possibly use modulo for different octaves
-                //0x06: '..',
-  0x10: 'C',
-  0x11: 'Cm',
-  0x12: 'D',
-  0x13: 'Dm',
-  0x14: 'E',
-  0x15: 'F',
-  0x16: 'Fm',
-  0x17: 'G',
-  0x18: 'Gm',
-  0x19: 'A',
-  0x1a: 'Am',
-  0x1b: 'B'
+const keys = { // todo non-confirmed enums mod=0xC (Problem for now 0x00 = no key set)
+  0x00: 'Am', 0x01: 'A#m', 0x02: 'Bm', 0x03: 'Cm', 0x04: 'C#m', 0x05: 'Dm', 0x06: 'Ebm', 0x07: 'Em', 0x08: 'Fm', 0x09: 'F#m', 0x0A: 'Gm', 0x0B: 'G#m'
+  //  0x0C: 'Am', 0x0D: 'A#m', 0x0F: 'Bm', 0x10: 'Cm', 0x11: 'C#m', 0x12: 'Dm', 0x13: 'Ebm', 0x14: 'Em', 0x15: 'Fm', 0x16: 'F#m', 0x17: 'Gm', 0x18: 'G#m',
+  //  0x19: 'Am', 0x1A: 'A#m', 0x1B: 'Bm', 0x1C: 'Cm', 0x1D: 'C#m', 0x1E: 'Dm', 0x1F: 'Ebm', 0x20: 'Em', 0x21: 'Fm', 0x22: 'F#m', 0x23: 'Gm', 0x24: 'G#m'
 };
 
 function VDJSample(path) {
@@ -136,17 +126,13 @@ function VDJSample(path) {
 
   // 0x48 f32    = gain (normalized, 1 = 100% - min: 0.0974999964237213, max: 3.70749998092651) => dB = 20 x log10(n)?
   this.gain = getFloat32();
-  //this.gainDb = this.gain === 0 ? 0 : 20 * Math.log10(this.gain);
 
   Object.defineProperty(this, 'gainDb', {
     get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
     set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
   });
 
-  // 0x4c uint8  = Blue (color to use for transparency)
-  // 0x4d uint8  = Green
-  // 0x4e uint8  = Red
-  // 0x4f uint8  = Alpha/Transparency (video)
+  // 0x4c uint32  = BGRA (LE) => ARGB
   this.transparencyColor = new Color(getUint32());
 
   // 0x50 uint32 = ??
@@ -170,12 +156,16 @@ function VDJSample(path) {
   // 0x70 uint8  = key: 0x10 = C, 0x11 = C#, 0x12 = D, etc. (alt. uint32)
   const key = getUint8();
   this.key = key ? key : null;
-  //this.keyNote  todo: note table
+  skip(3); // may be a full uint32 - how knows..
 
-  skip(3);
+  Object.defineProperty(this, 'keyDesc', {
+    get: () => this.key > 0 ? keys[ this.key % 0xc ] : null  // todo untested
+    //set: (key) ...
+  });
+
   // 0x74 uint8  = key type: 0x00 = don't match key, 0x01 = match comp. key, 0x02 = match exact key (alt. uint32)
   this.keyMatchType = getUint8();
-  skip(3);
+  skip(3); // may be a full uint32 - how knows..
 
   Object.defineProperty(this, 'keyMatchTypeDesc', {
     get: () => keyMatchTypes[ this.keyMatchType ]

@@ -136,9 +136,9 @@
 <li>Extract and save out media data</li>
 <li>Extract and save out thumb image (if present)</li>
 <li>Change ranges, beatgrid, loop/drop modes etc.</li>
-<li>(todo) Repair malformed samples</li>
+<li>(partly) Repair malformed samples</li>
 <li>(todo) Create new samples from scratch</li>
-<li>(todo) Export with modifications</li>
+<li>Export with modifications</li>
 </ul>
 </li>
 <li>Folders
@@ -386,6 +386,19 @@ const score2 = vdj.utils.compareFingerprintsOffset(fp1, fp2, 200);
 your tracks, then run comparison between all to see the matching score between
 them and use that to determine if you should move/delete the one of less quality
 and so forth.</p>
+<p><strong>VDJSamples</strong></p>
+<p>You can load, modify and save new vdjsample files with vdj-data:</p>
+<pre class="prettyprint source lang-javascript"><code>const sample = new vdj.Sample('path/to/sample.vdjsample');
+
+// modify bpm:
+sample.bpm = 140;
+
+// modify range start to 2 sec.
+sample.startTime = 2.0;
+
+// compile and write back new sample:
+sample.write('path/to/new-sample.vdjsample');
+</code></pre>
 <p><strong>Backup</strong>:</p>
 <p>Using backup will backup databases from all available VirtualDJ drives, playlists,
 folders, mappings, history, settings, samples etc. You can also define a custom

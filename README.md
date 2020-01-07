@@ -32,9 +32,9 @@ Features
     - Extract and save out media data
     - Extract and save out thumb image (if present)
     - Change ranges, beatgrid, loop/drop modes etc.
-    - (todo) Repair malformed samples
+    - (partly) Repair malformed samples
     - (todo) Create new samples from scratch
-    - (todo) Export with modifications
+    - Export with modifications
 - Folders
     - (todo) create and modify virtual folders
     - (todo) create and modify filter folders
@@ -320,6 +320,23 @@ You can use this in combination with for example a database to fingerprint all
 your tracks, then run comparison between all to see the matching score between
 them and use that to determine if you should move/delete the one of less quality
 and so forth.
+
+**VDJSamples**
+
+You can load, modify and save new vdjsample files with vdj-data:
+
+```javascript
+const sample = new vdj.Sample('path/to/sample.vdjsample');
+
+// modify bpm:
+sample.bpm = 140;
+
+// modify range start to 2 sec.
+sample.startTime = 2.0;
+
+// compile and write back new sample:
+sample.write('path/to/new-sample.vdjsample');
+```
 
 **Backup**:
 

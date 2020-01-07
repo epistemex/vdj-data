@@ -1,6 +1,16 @@
 Change log for vdj-data
 -----------------------
 
+0.8.0-alpha
+-----------
+- Add: Can parse, compile and save VDJSamples
+- Add: Exposing Sample object on main vdj instance
+- Add: add() method to Playlist to correctly initialize entries/songs
+- Add: remove() and removeAt() for Playlists
+- Add: write() for Playlists
+- Add: Database.prototype.removeAt() to remove song using index.
+- Chg: Database.prototype.remove() now only takes a Song object.
+
 0.7.1-alpha
 -----------
 - Chg: vdj.getSubFile() renamed to vdj.getFilePath()

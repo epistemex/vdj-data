@@ -253,58 +253,52 @@ VDJSample.prototype = {
     let json;
 
     try {
-      const jStr = result.output.toString(); //.replace(/^[,\s]+{|}[,\s]$/g, '');
+      const jStr = result.output.toString();
       json = JSON.parse(jStr.substring(jStr.indexOf('{'), jStr.lastIndexOf('}') + 1).trim());
     }
     catch(err) {
       debug(err);
-      throw 'Unable to parse output as JSON.';
+      throw 'Unable to parse metadata as JSON.';
+    }
+
+    // check for stream types
+    let hasVideo = false;
+    let hasAudio = false;
+    json.streams.forEach(s => {
+      if ( s.codec_type === 'audio' ) hasAudio = true;
+      else if ( s.codec_type === 'video' ) hasVideo = true;
+    });
+
+    if ( !hasAudio && !hasVideo ) {
+      throw 'Media file contains no supported A/V streams.'
     }
 
     // convert input
-    const ext = Path.parse(path).ext.toLowerCase();
-    const isAudio = [ '.wav', '.mp3', '.aac', '.flac', '.aif', '.aiff', '.m4a', '.ogg' ].includes(ext);
-    const isVideo = [ '.mp4', '.m4v', '.mkv', '.mpg', '.mpeg', '.avi', '.webm', '.ogv', '.mov' ].includes(ext);
-
-    if ( !isAudio && !isVideo ) {
-      throw 'Unsupported format.'
-    }
-
-    // todo output to stdout and use buffer from there
-
-    let rndFilename = Path.join(Path.parse(path).dir, Math.random().toString().substr(1));
-    if ( isAudio ) {
+    if ( hasAudio && !hasVideo ) {
       if ( nonLossy ) {
-        rndFilename += '.flac';
-        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-sample_fmt', 's16', '-ar', '44100', rndFilename ], { maxBuffer: 1 << 22 });
+        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-sample_fmt', 's16', '-ar', '44100', '-f', 'flac', '-' ], { maxBuffer: 1 << 22 });
       }
       else {
-        rndFilename += '.ogg';
-        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-c:a', 'libvorbis', '-b:a', '192k', rndFilename ], { maxBuffer: 1 << 22 });
+        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-c:a', 'libvorbis', '-b:a', '192k', '-f', 'ogg', '-' ], { maxBuffer: 1 << 22 });
       }
       this.mediaType = 0;
       this.tracks = 0;
     }
     else {
-      let hasVideo = false;
-      let hasAudio = false;
-      json.streams.forEach(s => {
-        if ( s.codec_type === 'audio' ) hasAudio = true;
-        else if ( s.codec_type === 'video' ) hasVideo = true;
-      });
-
-      const vp = hasVideo ? (hasAudio ? [ '-c:v', 'libx264' ] : [ '-c:v', 'hap', '-format', 'hap_alpha' ]) : [];
+      // could use h264_nvenc on Nvidia/Cuda enabled machines, but the source is usually very short..
+      const vp = hasVideo ? (hasAudio ? [ '-c:v', 'libx264' ] : [ '-c:v', 'hap', '-format', 'hap_alpha' ]) : []; //todo check source for alpha, then choose HAP
       const ap = hasAudio ? [ '-c:a', 'aac' ] : [];
+      const tmp = Path.join(Path.parse(path).dir, Math.random().toString().substr(1)) + '.mkv';
 
-      rndFilename += '.mkv';
-      result = spawnSync('ffmpeg', [ '-y', '-i', path, ...vp, ...ap, rndFilename ], { maxBuffer: 1 << 22 });
+      result = spawnSync('ffmpeg', [ '-y', '-i', path, ...vp, ...ap, tmp ], { maxBuffer: 1 << 22 });
+      result.stdout = utils.loadFile(tmp);
+      fs.unlinkSync(tmp);
 
       this.mediaType = hasVideo && hasAudio ? 1 : 2;
       this.tracks = this.mediaType;
     }
 
     if ( result.error ) {
-      fs.unlinkSync(rndFilename);
       if ( result.error.toString().includes('ENOENT') ) {
         throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
       }
@@ -314,10 +308,9 @@ VDJSample.prototype = {
     }
 
     // load dst. file and delete
-    this.media = new Uint8Array(utils.loadFile(rndFilename).buffer);
+    this.media = new Uint8Array(result.stdout.buffer);
     this.mediaSize = this.media.byteLength;
     this.thumbOffset = 0x78 + this.path.length + this.mediaSize; // calc. for informal reasons
-    fs.unlinkSync(rndFilename);
 
     this.totalDuration = +json.format.duration;
     this.endTime = this.totalDuration;

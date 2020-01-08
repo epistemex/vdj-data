@@ -53,6 +53,32 @@ function VDJSample(path) {
   const _getter = (name, get) => {Object.defineProperty(this, name, { get })};
   let _path = '';
 
+  Object.defineProperty(this, 'path', {
+    get: () => _path,
+    set: (newPath) => {
+      if ( typeof newPath === 'string' ) {
+        _path = newPath;
+        this.basename = Path.parse(_path).name;
+        this.offsetData = 0x78 + _path.length;
+        this.thumbOffset = this.offsetData + this.mediaSize;
+      }
+    }
+  });
+
+  Object.defineProperty(this, 'keyDesc', {
+    get: () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
+    set: (key) => {
+      const i = Object.values(keys).indexOf(this._frmKey(key));
+      if ( i < 0 ) throw 'Invalid key';
+      this.key = i;
+    }
+  });
+
+  Object.defineProperty(this, 'gainDb', {
+    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
+    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
+  });
+
   let view, data;
   let pos = 0;
 
@@ -138,31 +164,7 @@ function VDJSample(path) {
   _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
 
-  Object.defineProperty(this, 'path', {
-    get: () => _path,
-    set: (newPath) => {
-      if ( typeof newPath === 'string' ) {
-        _path = newPath;
-        this.basename = Path.parse(_path).name;
-        this.offsetData = 0x78 + _path.length;
-        this.thumbOffset = this.offsetData + this.mediaSize;
-      }
-    }
-  });
-
-  Object.defineProperty(this, 'keyDesc', {
-    get: () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
-    set: (key) => {
-      const i = Object.values(keys).indexOf(this._frmKey(key));
-      if ( i < 0 ) throw 'Invalid key';
-      this.key = i;
-    }
-  });
-
-  Object.defineProperty(this, 'gainDb', {
-    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
-    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
-  });
+  this.validateTimeRange();
 
   // initialize path and basename
   this.path = path || '';
@@ -220,12 +222,24 @@ VDJSample.prototype = {
     }
   },
 
+  validateTimeRange: function() {
+    if ( this.totalDuration > 0 ) {
+      if ( this.endTime > this.totalDuration ) this.endTime = this.totalDuration;
+      if ( this.startTime > this.endTime ) this.startTime = this.endTime;
+      this.duration = this.endTime - this.startTime;
+    }
+    else {
+      this.startTime = this.endTime = this.duration = 0;
+    }
+  },
+
   /**
    * Save embedded media content to file.
    * @param {string} path - destination file, filename and extension.
    * @returns {boolean} true if success
    */
   saveMedia: function(path) {
+    console.log('media', path, this.media, this.media.byteLength);
     return this._save(path, this.media);
   },
 
@@ -295,8 +309,7 @@ VDJSample.prototype = {
       else {
         result = spawnSync('ffmpeg', [ '-y', '-i', path, '-c:a', 'libvorbis', '-b:a', '192k', '-f', 'ogg', '-' ], { maxBuffer: 1 << 22 });
       }
-      this.mediaType = 0;
-      this.tracks = 0;
+      this.mediaType = this.tracks = 0;
     }
     else {
       // could use h264_nvenc on Nvidia/Cuda enabled machines, but the source is usually very short..
@@ -308,8 +321,7 @@ VDJSample.prototype = {
       result.stdout = utils.loadFile(tmp);
       fs.unlinkSync(tmp);
 
-      this.mediaType = hasVideo && hasAudio ? 1 : 2;
-      this.tracks = this.mediaType;
+      this.mediaType = this.tracks = hasVideo && hasAudio ? 1 : 2;
     }
 
     if ( result.error ) {
@@ -323,7 +335,10 @@ VDJSample.prototype = {
 
     this.media = new Uint8Array(result.stdout.buffer);
     this.mediaSize = this.media.byteLength;
-    this.totalDuration = this.endTime = +json.format.duration;
+    this.totalDuration = +json.format.duration;
+    this.startTime = 0;
+    this.endTime = this.totalDuration;
+    this.duration = this.totalDuration;
     this.path = path; // note: calculates offsets - must be last
 
     return this
@@ -363,6 +378,8 @@ VDJSample.prototype = {
     const txt = te.encode(this.path);
     const pathLength = removePath ? 0 : txt.length;
     const size = 0x78 + pathLength + this.mediaSize + this.thumbSize;
+
+    this.validateTimeRange();
 
     const data = new Uint8Array(size);
     const view = new DataView(data.buffer);

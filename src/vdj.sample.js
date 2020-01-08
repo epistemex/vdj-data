@@ -170,7 +170,7 @@ function VDJSample(path) {
 
   // Checks
   if ( this.offsetThumb && this.offsetThumb === this.offsetPath ) {
-    this.error.push('WARNING: vdjsample may have corrupted path data.');
+    this.errors.push('WARNING: vdjsample may have corrupted path data.');
     this.path = '';
     this.offsetPath = 0x78;
   }
@@ -234,34 +234,16 @@ VDJSample.prototype = {
    *
    * @param {string} path - path to media file to embed
    * @param {boolean} [nonLossy=false] set to true for non-lossy conversion for audio files
-   * @returns {Promise<void>}
    */
-  setMedia: async function(path, nonLossy = false) {
-    const buffer = await utils.loadFilePart(path, 0, 3);
-    if ( !buffer ) throw 'Could not load media from path.';
-
-    // check for valid types. not sure if list is complete at this point - VDJ converts formats internally (wav->flac for non-lossy etc.)
-    const magics = [
-      0x43614C66,     // fLaC
-      0x5367674F,     // OggS
-      0xA3DF451A     // matroska
-    ];
-
-    const data = new DataView(buffer.subarray(0, 3).buffer);
+  setMedia: function(path, nonLossy = false) {
     let result;
-
-    if ( !magics.includes(data.getUint32(0, true)) ) {
-      throw 'Unsupported media format for vdjsample.';
-      //return console.log('Unsupported media format for vdjsample.');
-    }
-
     this.path = path;
 
     // probe source file
     result = spawnSync('ffprobe', [ '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path ], { maxBuffer: 1 << 22 });
     if ( result.error ) {
       if ( result.error.toString().includes('ENOENT') ) {
-        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
+        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org/.';
       }
       else {
         throw 'Could not parse this file. Make sure it is of correct type and exist.';
@@ -282,11 +264,13 @@ VDJSample.prototype = {
     // convert input
     const ext = Path.parse(path).ext.toLowerCase();
     const isAudio = [ '.wav', '.mp3', '.aac', '.flac', '.aif', '.aiff', '.m4a', '.ogg' ].includes(ext);
-    const isVideo = [ '.mp4', '.m4v', '.mkv', '.mpg', '.mpeg', '.avi', '.webm', '.ogv' ].includes(ext);
+    const isVideo = [ '.mp4', '.m4v', '.mkv', '.mpg', '.mpeg', '.avi', '.webm', '.ogv', '.mov' ].includes(ext);
 
     if ( !isAudio && !isVideo ) {
       throw 'Unsupported format.'
     }
+
+    // todo output to stdout and use buffer from there
 
     let rndFilename = Path.join(Path.parse(path).dir, Math.random().toString().substr(1));
     if ( isAudio ) {
@@ -309,16 +293,14 @@ VDJSample.prototype = {
         else if ( s.codec_type === 'video' ) hasVideo = true;
       });
 
-      this.mediaType = hasVideo && hasAudio ? 1 : 2;
-      this.tracks = this.mediaType;
-
       const vp = hasVideo ? (hasAudio ? [ '-c:v', 'libx264' ] : [ '-c:v', 'hap', '-format', 'hap_alpha' ]) : [];
       const ap = hasAudio ? [ '-c:a', 'aac' ] : [];
 
       rndFilename += '.mkv';
       result = spawnSync('ffmpeg', [ '-y', '-i', path, ...vp, ...ap, rndFilename ], { maxBuffer: 1 << 22 });
-      this.mediaType = 1;
-      this.tracks = 1;
+
+      this.mediaType = hasVideo && hasAudio ? 1 : 2;
+      this.tracks = this.mediaType;
     }
 
     if ( result.error ) {

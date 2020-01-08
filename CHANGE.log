@@ -1,6 +1,10 @@
 Change log for vdj-data
 -----------------------
 
+0.10.1-alpha
+------------
+Add: validateTimes() for Sample
+
 0.10.0-alpha
 ------------
 Add: VDJSample.setThumb() implemented w/ support for PNG files.

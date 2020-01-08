@@ -14,6 +14,8 @@ const utils = require('./utils');
 const Color = require('./vdj.color');
 const { spawnSync } = require('child_process');
 
+const errFFmpeg = 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org/.';
+
 const trackModes = {
   0: 'audio',
   1: 'audio+video',
@@ -176,8 +178,8 @@ function VDJSample(path) {
   // Checks
   if ( this.offsetThumb && this.offsetThumb === this.offsetPath ) {
     this.errors.push('WARNING: vdjsample may have corrupted path data.');
-    this.path = '';
     this.offsetPath = 0x78;
+    this.path = '';
   }
 
   /* ---  Helpers  -----------------------------------------------------------*/
@@ -205,21 +207,8 @@ function VDJSample(path) {
 
 VDJSample.prototype = {
   _frmKey: function(key) {
-    if ( key.length === 1 ) return key.toUpperCase();
-    else if ( key.length === 2 ) return key[ 0 ].toUpperCase() + key[ 1 ].toLowerCase();
-    else if ( key.length === 3 ) return key[ 0 ].toUpperCase() + key[ 1 ].toLowerCase() + key[ 2 ].toLowerCase();
-    else throw 'Invalid key length';
-  },
-
-  _save: function(path, data) {
-    try {
-      fs.writeFileSync(path, data);
-      return true
-    }
-    catch(err) {
-      debug(err);
-      return false
-    }
+    if ( key.length < 1 || key.length > 3 ) throw 'Invalid key length';
+    return key[ 0 ].toUpperCase() + key.toLowerCase().substr(1);
   },
 
   /**
@@ -243,8 +232,7 @@ VDJSample.prototype = {
    * @returns {boolean} true if success
    */
   saveMedia: function(path) {
-    console.log('media', path, this.media, this.media.byteLength);
-    return this._save(path, this.media);
+    return utils.saveFile(path, this.media);
   },
 
   /**
@@ -253,7 +241,7 @@ VDJSample.prototype = {
    * @returns {boolean} true if success
    */
   saveThumb: function(path) {
-    return this.thumb && this.thumbSize ? this._save(path, this.thumb) : false;
+    return this.thumb && this.thumbSize ? utils.saveFile(path, this.thumb) : false;
   },
 
   /**
@@ -270,19 +258,18 @@ VDJSample.prototype = {
    */
   setMedia: function(path, nonLossy = false) {
     let result;
+    let json;
+    let hasVideo = false;
+    let hasAudio = false;
 
     // probe source file
     result = spawnSync('ffprobe', [ '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path ], { maxBuffer: 1 << 22 });
     if ( result.error ) {
-      if ( result.error.code === 'ENOENT' && result.error.path === 'ffprobe' ) {
-        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org/.';
-      }
+      if ( result.error.code === 'ENOENT' && result.error.path === 'ffprobe' ) throw errFFmpeg;
       else {
         throw 'Could not parse this file. Make sure it is of correct type and exist.';
       }
     }
-
-    let json;
 
     try {
       const jStr = result.output.toString();
@@ -294,8 +281,6 @@ VDJSample.prototype = {
     }
 
     // check for stream types
-    let hasVideo = false;
-    let hasAudio = false;
     json.streams.forEach(s => {
       if ( s.codec_type === 'audio' ) hasAudio = true;
       else if ( s.codec_type === 'video' ) hasVideo = true;
@@ -329,9 +314,7 @@ VDJSample.prototype = {
     }
 
     if ( result.error ) {
-      if ( result.error.code === 'ENOENT' && result.error.path === 'ffmpeg' ) {
-        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
-      }
+      if ( result.error.code === 'ENOENT' && result.error.path === 'ffmpeg' ) throw errFFmpeg;
       else {
         throw 'Could not convert this file. Make sure it is of correct type and exist.';
       }
@@ -456,12 +439,8 @@ VDJSample.prototype = {
    * @throws on errors
    */
   write: function(path, removePath = false) {
-    try {
-      fs.writeFileSync(path, this.compile(removePath))
-    }
-    catch(err) {
-      debug(err);
-      throw 'Could not save sample to path.'
+    if ( !utils.saveFile(path, this.compile(removePath)) ) {
+      throw 'Could not save sample to this path.';
     }
   }
 

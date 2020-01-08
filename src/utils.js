@@ -398,13 +398,24 @@ function bitCount(n) {
   return ((n + (n >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24;
 }
 
-function loadFile(path, type) {
+function loadFile(path, options) {
   try {
-    return fs.readFileSync(path, type);
+    return fs.readFileSync(path, options);
   }
   catch(err) {
     debug(err);
     return null
+  }
+}
+
+function saveFile(path, data, options) {
+  try {
+    fs.writeFileSync(path, data, options);
+    return true
+  }
+  catch(err) {
+    debug(err);
+    return false
   }
 }
 
@@ -455,5 +466,6 @@ module.exports = {
   compareFingerprints,
   compareFingerprintsOffset,
   loadFile,
-  loadFilePart
+  loadFilePart,
+  saveFile
 };

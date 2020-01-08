@@ -1,13 +1,18 @@
 Change log for vdj-data
 -----------------------
 
-0.10.1-alpha
+0.11.0-alpha
 ------------
-Add: validateTimes() for Sample
+Add: Sample.prototype.validateTimes()
+Add: Mapped getFileTags() to Song.prototype.getTags() using the instance's path.
+Add: Advanced filename cleaner via Song.prototype.cleanName()
+Add: Song.prototype.filenameToTag()
+Add: Database.prototype.writeStream()
+Add: Database.prototype.snapshot() to take quick backups in the same folder as original.
 
 0.10.0-alpha
 ------------
-Add: VDJSample.setThumb() implemented w/ support for PNG files.
+Add: Sample.prototype.setThumb() implemented w/ support for PNG files as-is.
 Chg: No longer need for getFolderPath()/getFilePath(). Just use the now pre-initialized enums directly (vdj.FOLDER.PLAYLISTS etc).
 
 0.9.1-alpha-hot-fix

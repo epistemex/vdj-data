@@ -408,6 +408,24 @@ function loadFile(path, type) {
   }
 }
 
+function loadFilePart(path, start, end) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    const stream = fs.createReadStream(path, { start, end, highWaterMark: 8192 });
+    stream.on('data', chunks.push.bind(chunks));
+    //stream.on("data", chunk => chunks.push(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => {
+      if ( chunks.length === 1 ) {
+        resolve(chunks[ 0 ])
+      }
+      else {
+        resolve(Buffer.concat(chunks, end - start))
+      }
+    });
+  })
+}
+
 module.exports = {
   toEntities,
   fromEntities,
@@ -436,5 +454,6 @@ module.exports = {
   getAudioFingerprint,
   compareFingerprints,
   compareFingerprintsOffset,
-  loadFile
+  loadFile,
+  loadFilePart
 };

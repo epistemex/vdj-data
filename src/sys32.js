@@ -73,6 +73,7 @@ function _execSync(cmd, args, timeout = 5) {
 module.exports = {
   getRegSync,
   getAudioFingerprint,
+  runSync       : _execSync,
   listDrivesSync: drives.listSync,
   driveType     : drives.type
 };

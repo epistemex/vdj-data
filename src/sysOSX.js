@@ -53,5 +53,6 @@ function _execSync(cmd, args, timeout = 5) {
 module.exports = {
   getAudioFingerprint,
   listDrivesSync,
-  type
+  type,
+  runSync: _execSync
 };

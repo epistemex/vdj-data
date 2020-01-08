@@ -404,4 +404,28 @@ VDJSample.prototype = {
 
 };
 
+VDJSample.TRACKMODE = {
+  AUDIO     : 0,
+  AUDIOVIDEO: 1,
+  VIDEO     : 2
+};
+
+VDJSample.SAMPLEMODE = {
+  DROP: 0,
+  LOOP: 1
+};
+
+VDJSample.LOOPMODE = {
+  FLAT     : 0,
+  PITCHED  : 1,
+  SYNCSTART: 2,
+  SYNCLOCK : 3
+};
+
+VDJSample.KEYMATCHMODE = {
+  DONOTMATCH     : 0,
+  MATCHCOMPATIBLE: 1,
+  MATCHEXACT     : 2
+};
+
 module.exports = VDJSample;

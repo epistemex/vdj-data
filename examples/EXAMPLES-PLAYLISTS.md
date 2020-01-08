@@ -40,9 +40,8 @@ TIP: to write to VDJ's playlist folder, obtain path this way:
 
 ```javascript
 const path = require('path');
-const plPath = vdj.FOLDER.PLAYLISTS;
 
 // Then merge and write:
-pl.write(path.join(plPath, 'random-playlist.m3u'));
+pl.write(path.join(vdj.FOLDER.PLAYLISTS, 'random-playlist.m3u'));
 ```
 

@@ -32,8 +32,7 @@ s.write(dst);
 installed on your system and be available via PATH (can run from anywhere).
 
 They are free and can be installed and forgotten about. Download a version for
-your platform from [ffmpeg.org](https://ffmpeg.org/). The installer gives you
-the option to make it available via PATH.
+your platform from [ffmpeg.org](https://ffmpeg.org/).
 
 These are used to convert and validate the media to make sure it is saved in a VDJ
 compatible format. It also allows you to use almost any source type, codec.

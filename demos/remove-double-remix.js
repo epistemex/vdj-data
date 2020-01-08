@@ -58,7 +58,10 @@ if ( count ) {
   else {
     vdj.isRunning().then(running => {
       if ( running ) console.warn('WARNING: VirtualDJ is running, please quit and run this script again...');
-      else db.write(path);
+      else {
+        db.snapshot();
+        db.write(path);
+      }
     });
   }
 }

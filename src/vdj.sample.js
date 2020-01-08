@@ -47,7 +47,6 @@ const keys = {
 };
 
 function VDJSample(path) {
-
   // todo: lock some fields as getters only (version etc.)
   // todo: add some checks via setters (time range limits, modes/flags etc.)
 
@@ -122,7 +121,7 @@ function VDJSample(path) {
     this.totalDuration = 0;
     this.endTime = 0;
     this.gain = 0;
-    this.transparencyColor = new Color(0x7f000000);
+    this.transparencyColor = new Color(0);
     this.offsetThumb = 0;
     this.thumbSize = 0;
     this.offsetPath = 0x78;
@@ -142,8 +141,12 @@ function VDJSample(path) {
   Object.defineProperty(this, 'path', {
     get: () => _path,
     set: (newPath) => {
-      _path = newPath;
-      this.basename = Path.parse(_path).name;
+      if ( typeof newPath === 'string' ) {
+        _path = newPath;
+        this.basename = Path.parse(_path).name;
+        this.offsetData = 0x78 + _path.length;
+        this.thumbOffset = this.offsetData + this.mediaSize;
+      }
     }
   });
 
@@ -217,12 +220,22 @@ VDJSample.prototype = {
     }
   },
 
+  /**
+   * Save embedded media content to file.
+   * @param {string} path - destination file, filename and extension.
+   * @returns {boolean} true if success
+   */
   saveMedia: function(path) {
     return this._save(path, this.media);
   },
 
+  /**
+   * Save embedded thumb image content to file, if any.
+   * @param {string} path - destination file, filename and extension.
+   * @returns {boolean} true if success
+   */
   saveThumb: function(path) {
-    return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
+    return this.thumb && this.thumbSize ? this._save(path, this.thumb) : false;
   },
 
   /**
@@ -234,10 +247,11 @@ VDJSample.prototype = {
    *
    * @param {string} path - path to media file to embed
    * @param {boolean} [nonLossy=false] set to true for non-lossy conversion for audio files
+   * @returns {VDJSample}
+   * @throws on errors
    */
   setMedia: function(path, nonLossy = false) {
     let result;
-    this.path = path;
 
     // probe source file
     result = spawnSync('ffprobe', [ '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path ], { maxBuffer: 1 << 22 });
@@ -307,20 +321,41 @@ VDJSample.prototype = {
       }
     }
 
-    // load dst. file and delete
     this.media = new Uint8Array(result.stdout.buffer);
     this.mediaSize = this.media.byteLength;
-    this.thumbOffset = 0x78 + this.path.length + this.mediaSize; // calc. for informal reasons
+    this.totalDuration = this.endTime = +json.format.duration;
+    this.path = path; // note: calculates offsets - must be last
 
-    this.totalDuration = +json.format.duration;
-    this.endTime = this.totalDuration;
+    return this
   },
 
+  /**
+   * Set a PNG as thumb image for this sample. Max file size is 4 mb.
+   * The image is stored as-is.
+   * @param {string} path - path to PNG image file to embed.
+   * @returns {VDJSample}
+   * @throws on errors
+   */
   setThumb: function(path) {
-    // png
+    const buffer = utils.loadFile(path);
+    if ( !buffer ) throw 'Could not load PNG file from this path.';
+    if ( buffer.length > 1 << 22 ) throw 'PNG is larger than 4 mb.';
 
+    const data = new DataView(buffer.buffer);
+    if ( data.getUint32(0) !== 0x89504E47 ) throw 'Need to be a PNG file.';
+
+    this.thumb = new Uint8Array(data.buffer);
+    this.thumbSize = data.byteLength;
+
+    return this
   },
 
+  /**
+   * Compile instance into a vdjsample buffer.
+   * @param {boolean} [removePath=false] - remove embedded path information if true.
+   * @returns {Uint8Array} buffer holding compiled vdjsample
+   * @throws on errors
+   */
   compile: function(removePath = false) {
     if ( !this.media || !this.mediaSize ) throw 'No media is set.';
 
@@ -392,6 +427,13 @@ VDJSample.prototype = {
     return data
   },
 
+  /**
+   * Compile instance into a vdjsample and save it to given path.
+   * @param {string} path - destination path for vdjsample (usually with the
+   * extension ".vdjsample")
+   * @param {boolean} [removePath=false] - remove embedded path information if true.
+   * @throws on errors
+   */
   write: function(path, removePath = false) {
     try {
       fs.writeFileSync(path, this.compile(removePath))

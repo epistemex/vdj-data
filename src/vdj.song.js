@@ -213,30 +213,56 @@ Song.prototype = {
 
   },
 
+  /**
+   * Sort POIs by time position.
+   */
   sortPOIs: function() {
-    this.pois = this.pois.sort((a, b) => {
+    this.pois.sort((a, b) => {
       return utils.eq(a.pos, b.pos) ? 0 : (a.pos < b.pos ? -1 : 1)
     })
   },
 
+  /**
+   * Get tags from referenced file path in this instance.
+   *
+   * The Promise returns a JSON object with all available tags,
+   * or null if unsuccessful (no tags or no file).
+   * @returns {Promise<*|null>}
+   */
   getTags: function() {
     return utils.getFileTags(this.filePath)
   },
 
+  /**
+   * Calc a MD5 hash for the media file referenced in this instance.
+   * The hash is also stored as a property (`instance.hash`).
+   *
+   * Note that if max is set and the file size is larger, the file
+   * is ignored completely rather than loading just a part.
+   *
+   * @param {number} [max=-1] max filesize in bytes, default = any size (-1)
+   * @returns {string|null} hash string, or null if any error occurred.
+   */
   calcMD5Hash: function(max = -1) {
-    // todo consider different strategy only loading first 1 or 2 Mbs
+    this.hash = null;
     max = max >>> 0;
-    if ( fs.existsSync(this.filePath) && fs.statSync(this.filePath).size < max ) {
+
+    if ( max && fs.existsSync(this.filePath) && fs.statSync(this.filePath).size < max ) {
       try {
-        const hash = crypto.createHash('md5').update(fs.readFileSync(this.filePath)).digest('hex');
-        return this.hash = hash
+        const file = utils.loadFile(this.filePath);
+        if ( file ) {
+          this.hash = crypto
+            .createHash('md5')
+            .update(file)
+            .digest('hex');
+        }
       }
       catch(err) {
         debug(err);
-        return this.hash = null
       }
     }
-    else return this.hash = null
+
+    return this.hash
   }
 
 };

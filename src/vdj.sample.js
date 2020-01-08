@@ -242,7 +242,7 @@ VDJSample.prototype = {
     // probe source file
     result = spawnSync('ffprobe', [ '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path ], { maxBuffer: 1 << 22 });
     if ( result.error ) {
-      if ( result.error.toString().includes('ENOENT') ) {
+      if ( result.error.code === 'ENOENT' && result.error.path === 'ffprobe' ) {
         throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org/.';
       }
       else {
@@ -299,7 +299,7 @@ VDJSample.prototype = {
     }
 
     if ( result.error ) {
-      if ( result.error.toString().includes('ENOENT') ) {
+      if ( result.error.code === 'ENOENT' && result.error.path === 'ffmpeg' ) {
         throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
       }
       else {

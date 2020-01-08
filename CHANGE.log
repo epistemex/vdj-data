@@ -1,6 +1,15 @@
 Change log for vdj-data
 -----------------------
 
+0.10.0-alpha
+------------
+Add: VDJSample.setThumb() implemented w/ support for PNG files.
+Chg: No longer need for getFolderPath()/getFilePath(). Just use the now pre-initialized enums directly (vdj.FOLDER.PLAYLISTS etc).
+
+0.9.1-alpha-hot-fix
+------------------
+Hot: Fixed some leftover code that could have limited file types for Sample.setMedia().
+
 0.9.0-alpha
 -----------
 Add: VDJSamples can be made from scratch

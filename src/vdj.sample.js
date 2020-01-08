@@ -208,7 +208,7 @@ function VDJSample(path) {
 VDJSample.prototype = {
   _frmKey: function(key) {
     if ( key.length < 1 || key.length > 3 ) throw 'Invalid key length';
-    return key[ 0 ].toUpperCase() + key.toLowerCase().substr(1);
+    return key[ 0 ].toUpperCase() + key.substr(1).toLowerCase();
   },
 
   /**
@@ -218,12 +218,18 @@ VDJSample.prototype = {
   validateTimes: function() {
     if ( this.totalDuration > 0 ) {
       if ( this.endTime > this.totalDuration ) this.endTime = this.totalDuration;
+      else if ( this.endTime < 0 ) this.endTime = 0;
+
       if ( this.startTime > this.endTime ) this.startTime = this.endTime;
+      else if ( this.startTime < 0 ) this.startTime = 0;
+
       this.duration = this.endTime - this.startTime;
     }
     else {
       this.startTime = this.endTime = this.duration = this.totalDuration = 0;
     }
+
+    return this
   },
 
   /**

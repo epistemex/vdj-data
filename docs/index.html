@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFilePath">getFilePath</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getFolderPath">getFolderPath</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
 				</ul>
 			</li>
 			
@@ -136,10 +136,10 @@
 <li>Extract and save out media data</li>
 <li>Extract and save out thumb image (if present)</li>
 <li>Change ranges, beatgrid, loop/drop modes etc.</li>
-<li>(partly) Repair malformed samples</li>
+<li>Repair malformed samples (addresses VDJ specific bug).</li>
 <li>Create new samples from scratch</li>
 <li>Add any supported media (via the free ffmpeg/ffprobe. See <a href="http://ffmpeg.org/">ffmpeg.org</a>)</li>
-<li>(todo) Set thumb image</li>
+<li>Set PNG thumb image</li>
 <li>Export with modifications</li>
 </ul>
 </li>
@@ -161,7 +161,7 @@
 <li>(todo) Export as Serato file tags</li>
 </ul>
 </li>
-<li>System utilities (Windows only for now):
+<li>System utilities (Windows only at the moment):
 <ul>
 <li>Get all drives with VDJ database on them</li>
 <li>Check if VirtualDJ is running.</li>
@@ -191,6 +191,7 @@ run, it has only been tested and developed (so far) on Windows.</p>
 you just want to work directly with the VDJ database XML files. They have a free
 version that can be obtained on their web site. Tip: You are also able to create
 database files from scratch using only this package.</p>
+<p>If you want to create/modify vdjsamples with <em>new media content</em>, then <a href="https://ffmpeg.org/">ffmpeg/ffprobe</a> is also needed. See note below under vdjsample example.</p>
 <h2>Install</h2>
 <p>Run the following command in CLI to install this package into your project:</p>
 <pre><code>npm i silverspex/vdj-data
@@ -202,285 +203,43 @@ installed on your system. CD into a root folder where you want to clone, and run
 <pre><code>git clone https://github.com/silverspex/vdj-data.git
 </code></pre>
 <p>Then cd into <code>vdj-data/</code>.</p>
-<h2>New to Node development?</h2>
-<p>See <a href="./new-to-node-dev.md">this small write-up</a> to get you started.</p>
+<h2>WANTED</h2>
+<p>If you have problems with your VDJ database or sample files I would be interested
+in taking a look at them to see if I can build scripts to fix them automatically.</p>
+<p>Please notify me in <a href="https://github.com/silverspex/vdj-data/issues">issues</a> and I'll give you
+an email to use to send me the data (or post a Dropbox/<a href="https://send.firefox.com/">Firefox send</a> link if you don't mind). The data will be destroyed after use.</p>
 <h2>Examples</h2>
-<p>Examples showing some of the functions the package offers.</p>
-<p>Always included in your projects:</p>
+<p>Getting started. After npm has finished installed this package, you can
+<code>require()</code> the package in your .js file to use the vdj-data API:</p>
 <pre class="prettyprint source lang-javascript"><code>// Import and use in your projects
 const vdj = require('vdj-data');
 
-// VDJ Data API can now be used ..
+// The VDJ Data API can now be used ..
 </code></pre>
 <p>If you only cloned the repo you would want to import the <code>index.js</code> file instead.
 Just make sure the relative or absolute path resolves to the index.js file:</p>
 <pre class="prettyprint source lang-javascript"><code>// Import from the demo folder would look like this
 const vdj = require('../index');
-
-// VDJ Data API can now be used ..
 </code></pre>
-<p>Various ways to load and handle databases:</p>
-<pre class="prettyprint source lang-javascript"><code>// Get main VirtualDJ database.xml
-const mainDatabasePath = vdj.FILE.DATABASE;
-
-// Load and parse a single database
-const database = vdj.loadDatabase(mainDatabasePath);
-if (database) {
-  // use here...
-}
-
-// Load all available databases from various drives (Windows only for now)
-const databases = vdj.loadAllDatabases();
-
-// Merge all databases into a single instance for simplified use:
-// NOTICE: these are STATIC methods on the Database object itself.
-const merged = vdj.Database.merge(databases);
-
-// Split them out using ignoreDrives (Windows) and available drives:
-const split = vdj.Database.split(merged);
-
-// NOTE: REMEMBER TO BACKUP YOUR DATA FIRST FOR THE FOLLOWING:
-
-// Export a database back to disk as XML:
-database.write(mainDatabasePath);
-
-// write back the array of databases from loadAllDatabases() or split();
-split.forEach(db => db.write(db.path));
-</code></pre>
-<p>Various ways using a database:</p>
-<pre class="prettyprint source lang-javascript"><code>// iterate over all Song objects
-database.songs.forEach(song => { /* do something with a song here */ });
-
-// search returning array of matching Song objects
-const results = database.search(&quot;talla world&quot;, {artists: true, title: true});
-
-// find a Song using a path:
-const songFromPath = database.findSongByPath('full/path/to/my/song.wav');
-
-// load a song initializing path and size
-const song = database.loadSong('path/to/song.mp3');
-
-// load a song and parse tags if any (uses Promise)
-const songAndTags = await database.loadSongAndTags('path/to/song.flac');
-
-// add to database
-database.add(song);
-database.add(songAndTags);
-
-// remove a song
-const oldSong = database.remove(song);
-
-// remove a song using an index
-const oldSong2 = database.removeAt(7);
-
-// verify song paths - unavailable songs returned as an Array of Song objects:
-const unavailables = database.verifyPaths();
-
-// convert to XML (string)
-const xml = database.toXML();
-
-// convert to JSON (object)
-const json = database.toJSON();
-</code></pre>
-<p>Various ways using Song objects:</p>
-<pre class="prettyprint source lang-javascript"><code>// Get first song in database assuming there is one
-const song = database.songs[0];
-
-// convert to strings
-const txt = song.toString();     // -> artists - title (remix)
-const tx7 = song.toString('%title - %artist [%remix] [%year]');
-
-song.filenameToTag();
-
-// top-level information
-const path = song.filePath;
-const size = song.fileSize;
-
-// using tags (all fields from the db is available; just showing a couple in the examples):
-const artist = song.tags.artist;
-const title = song.tags.title;
-// ...
-
-// using infos
-const playCount = song.infos.playCount;
-// ...
-
-// using scan
-const bpm = song.scan.bpm;
-// ...
-
-// using POIs
-song.pois.forEach(poi => { /* do something with a POI */ });
-// or directly (here assuming there is one):
-const firstPoiPosition = song.pois[0].pos;
-
-// verify path
-const success = song.verifyPath();
-
-// update comment
-song.comment = 'Edited via VDJ Data API!';
-</code></pre>
-<p>Using Playlists:</p>
-<pre class="prettyprint source lang-javascript"><code>// Load a Playlist
-const pl = vdj.loadPlaylist('path/to/playlist.m3u');
-
-// number of Song objects with valid paths
-const plSongCount = pl.songs.length;
-
-// array with path strings of missing files
-const plMissing = pl.verifyPaths();
-
-// compile to string that can be saved as new playlist
-const newPlaylist = pl.compile();
-</code></pre>
-<p>Create playlists from scratch:</p>
-<pre class="prettyprint source lang-javascript"><code>// Load and merge all available VDJ databases, and we only need the songs array:
-const songs = vdj.Database.merge(vdj.loadAllDatabases()).songs;
-
-// Create an empty playlist
-const pl = new vdj.Playlist();
-
-// add 100 random tracks (any track type in this example)
-for(let i = 0; i &lt; 100; i++) {
-  const t = (Math.random() * songs.length)|0;
-  pl.add(songs[t]);
-}
-
-// save out list - voila!
-pl.write('path/to/random-playlist.m3u');
-</code></pre>
-<p>TIP: to write to VDJ's playlist folder, obtain path this way:</p>
-<pre class="prettyprint source lang-javascript"><code>const path = require('path');
-const plPath = vdj.FOLDER.PLAYLISTS;
-
-// Then merge and write:
-pl.write(path.join(plPath, 'random-playlist.m3u'));
-</code></pre>
-<p><strong>Audio Fingerprint (AcoustID)</strong></p>
-<p>Getting AcoustID fingerprints (Windows/Mac (latter untested)):</p>
-<pre class="prettyprint source lang-javascript"><code>const vdj = require('vdj-data');
-
-// The resulting fingerprint can be used with AcoustID etc.
-const json = vdj.utils.getAudioFingerprint(pathToAudioFile);
-console.log(json.fingerprint);    // AQADtEkyccoWCYmiF1P-DNeHY43xJvlxKsOTK0...
-console.log(json.duration);       // duration in seconds
-
-// or raw integer values for your own database or lookups:
-const jsonRaw = vdj.utils.getAudioFingerprint(pathToAudioFile, true);  // request raw data
-console.log(jsonRaw.fingerprint); // [723947855, 1764135188, ... ]
-console.log(jsonRaw.duration);    // duration in seconds
-</code></pre>
-<p>Compare fingerprints:</p>
-<pre class="prettyprint source lang-javascript"><code>// get audio fingerprints using the raw option
-const fp1 = vdj.utils.getAudioFingerprint('path/to/audio1.flac', true);
-const fp2 = vdj.utils.getAudioFingerprint('path/to/audio1.mp3', true);
-
-// use the simple matcher (doesn't consider offsets)
-const score = vdj.utils.compareFingerprints(fp1, fp2);
-console.log('Score:', score);
-console.log(score > 0.9 ? 'Likely a match.' : 'Unlikely a match.');
-
-// use matcher supporting larger offsets (max offset)
-const score2 = vdj.utils.compareFingerprintsOffset(fp1, fp2, 200);
-//...
-</code></pre>
-<p>You can use this in combination with for example a database to fingerprint all
-your tracks, then run comparison between all to see the matching score between
-them and use that to determine if you should move/delete the one of less quality
-and so forth.</p>
-<p><strong>VDJSamples</strong></p>
-<p>You can load, modify and save new vdjsample files with vdj-data:</p>
-<pre class="prettyprint source lang-javascript"><code>const sample = new vdj.Sample('path/to/sample.vdjsample');
-
-// modify bpm:
-sample.bpm = 140;
-
-// modify range start to 2 sec.
-sample.startTime = 2.0;
-
-// compile and write back new sample:
-sample.write('path/to/new-sample.vdjsample');
-</code></pre>
-<p><strong>Backup</strong>:</p>
-<p>Using backup will backup databases from all available VirtualDJ drives, playlists,
-folders, mappings, history, settings, samples etc. You can also define a custom
-list as a 3. argument if you prefer.</p>
-<p>The backup zip files may be both one created by VirtualDJ itself, or the one
-created using this package's <code>backup()</code> method as shown below.</p>
-<pre class="prettyprint source lang-javascript"><code>// get list of all database paths except main as backup() includes that
-const databasePaths = isWin 
-  ? vdj.getDrivePaths(true, false).map(p => path.join(p, 'database.xml'))
-  : undefined; // getDrivePaths() not currently supported on Mac
-
-// backup() uses Promise
-vdj
-  .backup(`vdj-backup-${ Date.now() }.zip`, databasePaths)
-  .then(success => { /* next step from here */ })
-  .catch(error => { /* an error occurred */ })
-
-// or use async/await
-(async () => {
-  try {
-    const success = await vdj.backup(`vdj-backup-${ Date.now() }.zip`, databasePaths);
-  }
-  catch(err) { /* an error occurred */ }
-})();
-</code></pre>
-<p><strong>Restore</strong>:</p>
-<p>Using restore will restore anything found in a zip backup file, whether it was
-created by VirtualDJ or via <code>backup()</code>.</p>
-<pre class="prettyprint source lang-javascript"><code>// Caution: Will overwrite anything in its path...
-(async () => {
-  const homeFolder = vdj.getVDJHome();
-  const status = await vdj.restore('path/to/backup.zip', homeFolder);
-  //...
-})();
-</code></pre>
-<p>System functions:</p>
-<pre class="prettyprint source lang-javascript"><code>// check if VirtualDJ is running to block reading/writing database.xml files
-(async () => {
-  const running = await vdj.isRunning();
-  if (!running) { /* do yar thang... */ }
-})();
-
-// list all drives with VirtualDJ databases and get basic drive info
-const drives = vdj.getDrives();
-
-// always a main home drive if VirtualDJ is installed
-console.log(drives);
-/* =>
-[
-  {
-    root: 'D:\\',
-    folder: 'D:\\docs\\VirtualDJ',
-    size: 1000203087872,
-    free: 569048289280,
-    type: 'Local Fixed Disk',
-    main: true
-  },
-  ...
-*/
-
-// globally available after importing 'vdj-data'
-if (isWin) { /* Windows version */ }
-if (isMac) { /* OSX version */ }
-
-// or use global.isWin / global.isMac
-</code></pre>
+<h2>Also see these examples</h2>
+<ul>
+<li><a href="examples/EXAMPLES-DATABASE.md">Using the Database object</a></li>
+<li><a href="examples/EXAMPLES-SONGS.md">Using the Song object</a></li>
+<li><a href="examples/EXAMPLES-PLAYLISTS.md">Using the Playlist object</a></li>
+<li><a href="examples/EXAMPLES-VDJSAMPLE.md">Using the VDJSample object</a></li>
+<li><a href="examples/EXAMPLES-FINGERPRINTING.md">Using AcoustID audio fingerprinting</a></li>
+<li><a href="examples/EXAMPLES-BACKUP-RESTORE.md">Using the Backup and Restore functions</a></li>
+<li><a href="examples/EXAMPLES-SYSTEM.md">System functions</a></li>
+</ul>
 <h2>Demos</h2>
-<p>The folder demos/ contains some demo scripts. To run, open CLI, &quot;cd&quot; to root folder
-and type:</p>
+<p>The folder <code>demos/</code> contains some demo scripts to get you started. To run, open CLI,
+&quot;cd&quot; to root folder and type:</p>
 <pre><code>node demos\name-of-demo &lt;args-if-any&gt;
 </code></pre>
 <p>See content of each file for details.</p>
 <h2>Documentation</h2>
 <p>The package comes (eventually) with full API documentation which you find in the
-docs/ folder.</p>
-<h2>Performance</h2>
-<p>Currently load and parse about 25,000 - 30,000 song entries in less than a second,
-depending on system configuration and database details (this result with a slow
-spinning disk, 23 mb database, i7).</p>
-<p>The code base is not fully optimized so expect even better performance over time.</p>
+<code>docs/</code> folder.</p>
 <h2>Issues</h2>
 <p>NOTE: The development is currently in ALPHA. The API may change without prior
 notice. Many features are not yet implemented. However, most of what you would
@@ -489,10 +248,10 @@ need to read, write and maintain database information is ready for use.</p>
 <ul>
 <li>Currently system calls (detection of folder paths etc.) only works with Windows.</li>
 </ul>
-<p>Feel free to use the issue tracker to report issues, feature requests.</p>
+<p>Feel free to use the issue tracker to <a href="https://github.com/silverspex/vdj-data/issues">report issues</a>, feature requests.</p>
 <h2>License</h2>
-<p>There is currently no license available. You may download and evaluate the package
-and use it in your personal non-commercial projects. Future licenses will be made
+<p><strong>There is currently no license available.</strong> However, you may download and evaluate the
+package and use it in your personal non-commercial projects. Future licenses may be made
 available for personal as well as commercial use.</p>
 <p>Disclaimer: this project is unofficial and not affiliated with Atomix.</p>
 <p>(c) Silverspex 2019-2020</p></article>
@@ -547,7 +306,7 @@ available for personal as well as commercial use.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Tue Jan 7th 2020
+		on Wed Jan 8th 2020
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

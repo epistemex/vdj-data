@@ -12,6 +12,7 @@ const fs = require('fs');
 const Path = require('path');
 const utils = require('./utils');
 const Color = require('./vdj.color');
+const { spawnSync } = require('child_process');
 
 const trackModes = {
   0: 'audio',
@@ -47,73 +48,104 @@ const keys = {
 
 function VDJSample(path) {
 
-  // todo: init with defaults if no path.
   // todo: lock some fields as getters only (version etc.)
   // todo: add some checks via setters (time range limits, modes/flags etc.)
 
-  let buffer;
-  try {
-    buffer = fs.readFileSync(path)
-  }
-  catch {throw 'Could not load vdjsample from path.'}
-
   const _getter = (name, get) => {Object.defineProperty(this, name, { get })};
+  let _path = '';
 
-  this.path = path;
-  this.basename = Path.parse(path).name;
-
-  const td = new TextDecoder('utf-8');
-  const view = new DataView(buffer.buffer);
+  let view, data;
   let pos = 0;
 
-  if ( getUint32() !== 0x4a4456 ) throw 'Not a VDJ sample file.'; // magic => 0x56444A00LE ("VDJ\0")
+  if ( path && path.length ) {
+    const buffer = utils.loadFile(path);
+    if ( !buffer ) throw 'Could not load vdjsample from path.';
 
-  this.version = getUint32() / 100;                 // 0x04
-  this.offsetData = getUint32();                    // 0x08 - offset to data (or abs. header size)
-  this.mediaSize = getUint32();                     // 0x0C
-  this.mediaType = getUint32() & 0xff;              // 0x10
-  this.tracks = getUint32() & 0xff;                 // 0x14
-  this.mode = getUint32() & 0xff;                   // 0x18
-  this.dropLoop = getUint32() & 0xff;               // 0x1C
-  this.bpm = utils.toBPM(getFloat32());             // 0x20
-  this.beatGridOffset = getFloat32();               // 0x24
-  this.startTime = getFloat64();                    // 0x28
-  this.duration = getFloat64();                     // 0x30
-  this.totalDuration = getFloat64();                // 0x38
-  this.endTime = getFloat64();                      // 0x40 (abs. time)
-  this.gain = getFloat32();                         // 0x48
-  this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength in this case
-  pos += 4;                                         // 0x50 ??? video rel?
-  this.offsetThumb = getUint32();                   // 0x54
-  this.thumbSize = getUint32();                     // 0x58
-  this.offsetPath = getUint32();                    // 0x5C
-  const pathLength = getUint32();                   // 0x60
-  pos += 12;                                        // 0x64-0x6f ??? reserved?
-  const key = getUint32() & 0xff;                   // 0x70
-  this.keyMatchType = getUint32() & 0xff;           // 0x74
+    const td = new TextDecoder('utf-8');
+    view = new DataView(buffer.buffer);
 
-  this.key = Math.max(0, Math.min(0x18, key));
+    if ( getUint32() !== 0x4a4456 ) throw 'Not a VDJ sample file.'; // magic => 0x56444A00LE ("VDJ\0")
 
-  const file = new Uint8Array(buffer.buffer);
+    this.version = getUint32() / 100;                 // 0x04
+    this.offsetData = getUint32();                    // 0x08 - offset to data (or abs. header size)
+    this.mediaSize = getUint32();                     // 0x0C
+    this.mediaType = getUint32() & 0xff;              // 0x10
+    this.tracks = getUint32() & 0xff;                 // 0x14
+    this.mode = getUint32() & 0xff;                   // 0x18
+    this.dropLoop = getUint32() & 0xff;               // 0x1C
+    this.bpm = utils.toBPM(getFloat32());             // 0x20
+    this.beatGridOffset = getFloat32();               // 0x24
+    this.startTime = getFloat64();                    // 0x28
+    this.duration = getFloat64();                     // 0x30
+    this.totalDuration = getFloat64();                // 0x38
+    this.endTime = getFloat64();                      // 0x40 (abs. time)
+    this.gain = getFloat32();                         // 0x48
+    this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength in this case
+    pos += 4;                                         // 0x50 ??? video rel?
+    this.offsetThumb = getUint32();                   // 0x54
+    this.thumbSize = getUint32();                     // 0x58
+    this.offsetPath = getUint32();                    // 0x5C
+    const pathLength = getUint32();                   // 0x60
+    pos += 12;                                        // 0x64-0x6f ??? reserved?
+    const key = getUint32() & 0xff;                   // 0x70
+    this.keyMatchType = getUint32() & 0xff;           // 0x74
 
-  if ( pathLength ) {
-    try {
-      this.path = td.decode(file.subarray(this.offsetPath, this.offsetPath + pathLength));
+    this.key = Math.max(0, Math.min(0x18, key));
+
+    data = new Uint8Array(buffer.buffer);
+
+    if ( pathLength ) {
+      try {
+        this.path = td.decode(data.subarray(this.offsetPath, this.offsetPath + pathLength));
+      }
+      catch(err) {debug(err)}
     }
-    catch(err) {debug(err)}
-  }
-  else this.path = '';
+    else this.path = '';
 
-  this.media = file.slice(this.offsetData, this.offsetData + this.mediaSize);
-  this.thumb = this.offsetThumb && this.thumbSize ? file.slice(this.offsetThumb, this.offsetThumb + this.thumbSize) : null;
+    this.media = data.slice(this.offsetData, this.offsetData + this.mediaSize);
+    this.thumb = this.offsetThumb && this.thumbSize ? data.slice(this.offsetThumb, this.offsetThumb + this.thumbSize) : null;
+  }
+  else {
+    // initialize with defaults
+    this.path = '';
+    this.version = 8.31;
+    this.offsetData = 0;
+    this.mediaSize = 0;
+    this.mediaType = 0;
+    this.tracks = 0;
+    this.mode = 0;
+    this.dropLoop = 0;
+    this.bpm = 120;
+    this.beatGridOffset = 0;
+    this.startTime = 0;
+    this.duration = 0;
+    this.totalDuration = 0;
+    this.endTime = 0;
+    this.gain = 0;
+    this.transparencyColor = new Color(0x7f000000);
+    this.offsetThumb = 0;
+    this.thumbSize = 0;
+    this.offsetPath = 0x78;
+    this.keyMatchType = 0;
+    this.key = 0;
+    this.media = null;
+    this.thumb = null;
+  }
 
   /* ---  Utility props-------------------------------------------------------*/
-
   _getter('mediaTypeDesc', () => trackModes[ this.mediaType ]);
   _getter('tracksDesc', () => trackModes[ this.tracks ]);
   _getter('modeDesc', () => sampleModes[ this.mode ]);
   _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
+
+  Object.defineProperty(this, 'path', {
+    get: () => _path,
+    set: (newPath) => {
+      _path = newPath;
+      this.basename = Path.parse(_path).name;
+    }
+  });
 
   Object.defineProperty(this, 'keyDesc', {
     get: () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
@@ -129,13 +161,16 @@ function VDJSample(path) {
     set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
   });
 
+  // initialize path and basename
+  this.path = path || '';
+
   /* ---  Error checking -----------------------------------------------------*/
 
-  this.error = null;
+  this.errors = [];
 
   // Checks
   if ( this.offsetThumb && this.offsetThumb === this.offsetPath ) {
-    this.error = 'WARNING: vdjsample may have corrupted path data.';
+    this.error.push('WARNING: vdjsample may have corrupted path data.');
     this.path = '';
     this.offsetPath = 0x78;
   }
@@ -190,15 +225,119 @@ VDJSample.prototype = {
     return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
   },
 
-  setMedia: function(path) {
-    // todo consider ffmpeg for conversion? (flac, ogg / mkv, hap, webm?)
+  setMedia: async function(path, nonLossy = false) {
+    const buffer = await utils.loadFilePart(path, 0, 3);
+    if ( !buffer ) throw 'Could not load media from path.';
+
+    // check for valid types. not sure if list is complete at this point - VDJ converts formats internally (wav->flac for non-lossy etc.)
+    const magics = [
+      0x43614C66,     // fLaC
+      0x5367674F,     // OggS
+      0xA3DF451A     // matroska
+    ];
+
+    const data = new DataView(buffer.subarray(0, 3).buffer);
+    let result;
+
+    if ( !magics.includes(data.getUint32(0, true)) ) {
+      throw 'Unsupported media format for vdjsample.';
+      //return console.log('Unsupported media format for vdjsample.');
+    }
+
+    this.path = path;
+
+    // probe source file
+    result = spawnSync('ffprobe', [ '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path ], { maxBuffer: 1 << 22 });
+    if ( result.error ) {
+      if ( result.error.toString().includes('ENOENT') ) {
+        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
+      }
+      else {
+        throw 'Could not parse this file. Make sure it is of correct type and exist.';
+      }
+    }
+
+    let json;
+
+    try {
+      const jStr = result.output.toString(); //.replace(/^[,\s]+{|}[,\s]$/g, '');
+      json = JSON.parse(jStr.substring(jStr.indexOf('{'), jStr.lastIndexOf('}') + 1).trim());
+    }
+    catch(err) {
+      debug(err);
+      throw 'Unable to parse output as JSON.';
+    }
+
+    // convert input
+    const ext = Path.parse(path).ext.toLowerCase();
+    const isAudio = [ '.wav', '.mp3', '.aac', '.flac', '.aif', '.aiff', '.m4a', '.ogg' ].includes(ext);
+    const isVideo = [ '.mp4', '.m4v', '.mkv', '.mpg', '.mpeg', '.avi', '.webm', '.ogv' ].includes(ext);
+
+    if ( !isAudio && !isVideo ) {
+      throw 'Unsupported format.'
+    }
+
+    let rndFilename = Path.join(Path.parse(path).dir, Math.random().toString().substr(1));
+    if ( isAudio ) {
+      if ( nonLossy ) {
+        rndFilename += '.flac';
+        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-sample_fmt', 's16', '-ar', '44100', rndFilename ], { maxBuffer: 1 << 22 });
+      }
+      else {
+        rndFilename += '.ogg';
+        result = spawnSync('ffmpeg', [ '-y', '-i', path, '-c:a', 'libvorbis', '-b:a', '192k', rndFilename ], { maxBuffer: 1 << 22 });
+      }
+      this.mediaType = 0;
+      this.tracks = 0;
+    }
+    else {
+      let hasVideo = false;
+      let hasAudio = false;
+      json.streams.forEach(s => {
+        if ( s.codec_type === 'audio' ) hasAudio = true;
+        else if ( s.codec_type === 'video' ) hasVideo = true;
+      });
+
+      this.mediaType = hasVideo && hasAudio ? 1 : 2;
+      this.tracks = this.mediaType;
+
+      const vp = hasVideo ? (hasAudio ? [ '-c:v', 'libx264' ] : [ '-c:v', 'hap', '-format', 'hap_alpha' ]) : [];
+      const ap = hasAudio ? [ '-c:a', 'aac' ] : [];
+
+      rndFilename += '.mkv';
+      result = spawnSync('ffmpeg', [ '-y', '-i', path, ...vp, ...ap, rndFilename ], { maxBuffer: 1 << 22 });
+      this.mediaType = 1;
+      this.tracks = 1;
+    }
+
+    if ( result.error ) {
+      fs.unlinkSync(rndFilename);
+      if ( result.error.toString().includes('ENOENT') ) {
+        throw 'To use this method ffmpeg and ffprobe must be installed and available in PATH. See https://ffmpeg.org.';
+      }
+      else {
+        throw 'Could not convert this file. Make sure it is of correct type and exist.';
+      }
+    }
+
+    // load dst. file and delete
+    this.media = new Uint8Array(utils.loadFile(rndFilename).buffer);
+    this.mediaSize = this.media.byteLength;
+    this.thumbOffset = 0x78 + this.path.length + this.mediaSize; // calc. for informal reasons
+    fs.unlinkSync(rndFilename);
+
+    this.totalDuration = +json.format.duration;
+    this.endTime = this.totalDuration;
   },
 
   setThumb: function(path) {
     // png
+
   },
 
   compile: function(removePath = false) {
+    if ( !this.media || !this.mediaSize ) throw 'No media is set.';
+
     const te = new TextEncoder();
     const txt = te.encode(this.path);
     const pathLength = removePath ? 0 : txt.length;

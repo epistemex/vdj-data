@@ -103,9 +103,9 @@
 <li>Merge, split databases respecting ignoreDrives (Windows) and available drives</li>
 <li>Search for songs by title, artist etc, or by file path</li>
 <li>Verify song paths</li>
-<li>Export as XML or JSON</li>
 <li>Import, export, update using scripting</li>
 <li>Remove duplicate paths</li>
+<li>Export as XML or JSON</li>
 </ul>
 </li>
 <li>Songs:
@@ -116,6 +116,7 @@
 <li>Change and update any property (infos, tags, scan etc.)</li>
 <li>Add, change or remove POIs</li>
 <li>Extract every tag from a supported media file (cover art, user tags, native tags etc.)</li>
+<li>Export as XML or JSON</li>
 </ul>
 </li>
 <li>AcoustID (WIP)
@@ -171,57 +172,50 @@
 <li>Windows and MacOS (the latter does not enjoy full support at this time regarding
 auto-detection of paths etc., but should work on data level once loaded manually).</li>
 </ul>
-<p>You can use this from simple singleton scripts, or to make complex workflow and
-pipelines (e.g. automatic file format conversion, chart list playlist creation,
-file/folder organizing, mass custom tagging, metadata extraction and syncing,
-interaction with external services and so forth).</p>
-<p>This package can also be a building block to make software handling VDJ information.
-You can easily build graphical front-ends using HTML and local server, or Electron etc.</p>
-<p>It's free for your personal use (private or professionally). There are no obligations,
-but feel free to consider <a href="https://issuehunt.io/r/silverspex/vdj-data">donating</a> to the
-project to keep it going.</p>
+<h2>Who Is This For?</h2>
+<p>If you want to make anything from simple singleton scripts, which do one specific
+thing, to complex workflows and pipelines that combine online services, local
+conversion software, automatic tagging and so forth, then this is for you.</p>
+<p>You can alternatively use this package as a building block to make software
+handling VDJ data, and you can easily build graphical front-ends using HTML and
+for example a local server, or Electron etc.</p>
 <h2>Prerequisites</h2>
 <p>You need <a href="https://nodejs.org/en/">Node.js</a> v12+ installed for this package (it
 may work with older versions, but this has not been tested).</p>
-<p>It is assumed you're already familiar with how Node.js and NPM works if you plan
-to integrate this package with your software.</p>
+<p>You also need to know JavaScript as well as using Node.js and NPM.</p>
 <p>While the package should theoretically run on any platform where Node.js can
 run, it has only been tested and developed (so far) on Windows.</p>
 <p>It would also be an advantage to have the VirtualDJ software installed unless
-you just want to work directly with the VDJ database XML files. They have a free
-version that can be obtained on their web site. Tip: You are also able to create
-database files from scratch using only this package.</p>
-<p>If you want to create/modify vdjsamples with <em>new media content</em>, then <a href="https://ffmpeg.org/">ffmpeg/ffprobe</a> is also needed. See note below under vdjsample example.</p>
+you just want to work directly with VDJ data files directly or maker them from
+scratch.</p>
+<p>If you want to create or replace <code>*.vdjsamples</code> with <em>new media content</em>, then
+<a href="https://ffmpeg.org/">ffmpeg/ffprobe</a> is also needed. See note in the linked
+vdjsample example below.</p>
 <h2>Install</h2>
 <p>Run the following command in CLI to install this package into your project:</p>
 <pre><code>npm i silverspex/vdj-data
 </code></pre>
-<h2>Development</h2>
-<p>This step is only needed if you'd like to run the demos, fix bugs (PRs) or browse
-around (you can alternatively download the demos manually). It requires a <a href="https://git-scm.com/downloads">git command</a>
-installed on your system. CD into a root folder where you want to clone, and run:</p>
-<pre><code>git clone https://github.com/silverspex/vdj-data.git
-</code></pre>
-<p>Then cd into <code>vdj-data/</code>.</p>
 <h2>WANTED</h2>
 <p>If you have problems with your VDJ database or sample files I would be interested
 in taking a look at them to see if I can build scripts to fix them automatically.</p>
-<p>Please notify me in <a href="https://github.com/silverspex/vdj-data/issues">issues</a> and I'll give you
-an email to use to send me the data (or post a Dropbox/<a href="https://send.firefox.com/">Firefox send</a> link if you don't mind). The data will be destroyed after use.</p>
+<p>Notify me in <a href="https://github.com/silverspex/vdj-data/issues">issues</a> with a
+Dropbox or <a href="https://send.firefox.com/">Firefox send</a> link. Let me know if you
+want to ship the files privately instead.</p>
 <h2>Examples</h2>
 <p>Getting started. After npm has finished installed this package, you can
-<code>require()</code> the package in your .js file to use the vdj-data API:</p>
+<code>require()</code> the package into your .js file to use the vdj-data API:</p>
 <pre class="prettyprint source lang-javascript"><code>// Import and use in your projects
 const vdj = require('vdj-data');
 
 // The VDJ Data API can now be used ..
 </code></pre>
-<p>If you only cloned the repo you would want to import the <code>index.js</code> file instead.
-Just make sure the relative or absolute path resolves to the index.js file:</p>
+<p>If you cloned the repo via git, or downloaded the zip/tar-ball, you would want to
+import the <code>index.js</code> file instead. Just make sure the relative or absolute path
+resolves to the <code>index.js</code> file:</p>
 <pre class="prettyprint source lang-javascript"><code>// Import from the demo folder would look like this
 const vdj = require('../index');
 </code></pre>
-<h2>Also see these examples</h2>
+<p><strong>See these examples to get you started</strong></p>
 <ul>
 <li><a href="examples/EXAMPLES-DATABASE.md">Using the Database object</a></li>
 <li><a href="examples/EXAMPLES-SONGS.md">Using the Song object</a></li>
@@ -251,8 +245,8 @@ need to read, write and maintain database information is ready for use.</p>
 <p>Feel free to use the issue tracker to <a href="https://github.com/silverspex/vdj-data/issues">report issues</a>, feature requests.</p>
 <h2>License</h2>
 <p><strong>There is currently no license available.</strong> However, you may download and evaluate the
-package and use it in your personal non-commercial projects. Future licenses may be made
-available for personal as well as commercial use.</p>
+package and use it in your personal projects. Future licenses may be made available for
+personal as well as commercial use.</p>
 <p>Disclaimer: this project is unofficial and not affiliated with Atomix.</p>
 <p>(c) Silverspex 2019-2020</p></article>
     </section>

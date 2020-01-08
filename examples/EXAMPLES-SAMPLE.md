@@ -1,10 +1,10 @@
-VDJSample object
-================
+Sample object
+=============
 
 Load an existing sample:
 
 ```javascript
-const sample = new Sample('path/to/sample.vdjsample');
+const sample = new vdj.Sample('path/to/sample.vdjsample');
 
 // update thumb
 sample.setThumb('path/tp/thumb.png');
@@ -19,7 +19,7 @@ back as the internals will recompile the entire sample.
 Creating a new vdjsample to use with VDJ is easy:
 
 ```javascript
-const sample = new Sample();
+const sample = new vdj.Sample();
 sample.setMedia('path/to/sample.flac'); // see note below
 sample.setThumb('path/tp/thumb.png');   // optional
 
@@ -27,11 +27,12 @@ const dst = Path.join(vdj.FOLDER.SAMPLER, 'my-new-sample.vdjsample');
 s.write(dst);
 ```
 
-**Note** that setting media (`setMedia()`)will require **ffmpeg**/**ffprobe**
-installed on your computer and available in the PATH (can run from anywhere).
+**Note** that _setting_ media (`setMedia()`) will require **ffmpeg**/**ffprobe**
+installed on your system and be available via PATH (can run from anywhere).
 
 They are free and can be installed and forgotten about. Download a version for
-your platform from [ffmpeg.org](https://ffmpeg.org/).
+your platform from [ffmpeg.org](https://ffmpeg.org/). The installer gives you
+the option to make it available via PATH.
 
 These are used to convert and validate the media to make sure it is saved in a VDJ
 compatible format. It also allows you to use almost any source type, codec.

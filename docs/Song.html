@@ -250,7 +250,7 @@ and type casting.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="rename"><span class="type-signature"></span>rename(newName)</h4>
+    <h4 class="name" id="calcMD5Hash"><span class="type-signature"></span>calcMD5Hash( [max])</h4>
     
     
 </dt>
@@ -258,7 +258,10 @@ and type casting.</p>
 
     
     <div class="description">
-        <p>Renames the file name/path and also updates this Song instance.</p>
+        <p>Calc a MD5 hash for the media file referenced in this instance.
+The hash is also stored as a property (<code>instance.hash</code>).</p>
+<p>Note that if max is set and the file size is larger, the file
+is ignored completely rather than loading just a part.</p>
     </div>
     
 
@@ -281,6 +284,185 @@ and type casting.</p>
         <th>Type</th>
 
         
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    -1
+                
+                </td>
+            
+
+            <td class="description last"><p>max filesize in bytes, default = any size (-1)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>hash string, or null if any error occurred.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="cleanName"><span class="type-signature"></span>cleanName( [compilerOptions])</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Advanced filename cleaner using file basename in an attempt to restructure
+and clean up parts of the name (artist(s), title, featuring, presents, remix,
+year etc.)</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
 
         
 
@@ -293,24 +475,317 @@ and type casting.</p>
 
         <tr>
             
-                <td class="name"><code>newName</code></td>
+                <td class="name"><code>compilerOptions</code></td>
             
 
             <td class="type">
             
+                
+<span class="param-type">*</span>
+
+
+
+            
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>see src/cleaner for details</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="filenameToTag"><span class="type-signature"></span>filenameToTag()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Convert filename to tags for artist, title, remix and year.
+Based on cleanName().</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTags"><span class="type-signature"></span>getTags()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get tags from referenced file path in this instance.</p>
+<p>The Promise returns a JSON object with all available tags,
+or null if unsuccessful (no tags or no file).</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(*|null)></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="sortPOIs"><span class="type-signature"></span>sortPOIs()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sort POIs by time position.</p>
+    </div>
+    
+
+    
+
+    
+
+    
     
 
     
@@ -479,13 +954,13 @@ and type casting.</p>
     
     <div class="description">
         <p>Produces a string based on given formatting. The default formatting is:</p>
-<pre><code>%artists - %title (%remix)
+<pre><code>%artist - %title (%remix)
 </code></pre>
 <p>The information is extracted from the tags stored in the database. If a tag
 is empty an empty string is returned.</p>
 <p>Note that the keywords are case-sensitive.</p>
 <p>Keywords that can be used:</p>
-<pre><code>%artists
+<pre><code>%artist
 %title
 %remix
 %year
@@ -566,7 +1041,7 @@ is empty an empty string is returned.</p>
             
                 <td class="default">
                 
-                    "%artists - %title (%remix)"
+                    "%artist - %title (%remix)"
                 
                 </td>
             

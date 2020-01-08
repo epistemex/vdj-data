@@ -12,12 +12,14 @@ Features
     - Search for songs by title, artist etc, or by file path
     - Verify song paths
     - Import, export, update using scripting
-    - Remove duplicate paths
     - Export entire database and songs as XML or JSON
+    - Create quick database backup snapshots before applying modifications.
 - Songs:
     - Parse, add, remove Song objects
     - Load new songs from disk optionally including parsing tag information
     - Verify song path
+    - Advanced filename cleaner
+    - Extract tags from filename
     - Change and update any property (infos, tags, scan etc.)
     - Add, change or remove POIs
     - Extract every tag from a supported media file (cover art, user tags, native tags etc.)
@@ -31,7 +33,7 @@ Features
     - Modify playlist, add/remove songs
     - Validate song paths
     - Export new or modified playlists
-- VDJSample (WIP):
+- VDJSample:
     - Load VDJ samples
     - Extract and save out media data
     - Extract and save out thumb image (if present)
@@ -60,7 +62,7 @@ auto-detection of paths etc., but should work on data level once loaded manually
 Who Is This For?
 ----------------
 
-If you want to make anything from simple singleton scripts, which does one specific
+If you want to make anything from simple singleton scripts, which do one specific
 thing, to more complex workflows and pipelines that combine online services, local
 conversion software, automatic tagging and so forth, then this is for you!
 

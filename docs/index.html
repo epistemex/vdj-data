@@ -104,8 +104,8 @@
 <li>Search for songs by title, artist etc, or by file path</li>
 <li>Verify song paths</li>
 <li>Import, export, update using scripting</li>
-<li>Remove duplicate paths</li>
-<li>Export as XML or JSON</li>
+<li>Export entire database and songs as XML or JSON</li>
+<li>Create quick database backup snapshots before applying modifications.</li>
 </ul>
 </li>
 <li>Songs:
@@ -113,10 +113,12 @@
 <li>Parse, add, remove Song objects</li>
 <li>Load new songs from disk optionally including parsing tag information</li>
 <li>Verify song path</li>
+<li>Advanced filename cleaner</li>
+<li>Extract tags from filename</li>
 <li>Change and update any property (infos, tags, scan etc.)</li>
 <li>Add, change or remove POIs</li>
 <li>Extract every tag from a supported media file (cover art, user tags, native tags etc.)</li>
-<li>Export as XML or JSON</li>
+<li>Export song information as XML or JSON</li>
 </ul>
 </li>
 <li>AcoustID (WIP)
@@ -127,11 +129,14 @@
 </li>
 <li>Playlists
 <ul>
-<li>Load, update and create playlists (m3u)</li>
+<li>Load existing playlists (VDJ m3u)</li>
+<li>Create new playlists</li>
+<li>Modify playlist, add/remove songs</li>
 <li>Validate song paths</li>
+<li>Export new or modified playlists</li>
 </ul>
 </li>
-<li>VDJSample (WIP):
+<li>VDJSample:
 <ul>
 <li>Load VDJ samples</li>
 <li>Extract and save out media data</li>
@@ -174,33 +179,24 @@ auto-detection of paths etc., but should work on data level once loaded manually
 </ul>
 <h2>Who Is This For?</h2>
 <p>If you want to make anything from simple singleton scripts, which do one specific
-thing, to complex workflows and pipelines that combine online services, local
-conversion software, automatic tagging and so forth, then this is for you.</p>
+thing, to more complex workflows and pipelines that combine online services, local
+conversion software, automatic tagging and so forth, then this is for you!</p>
 <p>You can alternatively use this package as a building block to make software
 handling VDJ data, and you can easily build graphical front-ends using HTML and
 for example a local server, or Electron etc.</p>
 <h2>Prerequisites</h2>
-<p>You need <a href="https://nodejs.org/en/">Node.js</a> v12+ installed for this package (it
-may work with older versions, but this has not been tested).</p>
-<p>You also need to know JavaScript as well as using Node.js and NPM.</p>
-<p>While the package should theoretically run on any platform where Node.js can
-run, it has only been tested and developed (so far) on Windows.</p>
-<p>It would also be an advantage to have the VirtualDJ software installed unless
-you just want to work directly with VDJ data files directly or maker them from
-scratch.</p>
-<p>If you want to create or replace <code>*.vdjsamples</code> with <em>new media content</em>, then
-<a href="https://ffmpeg.org/">ffmpeg/ffprobe</a> is also needed. See note in the linked
-vdjsample example below.</p>
+<p>You need <a href="https://nodejs.org/en/">Node.js</a> v12+ installed to use this package.
+NPM (a package manager) comes as part of the installation.</p>
+<p>Of course, you'd also need to know JavaScript as well as using Node.js and NPM.</p>
+<p>It would be an advantage to have the VirtualDJ software installed unless you just
+want to work with VDJ data files directly or make them from scratch.</p>
+<p>If you want to create or replace <code>*.vdjsamples</code> with <em><strong>new media content</strong></em>, then
+<a href="https://ffmpeg.org/">ffmpeg/ffprobe</a> is also required. See note in the linked
+&quot;sample&quot; example below.</p>
 <h2>Install</h2>
 <p>Run the following command in CLI to install this package into your project:</p>
 <pre><code>npm i silverspex/vdj-data
 </code></pre>
-<h2>WANTED</h2>
-<p>If you have problems with your VDJ database or sample files I would be interested
-in taking a look at them to see if I can build scripts to fix them automatically.</p>
-<p>Notify me in <a href="https://github.com/silverspex/vdj-data/issues">issues</a> with a
-Dropbox or <a href="https://send.firefox.com/">Firefox send</a> link. Let me know if you
-want to ship the files privately instead.</p>
 <h2>Examples</h2>
 <p>Getting started. After npm has finished installed this package, you can
 <code>require()</code> the package into your .js file to use the vdj-data API:</p>
@@ -220,7 +216,7 @@ const vdj = require('../index');
 <li><a href="examples/EXAMPLES-DATABASE.md">Using the Database object</a></li>
 <li><a href="examples/EXAMPLES-SONGS.md">Using the Song object</a></li>
 <li><a href="examples/EXAMPLES-PLAYLISTS.md">Using the Playlist object</a></li>
-<li><a href="examples/EXAMPLES-VDJSAMPLE.md">Using the VDJSample object</a></li>
+<li><a href="examples/EXAMPLES-SAMPLE.md">Using the Sample object</a></li>
 <li><a href="examples/EXAMPLES-FINGERPRINTING.md">Using AcoustID audio fingerprinting</a></li>
 <li><a href="examples/EXAMPLES-BACKUP-RESTORE.md">Using the Backup and Restore functions</a></li>
 <li><a href="examples/EXAMPLES-SYSTEM.md">System functions</a></li>
@@ -232,8 +228,8 @@ const vdj = require('../index');
 </code></pre>
 <p>See content of each file for details.</p>
 <h2>Documentation</h2>
-<p>The package comes (eventually) with full API documentation which you find in the
-<code>docs/</code> folder.</p>
+<p>The package comes (eventually) with full API HTML documentation which you find
+in the <code>docs/</code> folder.</p>
 <h2>Issues</h2>
 <p>NOTE: The development is currently in ALPHA. The API may change without prior
 notice. Many features are not yet implemented. However, most of what you would
@@ -245,8 +241,7 @@ need to read, write and maintain database information is ready for use.</p>
 <p>Feel free to use the issue tracker to <a href="https://github.com/silverspex/vdj-data/issues">report issues</a>, feature requests.</p>
 <h2>License</h2>
 <p><strong>There is currently no license available.</strong> However, you may download and evaluate the
-package and use it in your personal projects. Future licenses may be made available for
-personal as well as commercial use.</p>
+package and use it in your private and personal projects.</p>
 <p>Disclaimer: this project is unofficial and not affiliated with Atomix.</p>
 <p>(c) Silverspex 2019-2020</p></article>
     </section>

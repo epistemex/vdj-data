@@ -20,8 +20,9 @@ Creating a new vdjsample to use with VDJ is easy:
 
 ```javascript
 const sample = new vdj.Sample();
-sample.setMedia('path/to/sample.flac'); // see note below
-sample.setThumb('path/tp/thumb.png');   // optional
+sample.setMedia('path/to/sample.flac');       // see note below
+sample.setMedia('path/to/sample.flac', true); // or as non-lossy
+sample.setThumb('path/tp/thumb.png');         // optional
 
 const dst = Path.join(vdj.FOLDER.SAMPLER, 'my-new-sample.vdjsample');
 s.write(dst);

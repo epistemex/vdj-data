@@ -274,9 +274,38 @@ Database.prototype = {
     }
   },
 
-  // todo
-  writeStream: function(ws) {
+  /**
+   * Pipe the generated database.xml content to a write stream.
+   * @param { WriteStream } ws - stream to pipe (write) to.
+   * @param {boolean} [close=false] close the stream when done
+   * @returns {*}
+   */
+  writeStream: function(ws, close = false) {
+    return close ? ws.end(this.toXML(), 'utf-8') : ws.write(this.toXML(), 'utf-8');
+  },
 
+  /**
+   * Takes a snapshot (or quick backup) of the database file.
+   * The backup file (with .bakN extension where N is a number) is saved
+   * to the same folder as the original.
+   *
+   * @param {number} [limit=99] maximum number of backups. If limit is reach
+   * the last one (=limit) will be overwritten.
+   * @returns {boolean} true if successful.
+   */
+  snapshot: function(limit = 99) {
+    if ( this.path ) {
+      let i = 0;
+      try {
+        while( fs.existsSync(`${ this.path }.bak${ i }`) && i < limit ) i++;
+        fs.copyFileSync(this.path, `${ this.path }.bak${ i }`);
+        return true
+      }
+      catch(err) {
+        debug(err);
+        return false
+      }
+    }
   }
 };
 

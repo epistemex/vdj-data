@@ -164,7 +164,7 @@ function VDJSample(path) {
   _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
   _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
 
-  this.validateTimeRange();
+  this.validateTimes();
 
   // initialize path and basename
   this.path = path || '';
@@ -222,14 +222,18 @@ VDJSample.prototype = {
     }
   },
 
-  validateTimeRange: function() {
+  /**
+   * Call this after modifying time ranges to make sure the times are valid,
+   * (start is not after end, end is not after duration etc.).
+   */
+  validateTimes: function() {
     if ( this.totalDuration > 0 ) {
       if ( this.endTime > this.totalDuration ) this.endTime = this.totalDuration;
       if ( this.startTime > this.endTime ) this.startTime = this.endTime;
       this.duration = this.endTime - this.startTime;
     }
     else {
-      this.startTime = this.endTime = this.duration = 0;
+      this.startTime = this.endTime = this.duration = this.totalDuration = 0;
     }
   },
 
@@ -379,7 +383,7 @@ VDJSample.prototype = {
     const pathLength = removePath ? 0 : txt.length;
     const size = 0x78 + pathLength + this.mediaSize + this.thumbSize;
 
-    this.validateTimeRange();
+    this.validateTimes();
 
     const data = new Uint8Array(size);
     const view = new DataView(data.buffer);

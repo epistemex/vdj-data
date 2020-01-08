@@ -94,7 +94,7 @@
 
     <section class="readme-section">
         <article><h1>vdj-data</h1>
-<p>JavaScript based scripting engine for VirtualDJ data files.</p>
+<p>JavaScript based scripting API for a variety of VirtualDJ data files.</p>
 <h2>Features</h2>
 <ul>
 <li>Databases:
@@ -137,7 +137,9 @@
 <li>Extract and save out thumb image (if present)</li>
 <li>Change ranges, beatgrid, loop/drop modes etc.</li>
 <li>(partly) Repair malformed samples</li>
-<li>(todo) Create new samples from scratch</li>
+<li>Create new samples from scratch</li>
+<li>Add any supported media (via the free ffmpeg/ffprobe. See <a href="http://ffmpeg.org/">ffmpeg.org</a></li>
+<li>(todo) Set thumb image</li>
 <li>Export with modifications</li>
 </ul>
 </li>
@@ -332,16 +334,16 @@ const plMissing = pl.verifyPaths();
 const newPlaylist = pl.compile();
 </code></pre>
 <p>Create playlists from scratch:</p>
-<pre class="prettyprint source lang-javascript"><code>// Load and merge all available VDJ databases for this demo
-const db = vdj.Database.merge(vdj.loadAllDatabases());
+<pre class="prettyprint source lang-javascript"><code>// Load and merge all available VDJ databases, and we only need the songs array:
+const songs = vdj.Database.merge(vdj.loadAllDatabases()).songs;
 
 // Create an empty playlist
 const pl = new vdj.Playlist();
 
-// add some random tracks (any track type in this example)
-for(let i = 0; i &lt; 50; i++) {
-  const t = (Math.random() * db.songs.length)|0;
-  pl.add(db.songs[t]);
+// add 100 random tracks (any track type in this example)
+for(let i = 0; i &lt; 100; i++) {
+  const t = (Math.random() * songs.length)|0;
+  pl.add(songs[t]);
 }
 
 // save out list - voila!

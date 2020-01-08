@@ -225,6 +225,17 @@ VDJSample.prototype = {
     return this.thumb && this.thumbSize > 1024 ? this._save(path, this.thumb) : false;
   },
 
+  /**
+   * Set or replace media for the sample. The media can be any supported format, audio as well as video.
+   * Video supports alpha channels. This method uses ffmpeg and ffprobe to convert and check. Make sure
+   * they have been installed on your system and is in the global PATH (see https://ffmpeg.org).
+   *
+   * Provide a path to audio/video file to embed for this sample.
+   *
+   * @param {string} path - path to media file to embed
+   * @param {boolean} [nonLossy=false] set to true for non-lossy conversion for audio files
+   * @returns {Promise<void>}
+   */
   setMedia: async function(path, nonLossy = false) {
     const buffer = await utils.loadFilePart(path, 0, 3);
     if ( !buffer ) throw 'Could not load media from path.';

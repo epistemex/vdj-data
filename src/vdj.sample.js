@@ -207,16 +207,18 @@ function VDJSample(path) {
 
 VDJSample.prototype = {
   _frmKey: function(key) {
-    if ( key.length < 1 || key.length > 3 ) throw 'Invalid key length';
-    return key[ 0 ].toUpperCase() + key.substr(1).toLowerCase();
+    return (key.length > 0 && key.length <= 3)
+           ? key[ 0 ].toUpperCase() + key.substr(1).toLowerCase()
+           : key;
   },
 
   /**
    * Call this after modifying time ranges to make sure the times are valid,
    * (start is not after end, end is not after duration etc.).
+   * @returns {VDJSample}
    */
   validateTimes: function() {
-    if ( this.totalDuration > 0 ) {
+    if ( this.totalDuration > 0 && this.totalDuration < 36000 ) {
       if ( this.endTime > this.totalDuration ) this.endTime = this.totalDuration;
       else if ( this.endTime < 0 ) this.endTime = 0;
 

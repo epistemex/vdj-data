@@ -37,8 +37,6 @@ module.exports = {
   loadDatabase    : vdj.loadDatabase,
   loadAllDatabases: vdj.loadAllDatabases,
   loadPlaylist    : vdj.loadPlaylist,
-  getFolderPath   : vdj.getFolderPath,
-  getFilePath     : vdj.getFilePath,
   backup          : require('./src/vdj.backup'),
   restore         : require('./src/vdj.restore'),
   utils           : require('./src/utils'),

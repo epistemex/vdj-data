@@ -221,7 +221,7 @@ const vdj = require('../index');
 </code></pre>
 <p>Various ways to load and handle databases:</p>
 <pre class="prettyprint source lang-javascript"><code>// Get main VirtualDJ database.xml
-const mainDatabasePath = vdj.getFilePath(vdj.FILE.DATABASE);
+const mainDatabasePath = vdj.FILE.DATABASE;
 
 // Load and parse a single database
 const database = vdj.loadDatabase(mainDatabasePath);
@@ -351,7 +351,7 @@ pl.write('path/to/random-playlist.m3u');
 </code></pre>
 <p>TIP: to write to VDJ's playlist folder, obtain path this way:</p>
 <pre class="prettyprint source lang-javascript"><code>const path = require('path');
-const plPath = vdj.getFolderPath(vdj.FOLDER.PLAYLISTS);
+const plPath = vdj.FOLDER.PLAYLISTS;
 
 // Then merge and write:
 pl.write(path.join(plPath, 'random-playlist.m3u'));

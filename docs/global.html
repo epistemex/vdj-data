@@ -158,7 +158,9 @@
 <dd>
     
     <div class="description">
-        <p>File type enums for getSubFolder().</p>
+        <p>File type enums These are initialized with
+the absolute path to the file and can be used
+directly.</p>
     </div>
     
 
@@ -225,7 +227,7 @@
             
                 <td class="default">
                 
-                    database.xml
+                    
                 
                 </td>
             
@@ -255,7 +257,7 @@
             
                 <td class="default">
                 
-                    settings.xml
+                    
                 
                 </td>
             
@@ -285,7 +287,7 @@
             
                 <td class="default">
                 
-                    license.dat
+                    
                 
                 </td>
             
@@ -350,7 +352,9 @@
 <dd>
     
     <div class="description">
-        <p>Folder type enums for getSubFolder().</p>
+        <p>Folder type enums. These are initialized with
+the absolute path to the folder and can be used
+directly.</p>
     </div>
     
 
@@ -417,7 +421,7 @@
             
                 <td class="default">
                 
-                    Backup
+                    
                 
                 </td>
             
@@ -447,7 +451,7 @@
             
                 <td class="default">
                 
-                    Cache
+                    
                 
                 </td>
             
@@ -477,7 +481,7 @@
             
                 <td class="default">
                 
-                    Cache/Covers
+                    
                 
                 </td>
             
@@ -507,7 +511,7 @@
             
                 <td class="default">
                 
-                    Cache/Plugins
+                    
                 
                 </td>
             
@@ -537,7 +541,7 @@
             
                 <td class="default">
                 
-                    Cloudlists
+                    
                 
                 </td>
             
@@ -567,7 +571,7 @@
             
                 <td class="default">
                 
-                    Devices
+                    
                 
                 </td>
             
@@ -597,7 +601,7 @@
             
                 <td class="default">
                 
-                    Folders
+                    
                 
                 </td>
             
@@ -627,7 +631,7 @@
             
                 <td class="default">
                 
-                    History
+                    
                 
                 </td>
             
@@ -657,7 +661,7 @@
             
                 <td class="default">
                 
-                    Mappers
+                    
                 
                 </td>
             
@@ -687,7 +691,7 @@
             
                 <td class="default">
                 
-                    Pads
+                    
                 
                 </td>
             
@@ -717,7 +721,7 @@
             
                 <td class="default">
                 
-                    Playlists
+                    
                 
                 </td>
             
@@ -747,7 +751,7 @@
             
                 <td class="default">
                 
-                    Plugins
+                    
                 
                 </td>
             
@@ -777,7 +781,7 @@
             
                 <td class="default">
                 
-                    Plugins/AutoStart
+                    
                 
                 </td>
             
@@ -807,7 +811,7 @@
             
                 <td class="default">
                 
-                    Plugins/SoundEffect
+                    
                 
                 </td>
             
@@ -837,7 +841,7 @@
             
                 <td class="default">
                 
-                    Plugins/VideoEffect
+                    
                 
                 </td>
             
@@ -867,7 +871,7 @@
             
                 <td class="default">
                 
-                    Plugins/VideoTransition
+                    
                 
                 </td>
             
@@ -897,7 +901,7 @@
             
                 <td class="default">
                 
-                    Plugins/Visualisations
+                    
                 
                 </td>
             
@@ -927,7 +931,7 @@
             
                 <td class="default">
                 
-                    Plugins64
+                    
                 
                 </td>
             
@@ -957,7 +961,7 @@
             
                 <td class="default">
                 
-                    Plugins64/AutoStart
+                    
                 
                 </td>
             
@@ -987,7 +991,7 @@
             
                 <td class="default">
                 
-                    Plugins64/SoundEffect
+                    
                 
                 </td>
             
@@ -1017,7 +1021,7 @@
             
                 <td class="default">
                 
-                    Plugins64/VideoEffect
+                    
                 
                 </td>
             
@@ -1047,7 +1051,7 @@
             
                 <td class="default">
                 
-                    Plugins64/VideoTransition
+                    
                 
                 </td>
             
@@ -1077,7 +1081,7 @@
             
                 <td class="default">
                 
-                    Plugins64/Visualisations
+                    
                 
                 </td>
             
@@ -1107,7 +1111,7 @@
             
                 <td class="default">
                 
-                    pulselocker
+                    
                 
                 </td>
             
@@ -1137,7 +1141,7 @@
             
                 <td class="default">
                 
-                    Sampler
+                    
                 
                 </td>
             
@@ -1167,7 +1171,7 @@
             
                 <td class="default">
                 
-                    Skins
+                    
                 
                 </td>
             
@@ -1197,7 +1201,7 @@
             
                 <td class="default">
                 
-                    Tools
+                    
                 
                 </td>
             
@@ -1227,7 +1231,7 @@
             
                 <td class="default">
                 
-                    videoskins
+                    
                 
                 </td>
             
@@ -2694,7 +2698,8 @@ this is optional. Set to false to ignore this drive (e.g. for backup()/restore()
 
     
     <div class="description">
-        <p>Get path string with absolute path to chosen file. File type is
+        <p>DEPRECATED
+Get path string with absolute path to chosen file. File type is
 a sub-file directly in the VirtualDJ system (docs) folder, such as &quot;database.xml&quot;,
 &quot;settings.xml&quot; etc.</p>
     </div>
@@ -2993,7 +2998,8 @@ If invalid path or unsupported type, a null is returned.</p>
 
     
     <div class="description">
-        <p>Get path string with absolute path to chosen folder or file. Folder type is
+        <p>DEPRECATED</p>
+<p>Get path string with absolute path to chosen folder or file. Folder type is
 a sub-folder of the system folder, such as &quot;plugins64/&quot;, &quot;backup/&quot;, &quot;sampler/&quot; etc.</p>
     </div>
     

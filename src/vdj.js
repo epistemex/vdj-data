@@ -11,62 +11,66 @@
 const fs = require('fs');
 const Path = require('path');
 
-//const sys = require(global.isWin ? './sys32' : './sysOSX');
 const sys = global.isWin ? require('./sys32') : require('./sysOSX');
 const xml = require('./xml');
 const utils = require('./utils');
-//const Database = require('./vdj.database');
 const Playlist = require('./vdj.playlist');
 
+let _settings;
+let _rootFolder = null;
+const _rp = sub => Path.resolve(_rootFolder, sub);
+getVDJHome(); // inits _rootFolder
+
 /**
- * Folder type enums for getSubFolder().
+ * Folder type enums. These are initialized with
+ * the absolute path to the folder and can be used
+ * directly.
  * @readonly
  * @enum {string}
  */
 const FOLDER = {
-  BACKUP             : 'Backup',
-  CACHE              : 'Cache',
-  CACHECOVERS        : 'Cache/Covers',
-  CACHEPLUGINS       : 'Cache/Plugins',
-  CLOUDLISTS         : 'Cloudlists',
-  DEVICES            : 'Devices',
-  FOLDERS            : 'Folders',
-  HISTORY            : 'History',
-  MAPPERS            : 'Mappers',
-  PADS               : 'Pads',
-  PLAYLISTS          : 'Playlists',
-  PLUGINS            : 'Plugins',
-  PLUGINSAUTOSTART   : 'Plugins/AutoStart',
-  PLUGINSSOUNDFX     : 'Plugins/SoundEffect',
-  PLUGINSVIDEOFX     : 'Plugins/VideoEffect',
-  PLUGINSVIDEOTRANS  : 'Plugins/VideoTransition',
-  PLUGINSVIZ         : 'Plugins/Visualisations',
-  PLUGINS64          : 'Plugins64',
-  PLUGINSAUTOSTART64 : 'Plugins64/AutoStart',
-  PLUGINSSOUNDFX64   : 'Plugins64/SoundEffect',
-  PLUGINSVIDEOFX64   : 'Plugins64/VideoEffect',
-  PLUGINSVIDEOTRANS64: 'Plugins64/VideoTransition',
-  PLUGINSVIZ64       : 'Plugins64/Visualisations',
-  PULSELOCKER        : 'pulselocker',
-  SAMPLER            : 'Sampler',
-  SKINS              : 'Skins',
-  TOOLS              : 'Tools',
-  VIDEOSKINS         : 'videoskins'
+  BACKUP             : _rp('Backup'),
+  CACHE              : _rp('Cache'),
+  CACHECOVERS        : _rp('Cache/Covers'),
+  CACHEPLUGINS       : _rp('Cache/Plugins'),
+  CLOUDLISTS         : _rp('Cloudlists'),
+  DEVICES            : _rp('Devices'),
+  FOLDERS            : _rp('Folders'),
+  HISTORY            : _rp('History'),
+  MAPPERS            : _rp('Mappers'),
+  PADS               : _rp('Pads'),
+  PLAYLISTS          : _rp('Playlists'),
+  PLUGINS            : _rp('Plugins'),
+  PLUGINSAUTOSTART   : _rp('Plugins/AutoStart'),
+  PLUGINSSOUNDFX     : _rp('Plugins/SoundEffect'),
+  PLUGINSVIDEOFX     : _rp('Plugins/VideoEffect'),
+  PLUGINSVIDEOTRANS  : _rp('Plugins/VideoTransition'),
+  PLUGINSVIZ         : _rp('Plugins/Visualisations'),
+  PLUGINS64          : _rp('Plugins64'),
+  PLUGINSAUTOSTART64 : _rp('Plugins64/AutoStart'),
+  PLUGINSSOUNDFX64   : _rp('Plugins64/SoundEffect'),
+  PLUGINSVIDEOFX64   : _rp('Plugins64/VideoEffect'),
+  PLUGINSVIDEOTRANS64: _rp('Plugins64/VideoTransition'),
+  PLUGINSVIZ64       : _rp('Plugins64/Visualisations'),
+  PULSELOCKER        : _rp('pulselocker'),
+  SAMPLER            : _rp('Sampler'),
+  SKINS              : _rp('Skins'),
+  TOOLS              : _rp('Tools'),
+  VIDEOSKINS         : _rp('videoskins')
 };
 
 /**
- * File type enums for getSubFolder().
+ * File type enums These are initialized with
+ * the absolute path to the file and can be used
+ * directly.
  * @readonly
  * @enum {string}
  */
 const FILE = {
-  DATABASEFILE: 'database.xml',
-  SETTINGSFILE: 'settings.xml',
-  LICENSEFILE : 'license.dat'
+  DATABASEFILE: _rp('database.xml'),
+  SETTINGSFILE: _rp('settings.xml'),
+  LICENSEFILE : _rp('license.dat')
 };
-
-let _settings;
-let _rootFolder;
 
 /**
  * Check if VirtualDJ software is running. It's critical as to write operations
@@ -92,7 +96,7 @@ function isRunning() {
  * @returns {*}
  */
 function getVDJFolders() {
-  let result = {};
+  let result = { homeFolder: process.env.APPDATA + '/no-virtualdj-path-found' };
   if ( isWin ) {
     const regs = require('./sys32').getRegSync('HKCU\\Software\\VirtualDJ');
     regs.forEach(reg => result[ utils.camelCase(reg[ 0 ]) ] = reg[ 2 ]);
@@ -232,7 +236,7 @@ function getDrives(listAll = false, includeHome = true) {
     ...sys.listDrivesSync(sys.driveType.network)
   ];
 
-  const vdjHome = getVDJFolders().homeFolder;
+  const vdjHome = getVDJHome();
   const vdjRoot = utils.getRoot(vdjHome).toUpperCase();
 
   let mainFolder;
@@ -293,29 +297,6 @@ function getDrivePaths(listAll = false, includeHome = true) {
   return getDrives(listAll, includeHome).map(drive => drive.folder);
 }
 
-/**
- * Get path string with absolute path to chosen folder or file. Folder type is
- * a sub-folder of the system folder, such as "plugins64/", "backup/", "sampler/" etc.
- *
- * @param {FOLDER} folderType - folder to get path for. See the vdj.FOLDER enum.
- * @returns {string} - absolute path to folder
- */
-function getFolderPath(folderType) {
-  return Path.resolve(getVDJFolders().homeFolder, folderType);
-}
-
-/**
- * Get path string with absolute path to chosen file. File type is
- * a sub-file directly in the VirtualDJ system (docs) folder, such as "database.xml",
- * "settings.xml" etc.
- *
- * @param {FILE} fileType - file to get path for. See the vdj.FILE enum.
- * @returns {string} - absolute path to folder
- */
-function getFilePath(fileType) {
-  return Path.resolve(getVDJFolders().homeFolder, fileType);
-}
-
 // Mac/PC ... kept here for evaluation
 function fromMacToPC() {
   // todo replace all paths (database, playlists etc.) and save to new folder
@@ -335,8 +316,6 @@ module.exports = {
   loadPlaylist,
   getDrives,
   getDrivePaths,
-  getFolderPath,
-  getFilePath,
   FOLDER,
   FILE
 };

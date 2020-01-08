@@ -133,7 +133,7 @@ Various ways to load and handle databases:
 
 ```javascript
 // Get main VirtualDJ database.xml
-const mainDatabasePath = vdj.getFilePath(vdj.FILE.DATABASE);
+const mainDatabasePath = vdj.FILE.DATABASE;
 
 // Load and parse a single database
 const database = vdj.loadDatabase(mainDatabasePath);
@@ -278,7 +278,7 @@ TIP: to write to VDJ's playlist folder, obtain path this way:
 
 ```javascript
 const path = require('path');
-const plPath = vdj.getFolderPath(vdj.FOLDER.PLAYLISTS);
+const plPath = vdj.FOLDER.PLAYLISTS;
 
 // Then merge and write:
 pl.write(path.join(plPath, 'random-playlist.m3u'));

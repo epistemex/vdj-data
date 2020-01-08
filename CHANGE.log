@@ -1,6 +1,12 @@
 Change log for vdj-data
 -----------------------
 
+0.9.0-alpha
+-----------
+Add: VDJSamples can be made from scratch
+Add: setMedia() on Samples can convert to correct media format (audio, video, video with alpha)
+Add: cascade ignorePath setting for Sample.write()
+
 0.8.0-alpha
 -----------
 - Add: Can parse, compile and save VDJSamples

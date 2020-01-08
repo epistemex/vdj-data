@@ -1,6 +1,6 @@
 {
   "name": "vdj-data",
-  "version": "0.8.0-alpha",
+  "version": "0.9.0-alpha",
   "description": "Manage VirtualDJ databases, playlists etc. using scripting.",
   "private": true,
   "main": "index.js",
@@ -19,6 +19,7 @@
     "backup",
     "restore",
     "fingerprint",
+    "samples",
     "acoustid"
   ],
   "author": "silverspex",

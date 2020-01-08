@@ -34,7 +34,7 @@ Features
     - Change ranges, beatgrid, loop/drop modes etc.
     - (partly) Repair malformed samples
     - Create new samples from scratch
-    - Add any supported media (via the free ffmpeg/ffprobe. See [ffmpeg.org](http://ffmpeg.org/)
+    - Add any supported media (via the free ffmpeg/ffprobe. See [ffmpeg.org](http://ffmpeg.org/))
     - (todo) Set thumb image
     - Export with modifications
 - Folders

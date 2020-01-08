@@ -1,6 +1,6 @@
 {
   "name": "vdj-data",
-  "version": "0.9.0-alpha",
+  "version": "0.9.1-alpha",
   "description": "Manage VirtualDJ databases, playlists etc. using scripting.",
   "private": true,
   "main": "index.js",

@@ -54,5 +54,4 @@ module.exports = {
   getAudioFingerprint,
   listDrivesSync,
   type,
-  runSync: _execSync
 };

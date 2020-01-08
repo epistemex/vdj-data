@@ -2,21 +2,22 @@
  *
  *  Song object
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
 'use strict';
 
+const crypto = require('crypto');
 const Path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 
 const utils = require('./utils');
 const Tags = require('./vdj.tags');
 const Infos = require('./vdj.infos');
 const Scan = require('./vdj.scan');
 const Poi = require('./vdj.poi');
+const { cleaner } = require('./cleaner');
 
 /**
  * Instance of a Song with normalized property names (JavaScript camel-case)
@@ -109,53 +110,37 @@ Song.prototype = {
     return xml.filter(x => x.length).join('\r\n');
   },
 
+  /**
+   * Convert filename to tags for artist, title, remix and year.
+   * Based on cleanName().
+   */
   filenameToTag: function() {
-    // todo related to cleanName() -- temp: doesn't handle double parenthesis/segments
-    let filename = Path.basename(this.filePath);
-    const ext = filename.lastIndexOf('.');
-    if ( ext > 0 ) filename = filename.substr(0, ext);
-
-    // clean up misc. spaces, chars (todo optimize)
-    filename = filename
-      .replace(/_/g, ' ')
-      .replace(/\[/g, '(')
-      .replace(/]/g, ')')
-      .replace(/–/g, '-');
-
-    let artist = null;
-    let title = null;
-    let remix = null;
-
-    const aPos = filename.indexOf(' - ');
-    if ( aPos ) {
-      artist = filename.substr(0, aPos).trim();
-      let rPos = filename.indexOf('(', aPos + 3);
-      if ( rPos >= 0 ) {
-        title = filename.substring(aPos + 3, rPos).trim();
-        const rEnd = filename.indexOf(')', rPos + 1);
-        if ( rEnd > 0 ) {
-          remix = filename.substring(rPos + 1, rEnd).trim();
-        }
-      }
-      else title = filename.substr(aPos + 3);
+    const c = this.cleanName({ format: '%artist %featuring %presents' });
+    if ( c ) {
+      if ( c.artists.length ) this.tags.artist = c.cleaned;
+      if ( c.title ) this.tags.title = c.title;
+      if ( c.remix ) this.tags.remix = c.remix;
+      if ( c.year ) this.tags.year = c.year;
     }
-
-    //internal control
-    //console.log(`"${artists}"`, `"${title}"`, `"${remix}"`, `"${Path.basename(this.filePath)}"`);
-
-    if ( artist ) this.tags.artist = artist;
-    if ( title ) this.tags.title = title;
-    if ( remix ) this.tags.remix = remix;
+    return !!c
   },
 
-  cleanName: function() {
-    // todo parse, extract and touch-up/part filenames
+  /**
+   * Advanced filename cleaner using file basename in an attempt to restructure
+   * and clean up parts of the name (artist(s), title, featuring, presents, remix,
+   * year etc.)
+   *
+   * @param {*} [compilerOptions] - see src/cleaner for details
+   * @returns {*}
+   */
+  cleanName: function(compilerOptions = {}) {
+    return cleaner(Path.parse(this.filePath).base, compilerOptions);
   },
 
   /**
    * Produces a string based on given formatting. The default formatting is:
    *
-   *     %artists - %title (%remix)
+   *     %artist - %title (%remix)
    *
    * The information is extracted from the tags stored in the database. If a tag
    * is empty an empty string is returned.
@@ -164,7 +149,7 @@ Song.prototype = {
    *
    * Keywords that can be used:
    *
-   *     %artists
+   *     %artist
    *     %title
    *     %remix
    *     %year
@@ -180,10 +165,10 @@ Song.prototype = {
    *     %user1
    *     %user2
    *
-   * @param {string} [format="%artists - %title (%remix)"] - formatting string
+   * @param {string} [format="%artist - %title (%remix)"] - formatting string
    * @returns {string}
    */
-  toString: function(format = '%artists - %title (%remix)') {
+  toString: function(format = '%artist - %title (%remix)') {
     const regexp = /%artist|%title|%remix|%year|%album|%label|%trackNumber|%genre|%composer|%bpm|%key|%grouping|%stars|%user1|%user2/g;
     return format.replace(regexp, kw => this.tags[ kw.substr(1) ] || '').replace('()', '').trim();
   },

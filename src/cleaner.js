@@ -2,7 +2,7 @@
  *
  *  Cleaner (filenames)
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019-2020 Silverspex
  *
  *************************************/
 
@@ -40,7 +40,7 @@ const defOptions = {
 };
 
 function parse(s, options) {
-  options = Object.assign(defOptions, options);
+  options = Object.assign({}, defOptions, options);
 
   const o = {
     cleaned  : null,
@@ -451,6 +451,8 @@ function parse(s, options) {
   //    o.title = o.remix;
   //    o.remix = tmp;
   //  }
+
+  // todo add score (difference between cleaned and original version)
 
   // compile
   o.cleaned = compile(o, options);

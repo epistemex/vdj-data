@@ -199,6 +199,7 @@ Song.prototype = {
   /**
    * Renames the file name/path and also updates this Song instance.
    * @param newName
+   * @private for now...
    */
   rename: function(newName) {
 
@@ -216,6 +217,10 @@ Song.prototype = {
     this.pois = this.pois.sort((a, b) => {
       return utils.eq(a.pos, b.pos) ? 0 : (a.pos < b.pos ? -1 : 1)
     })
+  },
+
+  getTags: function() {
+    return utils.getFileTags(this.filePath)
   },
 
   calcMD5Hash: function(max = -1) {

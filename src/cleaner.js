@@ -11,6 +11,8 @@
 const utils = require('./utils');
 const _esc = r => r.replace(rxEsc, '\\$&');
 
+const thisYear = (new Date).getFullYear();
+
 const rxDotWords = /\w{3,}[^\s]\.?[^\s]\w{3,}/g;
 const rxEsc = /[-\/\\^$*+?.()|[\]{}]/g;
 const rxUC = /\b(dj|pvp|bmp|emf|tlc|tv|abba|acdc|uk|hd|sd|hq|uhd|am|pm)\b/gi;
@@ -20,7 +22,7 @@ const rxForce = /\b(official|de|stereo)\b/i;
 const rxForceCap = /\b(music|video|the)\b/i;
 const rxRemove = /\b(hd|hq|hiq|sd)\b/i;
 const rxExt = /\.wmv|\.mp3|\.wav|\.flac|\.aac|\.mp4|\.wma|\.m4a/i;
-const rxRMX = /\b(remix|edit|mix|version|versions|cut|radio|bootleg|mashup|mash-up|original|extended|live|treatment|club|12"|7"|inch|lp|album|rework|re-lift|relift|single|ep|remaster|45|33|acapella|accapella|demo|uplifting|touch)\b/i;
+const rxRMX = /\b(remix|edit|mix|version|versions|cut|radio|bootleg|mashup|mash-up|original|extended|live|treatment|club|12"|7"|inch|lp|album|rework|re-lift|relift|single|ep|remaster|45|33|acapella|accapella|demo|uplifting|touch|official)\b/i;
 const rxWS = /\s\s+/g;
 const rxIChars = /[<>":*\/|?_]|\s\s+/g;
 const rxNumStart = /^\d+[^ ]/;
@@ -266,7 +268,7 @@ function parse(s, options) {
       }
       else {
         const n = p | 0;
-        if ( n >= 1860 && n <= (new Date).getFullYear() ) {
+        if ( n >= 1860 && n <= thisYear ) {
           o.year = p;
           used = true;
         }
@@ -336,7 +338,7 @@ function parse(s, options) {
     if ( o.artists[ 0 ] && y2.test(o.artists[ 0 ]) ) {
       o.artists[ 0 ] = o.artists[ 0 ].replace(y2, w => {
         const y = w.substr(1) | 0;
-        const now = (new Date).getFullYear().toString().substr(2);
+        const now = thisYear.toString().substr(2);
         if ( y < 0 || y > 99 ) return w;
         else if ( y >= 0 && y <= now ) {
           o.year = 2000 + y;
@@ -355,7 +357,7 @@ function parse(s, options) {
       o.title = o.title.replace(y2, w => {
         const y = w.substr(1) | 0;
         if ( y < 0 || y > 99 ) return w;
-        else if ( y >= 0 && y <= (new Date).getFullYear().toString().substr(2) ) {
+        else if ( y >= 0 && y <= thisYear.toString().substr(2) ) {
           return '20' + y;
         }
         else return '19' + y;
@@ -365,7 +367,7 @@ function parse(s, options) {
     s.split(/[ (]/g).forEach(p => {
       if ( !isNaN(p) ) {
         const n = p | 0;
-        if ( n >= 1860 && n <= (new Date).getFullYear() ) {
+        if ( n >= 1860 && n <= thisYear ) {
           o.year = n;
         }
       }
@@ -443,6 +445,15 @@ function parse(s, options) {
   // upper case in remix
   if ( o.remix && o.remix.length ) {
     o.remix = _case(o.remix).replace(rxRU, w => w.toUpperCase());
+  }
+
+  // remove any remaining year in title
+  if ( o.title ) {
+    const result = /\b\d{4}\b|\(\d{4}\)/g.exec(o.title);
+    if ( result && result.length && result[ 0 ] >= 1860 && result[ 0 ] <= thisYear ) {
+      if ( !o.year ) o.year = result[ 0 ];
+      o.title = o.title.replace(/\b\d{4}\b|\(\d{4}\)/g, '').trim();
+    }
   }
 
   // swap title and remix?

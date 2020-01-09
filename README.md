@@ -18,7 +18,7 @@ Features
     - Parse, add, remove Song objects
     - Load new songs from disk optionally including parsing tag information
     - Verify song path
-    - Advanced filename cleaner
+    - Advanced filename cleaner (BETA)
     - Extract tags from filename
     - Change and update any property (infos, tags, scan etc.)
     - Add, change or remove POIs
@@ -40,7 +40,7 @@ Features
     - Change ranges, beatgrid, loop/drop modes etc.
     - Repair malformed samples (addresses VDJ specific bug).
     - Create new samples from scratch
-    - Add any supported media (via the free ffmpeg/ffprobe. See [ffmpeg.org](http://ffmpeg.org/))
+    - Add or replace with almost any type of media (using ffmpeg)
     - Set PNG thumb image
     - Export with modifications
 - Folders
@@ -150,6 +150,7 @@ need to read, write and maintain database information is ready for use.
 Known issues:
 
 - Currently system calls (detection of folder paths etc.) only works with Windows.
+- Currently cannot detect if a _video_ file is a karaoke version (`database.loadSongAndTags()`)
 
 Feel free to use the issue tracker to [report issues](https://github.com/silverspex/vdj-data/issues), feature requests.
 

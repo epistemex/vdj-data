@@ -148,7 +148,7 @@ Song.prototype = {
    * @returns {*}
    */
   cleanName: function(compilerOptions = {}) {
-    return cleaner(Path.parse(this.filePath).base, compilerOptions);
+    return cleaner(Path.parse(this.filePath).name, compilerOptions);
   },
 
   /**
@@ -184,7 +184,23 @@ Song.prototype = {
    */
   toString: function(format = '%artist - %title (%remix)') {
     const regexp = /%artist|%title|%remix|%year|%album|%label|%trackNumber|%genre|%composer|%bpm|%key|%grouping|%stars|%user1|%user2/g;
-    return format.replace(regexp, kw => this.tags[ kw.substr(1) ] || '').replace('()', '').trim();
+    let tmp;
+
+    if ( !this.tags.artist || !this.tags.title || !this.tags.remix ) {
+      const p = this.cleanName({ format: '%artist %featuring' });
+      tmp = JSON.stringify(this.tags);
+      if ( p.cleaned ) this.tags.artist = p.cleaned;
+      if ( p.title ) this.tags.title = p.title;
+      if ( p.remix ) this.tags.remix = p.remix;
+    }
+
+    const result = format.replace(regexp, kw => this.tags[ kw.substr(1) ] || '').replace('()', '')
+      .trim();
+    ;
+
+    if ( tmp ) this.tags = JSON.parse(tmp);
+
+    return result
   },
 
   /**
@@ -270,6 +286,8 @@ Song.prototype = {
   ENUMS
 ----------------------------------------------------------------------------- */
 Song.FLAG = { // todo WIP
+  hidden : 1 << 0, // ?? Seem to mean hidden, but for unknown reason - just doesn't show in search and hasn't intentionally been removed from serachdb...
+  //cachedCover: 1 << 1, // ?? can't confirm
   karaoke: 1 << 5,
   video  : 1 << 6
 };

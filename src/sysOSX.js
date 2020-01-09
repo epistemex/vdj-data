@@ -35,7 +35,7 @@ function listDrivesSync() {
 }
 
 function getAudioFingerprint(audioPath, raw) {
-  const exePath = Path.join(__dirname, `bin/${ process.platform }/fpcalc`);
+  const exePath = Path.join(__dirname, `bin/${ process.platform.replace(/[./\\~]/g, '') }/fpcalc`);
   const args = [ '-json', audioPath ];
   if ( raw ) args.push('-raw');
   return JSON.parse(_execSync(exePath, args).toString());

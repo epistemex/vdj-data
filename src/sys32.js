@@ -45,7 +45,7 @@ function getRegSync(key) {
 }
 
 function getAudioFingerprint(audioPath, raw) {
-  const exePath = Path.join(__dirname, `../bin/${ process.platform }/fpcalc.exe`);
+  const exePath = Path.join(__dirname, `../bin/${ process.platform.replace(/[./\\~]/g, '') }/fpcalc.exe`);
   const args = [ '-json', audioPath ];
   if ( raw ) args.push('-raw');
   let json = null;

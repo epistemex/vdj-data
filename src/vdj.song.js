@@ -19,6 +19,12 @@ const Scan = require('./vdj.scan');
 const Poi = require('./vdj.poi');
 const { cleaner } = require('./cleaner');
 
+const services = {
+  'va': 'iDJPool',
+  'cb': 'Digitrax',
+  'vj': 'VJPro'
+};
+
 /**
  * Instance of a Song with normalized property names (JavaScript camel-case)
  * and type casting.
@@ -27,16 +33,15 @@ const { cleaner } = require('./cleaner');
  * @constructor
  */
 function Song(json = {}, initFlags) {
-  // read-only fields
-  const _flags = typeof initFlags === 'number' ? initFlags : utils.toInt(json.Flag);
-  const _karaoke = !!(_flags & (1 << 5));
-  const _video = !!(_flags & (1 << 6));
-  const _audioOnly = !_video && !_karaoke;
+  let _flags = 0;
+  let _audioOnly = true;
+  let _karaoke = false;
+  let _video = false;
+  let _netsearch = false;
+  let _netservice = null;
 
   this.filePath = utils.toStr(json.FilePath);
   this.fileSize = utils.toInt(json.FileSize);
-
-  if ( isNaN(this.flags) ) this.flags = null; // todo move to toInt..
 
   this.tags = new Tags(json.Tags ? json.Tags : {});
   this.scan = new Scan(json.Scan ? json.Scan : {});
@@ -44,9 +49,7 @@ function Song(json = {}, initFlags) {
 
   this.pois = [];
   if ( json.Poi ) {
-    for(let i = 0; i < json.Poi.length; i++) {
-      this.pois.push(new Poi(json.Poi[ i ]));
-    }
+    json.Poi.forEach(poi => this.pois.push(new Poi(poi)));
   }
 
   this.comment = utils.toStr(json.Comment);
@@ -54,12 +57,27 @@ function Song(json = {}, initFlags) {
   this.link = json.Link ? utils.toStr(json.Link.Cover) : null;
 
   Object.defineProperties(this, {
-    'flags'    : { enumerable: true, writable: false, value: _flags },
-    'audioOnly': { enumerable: true, writable: false, value: _audioOnly },
-    'video'    : { enumerable: true, writable: false, value: _video },
-    'karaoke'  : { enumerable: true, writable: false, value: _karaoke }
+    'audioOnly' : { enumerable: true, get: () => _audioOnly },
+    'video'     : { enumerable: true, get: () => _video },
+    'karaoke'   : { enumerable: true, get: () => _karaoke },
+    'netsearch' : { enumerable: true, get: () => _netsearch },
+    'netservice': { enumerable: true, get: () => _netservice },
+    'flags'     : {
+      enumerable: true,
+      get       : () => _flags,
+      set       : v => {
+        _flags = v | 0;
+        _karaoke = !!(_flags & Song.FLAG.karaoke);
+        _video = !!(_flags & Song.FLAG.video);
+        _netsearch = _flags & Song.FLAG.netsearch;
+        _audioOnly = !_video && !_karaoke && !_netsearch;
+        _netservice = _netsearch ? services[ this.filePath.substr(12, 2)
+          .toLowerCase() ] || 'unknown' : null;
+      }
+    }
   });
 
+  this.flags = typeof initFlags === 'number' ? initFlags : utils.toInt(json.Flag);
   this.hash = null;
 }
 
@@ -102,7 +120,7 @@ Song.prototype = {
    * @returns {string}
    */
   toXML: function() {
-    const song = { FilePath: (this.filePath), FileSize: this.fileSize, Flag: this.flags };
+    const song = { FilePath: this.filePath, FileSize: this.fileSize, Flag: this.flags === 0 ? null : this.flags };
     const attr = utils.getAttrList(song);
     const xml = [
       ` <Song ${ utils.attrListToKVString(attr) }>`,
@@ -137,6 +155,10 @@ Song.prototype = {
       if ( c.year ) this.tags.year = c.year;
     }
     return !!c
+  },
+
+  tagsToFilename: function(options) {
+
   },
 
   /**
@@ -218,14 +240,6 @@ Song.prototype = {
 
   },
 
-  filenameToTags: function(options) {
-
-  },
-
-  tagsToFilename: function(options) {
-
-  },
-
   /**
    * Sort POIs by time position.
    */
@@ -260,7 +274,7 @@ Song.prototype = {
     this.hash = null;
     max = max >>> 0;
 
-    if ( max && fs.existsSync(this.filePath) && fs.statSync(this.filePath).size < max ) {
+    if ( max && this.verifyPath() && fs.statSync(this.filePath).size < max ) {
       try {
         const file = utils.loadFile(this.filePath);
         if ( file ) {
@@ -283,11 +297,17 @@ Song.prototype = {
 /* -----------------------------------------------------------------------------
   ENUMS
 ----------------------------------------------------------------------------- */
+
+// These are valid with database v8.4 and possible since v8. No guarantee for
+// future versions since these are unofficial and undocumented.
 Song.FLAG = { // todo WIP
-  hidden : 1 << 0, // ?? Seem to mean hidden, but for unknown reason - just doesn't show in search and hasn't intentionally been removed from serachdb...
-  //cachedCover: 1 << 1, // ?? can't confirm
-  karaoke: 1 << 5,
-  video  : 1 << 6
+  hidden   : 1 << 0,  // hidden from search
+  notfound : 1 << 4,  // path/file not found (when showing up in results/lists i.e. strike icon)
+  karaoke  : 1 << 5,
+  video    : 1 << 6,
+  netsearch: 1 << 8 // still need to confirm but looks very likely based on type grouping
+  //netsearch: 1 << 11, // ?? also set on netsearch in main db (result status?)
+  //oldSample: 1 << 17, // < v8.3 correlates with old vdjsamples, but also some wav files....
 };
 
 /* -----------------------------------------------------------------------------

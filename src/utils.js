@@ -13,7 +13,7 @@ const Path = require('path');
 
 const videoExt = [ '.mp4', '.m4v', '.mov', '.mpg', '.mkv', '.ogv', '.wmv', '.webm' ];
 const audioExt = [ '.mp3', '.wav', '.flac', '.aac', '.ogg', '.aif', '.aiff', '.m4a', '.wma' ];
-const karaokeExt = [ '.kfn' ]; // .cdg is checked separately is source ext = .mp3
+const karaokeExt = [ '.kfn', '.kok', '.txk', '.kar' ]; // .cdg is checked separately
 
 const entityTable = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;', '\'': '&apos;' };
 const entityTableFrom = { 'amp': '&', 'quot': '"', 'lt': '<', 'gt': '>', 'apos': '\'' };
@@ -250,8 +250,10 @@ function loadFilePart(path, start, end) {
 }
 
 function getMediaTypes(path) {
-  const ext = Path.parse(path).ext.toLowerCase();
-  const karaoke = karaokeExt.includes(ext) || (ext === '.mp3' && fs.existsSync(path.substr(0, path.length - ext.length) + '.cdg'));
+  const parts = Path.parse(path);
+  const ext = parts.ext.toLowerCase();
+  const karaoke = karaokeExt.includes(ext) || fs.existsSync(Path.join(parts.dir, parts.name + '.cdg'));
+  //const karaoke = karaokeExt.includes(ext) || ([ '.mp3', '.wav', '.ogg', '.wma' ].includes(ext) && fs.existsSync(Path.join(parts.dir, parts.name + '.cdg')));
   return {
     karaoke,
     video: videoExt.includes(ext) || karaoke,

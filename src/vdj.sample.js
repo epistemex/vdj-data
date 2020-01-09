@@ -49,36 +49,35 @@ const keys = {
 };
 
 function VDJSample(path) {
-  // todo: lock some fields as getters only (version etc.)
-  // todo: add some checks via setters (time range limits, modes/flags etc.)
-
-  const _getter = (name, get) => {Object.defineProperty(this, name, { get })};
   let _path = '';
 
-  Object.defineProperty(this, 'path', {
-    get: () => _path,
-    set: (newPath) => {
-      if ( typeof newPath === 'string' ) {
-        _path = newPath;
-        this.basename = Path.parse(_path).name;
-        this.offsetData = 0x78 + _path.length;
-        this.thumbOffset = this.offsetData + this.mediaSize;
-      }
+  Object.defineProperties(this, {
+    'path'   : {
+      get       : () => _path,
+      set       : (newPath) => {
+        if ( typeof newPath === 'string' ) {
+          _path = newPath;
+          this.basename = Path.parse(_path).name;
+          this.offsetData = 0x78 + _path.length;
+          this.thumbOffset = this.offsetData + this.mediaSize;
+        }
+      },
+      enumerable: true
+    },
+    'keyDesc': {
+      get       : () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
+      set       : (key) => {
+        const i = Object.values(keys).indexOf(this._frmKey(key));
+        if ( i < 0 ) throw 'Invalid key';
+        this.key = i;
+      },
+      enumerable: true
+    },
+    'gainDb' : {
+      get       : () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
+      set       : (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20))),
+      enumerable: true
     }
-  });
-
-  Object.defineProperty(this, 'keyDesc', {
-    get: () => keys[ Math.max(0, Math.min(0x18, this.key)) ],
-    set: (key) => {
-      const i = Object.values(keys).indexOf(this._frmKey(key));
-      if ( i < 0 ) throw 'Invalid key';
-      this.key = i;
-    }
-  });
-
-  Object.defineProperty(this, 'gainDb', {
-    get: () => this.gain === 0 ? 0 : 20 * Math.log10(this.gain),
-    set: (db) => this.gain = Math.max(0.0975, Math.min(3.7, Math.pow(10, db / 20)))
   });
 
   let view, data;
@@ -160,11 +159,13 @@ function VDJSample(path) {
   }
 
   /* ---  Utility props-------------------------------------------------------*/
-  _getter('mediaTypeDesc', () => trackModes[ this.mediaType ]);
-  _getter('tracksDesc', () => trackModes[ this.tracks ]);
-  _getter('modeDesc', () => sampleModes[ this.mode ]);
-  _getter('dropLoopDesc', () => loopModes[ this.dropLoop ]);
-  _getter('keyMatchTypeDesc', () => keyMatchTypes[ this.keyMatchType ]);
+  Object.defineProperties(this, {
+    'mediaTypeDesc'   : { enumerable: true, get: () => trackModes[ this.mediaType ] },
+    'tracksDesc'      : { enumerable: true, get: () => trackModes[ this.tracks ] },
+    'modeDesc'        : { enumerable: true, get: () => sampleModes[ this.mode ] },
+    'dropLoopDesc'    : { enumerable: true, get: () => loopModes[ this.dropLoop ] },
+    'keyMatchTypeDesc': { enumerable: true, get: () => keyMatchTypes[ this.keyMatchType ] }
+  });
 
   this.validateTimes();
 

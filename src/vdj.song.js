@@ -53,10 +53,12 @@ function Song(json = {}, initFlags) {
   this.customMix = utils.toStr(json.CustomMix);
   this.link = json.Link ? utils.toStr(json.Link.Cover) : null;
 
-  Object.defineProperty(this, 'flags', { value: _flags, writable: false });
-  Object.defineProperty(this, 'audioOnly', { value: _audioOnly, writable: false });
-  Object.defineProperty(this, 'video', { value: _video, writable: false });
-  Object.defineProperty(this, 'karaoke', { value: _karaoke, writable: false });
+  Object.defineProperties(this, {
+    'flags'    : { enumerable: true, writable: false, value: _flags },
+    'audioOnly': { enumerable: true, writable: false, value: _audioOnly },
+    'video'    : { enumerable: true, writable: false, value: _video },
+    'karaoke'  : { enumerable: true, writable: false, value: _karaoke }
+  });
 
   this.hash = null;
 }

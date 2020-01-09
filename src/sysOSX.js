@@ -34,24 +34,15 @@ function listDrivesSync() {
 
 }
 
-function getAudioFingerprint(audioPath, raw) {
-  const exePath = Path.join(__dirname, `bin/${ process.platform.replace(/[./\\~]/g, '') }/fpcalc`);
-  const args = [ '-json', audioPath ];
-  if ( raw ) args.push('-raw');
-  return JSON.parse(_execSync(exePath, args).toString());
-}
-
 function _execSync(cmd, args, timeout = 5) {
   try {
     return execFileSync(cmd, args, { timeout: timeout * 1000 });
   }
-  catch {
-    return null;
-  }
+  catch(err) {debug(err)}
+  return null;
 }
 
 module.exports = {
-  getAudioFingerprint,
   listDrivesSync,
   type,
 };

@@ -107,13 +107,13 @@ function VDJSample(path) {
     this.totalDuration = getFloat64();                // 0x38
     this.endTime = getFloat64();                      // 0x40 (abs. time)
     this.gain = getFloat32();                         // 0x48
-    this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength in this case
+    this.transparencyColor = new Color(getUint32());  // 0x4C (ARGB) => A = transparency strength (tolerance) in this case
     pos += 4;                                         // 0x50 ??? video rel?
     this.offsetThumb = getUint32();                   // 0x54
     this.thumbSize = getUint32();                     // 0x58
     this.offsetPath = getUint32();                    // 0x5C
     const pathLength = getUint32();                   // 0x60
-    pos += 12;                                        // 0x64-0x6f ??? reserved?
+    pos += 12;                                        // 0x64-0x6f reserved?
     const key = getUint32() & 0xff;                   // 0x70
     this.keyMatchType = getUint32() & 0xff;           // 0x74
 

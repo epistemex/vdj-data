@@ -214,7 +214,7 @@ Song.prototype = {
    * or null if unsuccessful (no tags or no file).
    * @returns {Promise<*|null>}
    */
-  getTags: function() {
+  getFileTags: function() {
     return utils.getFileTags(this.filePath)
   },
 

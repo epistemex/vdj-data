@@ -44,19 +44,6 @@ function getRegSync(key) {
   return result;
 }
 
-function getAudioFingerprint(audioPath, raw) {
-  const exePath = Path.join(__dirname, `../bin/${ process.platform.replace(/[./\\~]/g, '') }/fpcalc.exe`);
-  const args = [ '-json', audioPath ];
-  if ( raw ) args.push('-raw');
-  let json = null;
-  try {
-    json = JSON.parse(_execSync(exePath, args).toString());
-    json.fingerprint = new Uint32Array(json.fingerprint);
-  }
-  catch {}
-  return json;
-}
-
 function _execSync(cmd, args, timeout = 5) {
   try {
     return execFileSync(cmd, args, { timeout: timeout * 1000 });
@@ -72,7 +59,6 @@ function _execSync(cmd, args, timeout = 5) {
 
 module.exports = {
   getRegSync,
-  getAudioFingerprint,
   listDrivesSync: drives.listSync,
   driveType     : drives.type
 };

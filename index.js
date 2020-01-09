@@ -44,6 +44,7 @@ module.exports = {
   Database        : require('./src/vdj.database'),
   Playlist        : require('./src/vdj.playlist'),
   Sample          : require('./src/vdj.sample'),
+  audio           : require('./src/audio'),
   FOLDER          : vdj.FOLDER,
   FILE            : vdj.FILE
 };

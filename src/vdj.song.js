@@ -186,17 +186,15 @@ Song.prototype = {
     const regexp = /%artist|%title|%remix|%year|%album|%label|%trackNumber|%genre|%composer|%bpm|%key|%grouping|%stars|%user1|%user2/g;
     let tmp;
 
-    if ( !this.tags.artist || !this.tags.title || !this.tags.remix ) {
-      const p = this.cleanName({ format: '%artist %featuring' });
+    if ( !this.tags.artist || !this.tags.title ) {
       tmp = JSON.stringify(this.tags);
-      if ( p.cleaned ) this.tags.artist = p.cleaned;
-      if ( p.title ) this.tags.title = p.title;
-      if ( p.remix ) this.tags.remix = p.remix;
+      if ( !this.filenameToTag() ) tmp = null;
     }
 
-    const result = format.replace(regexp, kw => this.tags[ kw.substr(1) ] || '').replace('()', '')
+    const result = format
+      .replace(regexp, kw => this.tags[ kw.substr(1) ] || '')
+      .replace(/\(\)|\s-\s?$/g, '')
       .trim();
-    ;
 
     if ( tmp ) this.tags = JSON.parse(tmp);
 

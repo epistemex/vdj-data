@@ -60,14 +60,15 @@ Database.prototype = {
   /**
    * Loads a music or video file and returns a Song object from it.
    * This call will only initialize path and file size.
-   * @param path
+   * @param {string} [path] - provide a path to a media file to pre-fill Song object with basic info (path, size)
+   * @param {number} [flags] - initialize flags (for new Song objects) such as video, karaoke flags.
    * @returns {Song|null}
    * @see loadSongAndTags()
    */
-  loadSong: function(path) {
+  loadSong: function(path, flags) {
     try {
       const stat = fs.statSync(path);
-      const song = new Song();
+      const song = new Song(undefined, flags);
       song.filePath = path;
       song.fileSize = stat.size;
       return song;
@@ -89,7 +90,12 @@ Database.prototype = {
    * @async
    */
   loadSongAndTags: async function(path) {
-    const song = this.loadSong(path);
+    let flags = 0;
+    const mediaTypes = utils.getMediaTypes(path);
+    if ( mediaTypes.video ) flags |= Song.FLAG.video;
+    if ( mediaTypes.karaoke ) flags |= Song.FLAG.karaoke;
+
+    const song = this.loadSong(path, flags);
 
     try {
       const meta = await utils.getFileTags(path);

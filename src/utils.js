@@ -11,21 +11,11 @@
 const fs = require('fs');
 const Path = require('path');
 
-const entityTable = {
-  '&' : '&amp;',
-  '"' : '&quot;',
-  '<' : '&lt;',
-  '>' : '&gt;',
-  '\'': '&apos;'
-};
+const videoExt = [ '.mp4', '.m4v', '.mov', '.mpg', '.mkv', '.ogv', '.wmv', '.webm' ];
+const audioExt = [ '.mp3', '.wav', '.flac', '.aac', '.ogg', '.aif', '.aiff', '.m4a', '.wma' ];
 
-const entityTableFrom = {
-  'amp' : '&',
-  'quot': '"',
-  'lt'  : '<',
-  'gt'  : '>',
-  'apos': '\''
-};
+const entityTable = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;', '\'': '&apos;' };
+const entityTableFrom = { 'amp': '&', 'quot': '"', 'lt': '<', 'gt': '>', 'apos': '\'' };
 
 const entityRX = new RegExp(`[${ Object.keys(entityTable).join('') }]`, 'g');
 const entityRXFrom = new RegExp(`&(${ Object.keys(entityTableFrom).join('|') });`, 'gi');
@@ -77,7 +67,7 @@ function fromBPM(bpm) {return 1 / (bpm / 60);}
  * @param {number} b - second number to compare
  */
 function eq(a, b) {
-  return Math.abs(a - b) < 0.000000001
+  return Math.abs(a - b) < 1e-6; // resolution set for XML/fractions
 }
 
 /**
@@ -108,9 +98,12 @@ function lookupPaths(paths, dbs, ignoreRoot = false) {
 
         // query current database
         if ( cdb ) {
+          let lPath = path.toLowerCase();
           for(let song of cdb.songs) {
-            let lPath = path.toLowerCase();
-            if ( song.filePath.toLowerCase() === lPath ) songs.push(song);
+            if ( song.filePath.toLowerCase() === lPath ) {
+              songs.push(song);
+              break
+            }
           }
         }
 
@@ -245,17 +238,24 @@ function loadFilePart(path, start, end) {
     const chunks = [];
     const stream = fs.createReadStream(path, { start, end, highWaterMark: 8192 });
     stream.on('data', chunks.push.bind(chunks));
-    //stream.on("data", chunk => chunks.push(chunk));
     stream.on('error', reject);
     stream.on('end', () => {
-      if ( chunks.length === 1 ) {
-        resolve(chunks[ 0 ])
-      }
+      if ( chunks.length === 1 ) resolve(chunks[ 0 ]);
       else {
         resolve(Buffer.concat(chunks, end - start))
       }
     });
   })
+}
+
+function getMediaTypes(path) {
+  const ext = Path.parse(path).ext.toLowerCase();
+  const karaoke = fs.existsSync(path.substr(0, path.length - ext.length) + '.cdg');
+  return {
+    karaoke,
+    video: videoExt.includes(ext) || karaoke,
+    audio: true
+  };
 }
 
 module.exports = {
@@ -285,5 +285,6 @@ module.exports = {
   getFileTags,
   loadFile,
   loadFilePart,
-  saveFile
+  saveFile,
+  getMediaTypes
 };

@@ -23,12 +23,19 @@ const { cleaner } = require('./cleaner');
  * Instance of a Song with normalized property names (JavaScript camel-case)
  * and type casting.
  * @param {*} [json] - optional Infos JSON from XML branch. If none an empty instance is created.
+ * @param {number} [initFlags] only used to initialize flags when loading song from disk (to set video/karaoke flags etc.)
  * @constructor
  */
-function Song(json = {}) {
+function Song(json = {}, initFlags) {
+  // read-only fields
+  const _flags = typeof initFlags === 'number' ? initFlags : utils.toInt(json.Flag);
+  const _karaoke = !!(_flags & (1 << 5));
+  const _video = !!(_flags & (1 << 6));
+  const _audioOnly = !_video && !_karaoke;
+
   this.filePath = utils.toStr(json.FilePath);
   this.fileSize = utils.toInt(json.FileSize);
-  this.flags = utils.toInt(json.Flag);
+
   if ( isNaN(this.flags) ) this.flags = null; // todo move to toInt..
 
   this.tags = new Tags(json.Tags ? json.Tags : {});
@@ -45,6 +52,11 @@ function Song(json = {}) {
   this.comment = utils.toStr(json.Comment);
   this.customMix = utils.toStr(json.CustomMix);
   this.link = json.Link ? utils.toStr(json.Link.Cover) : null;
+
+  Object.defineProperty(this, 'flags', { value: _flags, writable: false });
+  Object.defineProperty(this, 'audioOnly', { value: _audioOnly, writable: false });
+  Object.defineProperty(this, 'video', { value: _video, writable: false });
+  Object.defineProperty(this, 'karaoke', { value: _karaoke, writable: false });
 
   this.hash = null;
 }
@@ -250,6 +262,14 @@ Song.prototype = {
     return this.hash
   }
 
+};
+
+/* -----------------------------------------------------------------------------
+  ENUMS
+----------------------------------------------------------------------------- */
+Song.FLAG = { // todo WIP
+  karaoke: 1 << 5,
+  video  : 1 << 6
 };
 
 /* -----------------------------------------------------------------------------

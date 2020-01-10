@@ -291,7 +291,8 @@ Database.prototype = {
    * @returns {boolean} true if successful.
    */
   snapshot: function(limit = 99) {
-    if ( this.path ) {
+    const path = this.path || require('./vdj').FILE.DATABASEFILE;
+    if ( path ) {
       let i = 0;
       try {
         while( fs.existsSync(`${ this.path }.bak${ i }`) && i < limit ) i++;

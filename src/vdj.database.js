@@ -66,17 +66,7 @@ Database.prototype = {
    * @see loadSongAndTags()
    */
   loadSong: function(path, flags) {
-    try {
-      const stat = fs.statSync(path);
-      const song = new Song(undefined, flags);
-      song.filePath = path;
-      song.fileSize = stat.size;
-      return song;
-    }
-    catch(err) {
-      debug(err);
-    }
-    return null;
+    return Database.Song.fromFile(path, flags);
   },
 
   /**

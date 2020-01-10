@@ -28,11 +28,13 @@ const services = {
 /**
  * Instance of a Song with normalized property names (JavaScript camel-case)
  * and type casting.
- * @param {*} [json] - optional Infos JSON from XML branch. If none an empty instance is created.
+ * @param {*} [json] - optional Infos JSON from XML branch. A string is handled as path and initialize with basic path/size info. If none an empty instance is created.
  * @param {number} [initFlags] only used to initialize flags when loading song from disk (to set video/karaoke flags etc.)
  * @constructor
  */
 function Song(json = {}, initFlags) {
+  if ( typeof json === 'string' ) return Song.fromFile(json);
+
   let _flags = 0;
   let _audioOnly = true;
   let _karaoke = false;
@@ -48,7 +50,7 @@ function Song(json = {}, initFlags) {
   this.infos = new Infos(json.Infos ? json.Infos : {});
 
   this.pois = [];
-  if ( json.Poi ) {
+  if ( Array.isArray(json.Poi) ) {
     json.Poi.forEach(poi => this.pois.push(new Poi(poi)));
   }
 
@@ -313,6 +315,20 @@ Song.FLAG = { // todo WIP
 /* -----------------------------------------------------------------------------
   STATICS
 ----------------------------------------------------------------------------- */
+
+Song.fromFile = function(path, flags) {
+  try {
+    const stat = fs.statSync(path);
+    const song = new Song(undefined, flags);
+    song.filePath = path;
+    song.fileSize = stat.size;
+    return song;
+  }
+  catch(err) {
+    debug(err);
+  }
+  return null;
+};
 
 Song.Tags = Tags;
 Song.Scan = Scan;

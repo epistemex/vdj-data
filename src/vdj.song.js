@@ -42,7 +42,7 @@ function Song(json = {}, initFlags) {
   let _netsearch = false;
   let _netservice = null;
 
-  this.filePath = utils.toStr(json.FilePath);
+  this.path = utils.toStr(json.FilePath);
   this.fileSize = utils.toInt(json.FileSize);
 
   this.tags = new Tags(json.Tags ? json.Tags : {});
@@ -73,7 +73,7 @@ function Song(json = {}, initFlags) {
         _video = !!(_flags & Song.FLAG.video);
         _netsearch = _flags & Song.FLAG.netsearch;
         _audioOnly = !_video && !_karaoke && !_netsearch;
-        _netservice = _netsearch ? services[ this.filePath.substr(12, 2)
+        _netservice = _netsearch ? services[ this.path.substr(12, 2)
           .toLowerCase() ] || 'unknown' : null;
       }
     }
@@ -102,7 +102,7 @@ Song.prototype = {
     };
 
     // Song
-    if ( this.filePath ) json.FilePath = utils.fromStr(this.filePath);
+    if ( this.path ) json.FilePath = utils.fromStr(this.path);
     if ( this.fileSize ) json.FileSize = this.fileSize.toString();
     if ( this.flags ) json.Flag = this.flags.toString();
 
@@ -122,7 +122,7 @@ Song.prototype = {
    * @returns {string}
    */
   toXML: function() {
-    const song = { FilePath: this.filePath, FileSize: this.fileSize, Flag: this.flags === 0 ? null : this.flags };
+    const song = { FilePath: this.path, FileSize: this.fileSize, Flag: this.flags === 0 ? null : this.flags };
     const attr = utils.getAttrList(song);
     const xml = [
       ` <Song ${ utils.attrListToKVString(attr) }>`,
@@ -172,7 +172,7 @@ Song.prototype = {
    * @returns {*}
    */
   cleanName: function(compilerOptions = {}) {
-    return cleaner(Path.parse(this.filePath).name, compilerOptions);
+    return cleaner(Path.parse(this.path).name, compilerOptions);
   },
 
   /**
@@ -230,7 +230,7 @@ Song.prototype = {
    * @returns {boolean}
    */
   verifyPath: function() {
-    return fs.existsSync(this.filePath);
+    return fs.existsSync(this.path);
   },
 
   /**
@@ -259,13 +259,13 @@ Song.prototype = {
    * @returns {Promise<*|null>}
    */
   getFileTags: function() {
-    return utils.getFileTags(this.filePath)
+    return utils.getFileTags(this.path)
   },
 
   getSeratoTags: function() {
-    if ( this.filePath && this.filePath.toLowerCase().endsWith('.mp3') ) {
+    if ( this.path && this.path.toLowerCase().endsWith('.mp3') ) {
       const { getTags } = require('./getid3');
-      const hdr = getTags(this.filePath);
+      const hdr = getTags(this.path);
       if ( hdr && hdr.tags ) {
         const st = [];
         hdr.tags.forEach(tag => { // ID3v2.x etc.
@@ -336,9 +336,9 @@ Song.prototype = {
     this.hash = null;
     max = max >>> 0;
 
-    if ( max && this.verifyPath() && fs.statSync(this.filePath).size < max ) {
+    if ( max && this.verifyPath() && fs.statSync(this.path).size < max ) {
       try {
-        const file = utils.loadFile(this.filePath);
+        const file = utils.loadFile(this.path);
         if ( file ) {
           this.hash = crypto
             .createHash('md5')
@@ -380,7 +380,7 @@ Song.fromFile = function(path, flags) {
   try {
     const stat = fs.statSync(path);
     const song = new Song(undefined, flags);
-    song.filePath = path;
+    song.path = path;
     song.fileSize = stat.size;
     return song;
   }

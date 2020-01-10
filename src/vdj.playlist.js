@@ -107,7 +107,7 @@ Playlist.prototype = {
   add: function(song) {
     this.songs.push(song);
     this.entries.push({
-      path      : song.filePath,
+      path      : song.path,
       filesize  : song.fileSize,
       artist    : song.tags.artist,
       title     : song.tags.title,

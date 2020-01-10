@@ -263,9 +263,12 @@ Song.prototype = {
   },
 
   getSeratoTags: function() {
+    // only support for MP3 files for now
     if ( this.path && this.path.toLowerCase().endsWith('.mp3') ) {
+      const td = new TextDecoder('utf-8');
       const { getTags } = require('./getid3');
       const hdr = getTags(this.path);
+
       if ( hdr && hdr.tags ) {
         const st = [];
         hdr.tags.forEach(tag => { // ID3v2.x etc.
@@ -277,11 +280,61 @@ Song.prototype = {
           })
         });
 
-        const frames = st.map(frame => frame.id === 'TXXX' ? frame : _decodeFrame(frame.buffer.subarray(frame.offset, frame.offset + frame.size)));
+        const tags = [];
+        st
+          .map(frame => frame.id === 'TXXX' ? frame : _decodeFrame(frame.buffer.subarray(frame.offset, frame.offset + frame.size)))
+          .forEach(frame => {
+
+            if ( frame.description === 'Serato Analysis' ) {
+              tags.push({
+                type   : 'version',
+                version: +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`)
+              })
+            }
+            else if ( frame.description === 'Serato Autotags' ) {
+              const auto = td.decode(frame.data.subarray(2)).split('\0');
+              tags.push({
+                type    : 'autotags',
+                version : +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`),
+                bpm     : +auto[ 0 ],
+                autoGain: +auto[ 1 ],
+                db      : +auto[ 2 ]
+              })
+            }
+            else if ( frame.description === 'Serato BeatGrid' ) {
+              const view = new DataView(frame.data.buffer, frame.data.byteOffset, frame.data.byteLength);
+              const markers = [];
+              let pos = 2;
+              const count = view.getUint32(pos, true);
+              pos += 4;
+              for(let i = 0; i < count; i++) {
+                if ( i === count - 1 ) {  // end marker
+                  const position = view.getFloat32(pos, true);
+                  pos += 4;
+                  const bpm = view.getFloat32(pos, true);
+                  pos += 4;
+                  markers.push({ position, bpm, count: -1 })
+                }
+                else {
+                  const position = view.getFloat32(pos, true);
+                  pos += 4;
+                  const beats = view.getUint32(pos, true);
+                  pos += 4;
+                  markers.push({ position, bpm: -1, beats })
+                }
+              }
+
+              tags.push({
+                type   : 'beatgrid',
+                version: +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`),
+                markers
+              })
+            }
+          });
 
         // ... todo WIP
 
-        return frames;
+        return tags;
 
         function _decodeFrame(buffer) {
           let encoding;

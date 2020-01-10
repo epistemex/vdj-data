@@ -17,6 +17,7 @@ const Tags = require('./vdj.tags');
 const Infos = require('./vdj.infos');
 const Scan = require('./vdj.scan');
 const Poi = require('./vdj.poi');
+const Color = require('./vdj.color');
 const { cleaner } = require('./cleaner');
 
 const services = {
@@ -274,12 +275,92 @@ Song.prototype = {
         hdr.tags.forEach(tag => { // ID3v2.x etc.
           tag.frames.forEach(frame => {
             if ( frame.id === 'GEOB' || (frame.id === 'TXXX' && frame.content.key === 'SERATO_PLAYCOUNT') ) {
-              frame.buffer = new Uint8Array(tag.tag);
+              if ( frame.id !== 'TXXX' ) frame.buffer = new Uint8Array(tag.tag);
               st.push(frame);
             }
           })
         });
 
+        /*
+          {
+            id: 'TXXX',
+            name: 'userDefinedText',
+            offset: 242,
+            size: 20,
+            flags: 0,
+            content: { key: 'SERATO_PLAYCOUNT', value: '1' },
+            buffer: Uint8Array [
+               73,  68,  51,   3,   0,   0,   0,   2,  63, 120,  84,  73,
+               84,  50,   0,   0,   0,  16,   0,   0,   0,  87, 114, 111,
+              110, 103,  32,  68, 105, 114, 101,  99, 116, 105, 111, 110,
+              ... 40862 more items
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Overview',
+            data: Uint8Array [
+               1,  5,  1,  1,  1,  1,  1,  1, 42, 79, 42, 42,
+               1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+              42, 42, 85, 42,  1,  1,  1,  1,  1,  1,  1,  1,
+               1,  1,  1,  1, 36, 79, 78, 42,  1,  1,  1,  1,
+              ... 3742 more items
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Analysis',
+            data: Uint8Array [ 2, 1 ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Autotags',
+            data: Uint8Array [
+               1,  1, 48, 46, 48, 48, 0,
+              45, 48, 46, 48, 56, 57, 0,
+              48, 46, 48, 48, 48,  0
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Markers_',
+            data: Uint8Array [
+                2,   5,   0,   0,   0,  14,   0,   0,   0,  47, 103, 127,
+              127, 127, 127, 127,   0, 127, 127, 127, 127, 127,   6,  48,
+                0,   0,   1,   0,   0,   0,  12,   8, 113, 127, 127, 127,
+              ... 218 more items
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Markers2',
+            data: Uint8Array [
+                1,   1, 65, 81,  70,  68, 84,  48, 120,  80, 85, 103,
+               65,  65, 65, 65,  65,  69, 65,  80,  47,  47, 47,  48,
+               78,  86, 82, 81,  65,  65, 65,  65,  65,  78, 65,  65,
+               65,  65, 65, 66, 102, 110, 65,  77, 119,  65, 65,  65,
+              ... 370 more items
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato BeatGrid',
+            data: Uint8Array [
+              1, 0, 0, 0,
+              0, 0, 0
+            ]
+          },
+          {
+            type: 'application/octet-stream',
+            description: 'Serato Offsets_',
+            data: Uint8Array [
+                1,  2, 48, 48, 48, 48, 48, 48, 51, 50, 48, 48,
+               48, 48, 46, 48, 48, 48, 48, 48, 48,  0, 48, 48,
+               48, 48, 48, 48, 48, 52, 52, 49, 48, 48, 46, 48,
+              ... 19023 more items
+            ]
+          }
+         */
         const tags = [];
         st
           .map(frame => frame.id === 'TXXX' ? frame : _decodeFrame(frame.buffer.subarray(frame.offset, frame.offset + frame.size)))
@@ -291,6 +372,7 @@ Song.prototype = {
                 version: +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`)
               })
             }
+
             else if ( frame.description === 'Serato Autotags' ) {
               const auto = td.decode(frame.data.subarray(2)).split('\0');
               tags.push({
@@ -301,6 +383,69 @@ Song.prototype = {
                 db      : +auto[ 2 ]
               })
             }
+
+            else if ( frame.description === 'Serato Markers2' ) {
+              // convert binary base64 to string (! ..)
+              let base64 = Buffer.from(frame.data.buffer, frame.data.byteOffset + 2, frame.data.byteLength - 2)
+                .toString();
+              if ( base64.length % 4 !== 0 ) base64 += 'A'.padEnd((base64.length % 4) - 1, '='); // invalid length, pad if needed
+
+              // Now, convert back to binary format
+              const bin = Buffer.from(base64, 'base64');
+              const data = new Uint8Array(bin.buffer, bin.byteOffset, bin.byteLength);
+              const view = new DataView(data.buffer, bin.byteOffset, bin.byteLength);
+              const cuepoints = [];
+              let pos = 2;
+
+              while( pos < data.length - 1 ) {
+                const term = data.indexOf(0, pos);
+                if ( term < 0 || term >= data.length ) break;
+
+                const name = td.decode(data.subarray(pos, term));
+                pos = term + 1;
+                const len = view.getUint32(pos);
+                pos += 4;
+
+                //console.log(name, len);
+                if ( name === 'COLOR' ) {
+                  cuepoints.push({ type: 'color', color: new Color(view.getUint32(pos)) })
+                }
+                else if ( name === 'BPMLOCK' ) {
+                  cuepoints.push({ type: 'bpmlock', lock: !!data[ pos ] })
+                }
+                else if ( name === 'CUE' ) {
+                  const index = view.getUint16(pos);
+                  const position = view.getUint32(pos + 2) / 1000;
+                  const color = new Color(view.getUint32(pos + 6));
+                  const label = td.decode(data.subarray(pos + 12, pos + len - 1));
+                  cuepoints.push({ type: 'cue', index, position, color, label })
+                }
+                else if ( name === 'LOOP' ) {
+
+                }
+                else if ( name === 'FLIP' ) {
+
+                }
+                pos += len;
+
+              }
+
+              //console.log(cuepoints);
+              tags.push({
+                type   : 'markers2',
+                version: +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`),
+                cuepoints
+              })
+            }
+
+            else if ( frame.description === 'Serato Overview' ) {
+              tags.push({
+                type    : 'waveform',
+                version : +(`${ frame.data[ 0 ] }.${ frame.data[ 1 ] }`),
+                waveform: [ ...frame.data.subarray(2) ] //.map(i => i << 3)
+              })
+            }
+
             else if ( frame.description === 'Serato BeatGrid' ) {
               const view = new DataView(frame.data.buffer, frame.data.byteOffset, frame.data.byteLength);
               const markers = [];
@@ -309,7 +454,7 @@ Song.prototype = {
               pos += 4;
               for(let i = 0; i < count; i++) {
                 if ( i === count - 1 ) {  // end marker
-                  const position = view.getFloat32(pos, true);
+                  const position = view.getFloat32(pos, true);  // todo check endianess
                   pos += 4;
                   const bpm = view.getFloat32(pos, true);
                   pos += 4;

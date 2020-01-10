@@ -131,7 +131,7 @@ Database.prototype = {
    * @returns {boolean}
    */
   add: function(song, validate = true) {
-    if ( !(song instanceof Song) || (validate && !this._validatePath(song.filePath)) ) return false;
+    if ( !(song instanceof Song) || (validate && !this._validatePath(song.path)) ) return false;
     this.songs.push(song);
     return true;
   },
@@ -251,7 +251,8 @@ Database.prototype = {
    * @returns [] - list of Songs who's path could not be verified.
    */
   verifyPaths: function() {
-    return this.songs.filter(song => !song.verifyPath());
+    const mask = Database.Song.FLAG.notfound;
+    return this.songs.filter(song => song.flags & mask || (!song.netsearch && !song.verifyPath()));
   },
 
   /**

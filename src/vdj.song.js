@@ -262,6 +262,66 @@ Song.prototype = {
     return utils.getFileTags(this.filePath)
   },
 
+  getSeratoTags: function() {
+    if ( this.filePath && this.filePath.toLowerCase().endsWith('.mp3') ) {
+      const { getTags } = require('./getid3');
+      const hdr = getTags(this.filePath);
+      if ( hdr && hdr.tags ) {
+        const st = [];
+        hdr.tags.forEach(tag => { // ID3v2.x etc.
+          tag.frames.forEach(frame => {
+            if ( frame.id === 'GEOB' || (frame.id === 'TXXX' && frame.content.key === 'SERATO_PLAYCOUNT') ) {
+              frame.buffer = new Uint8Array(tag.tag);
+              st.push(frame);
+            }
+          })
+        });
+
+        const frames = st.map(frame => frame.id === 'TXXX' ? frame : _decodeFrame(frame.buffer.subarray(frame.offset, frame.offset + frame.size)));
+
+        // ... todo WIP
+
+        return frames;
+
+        function _decodeFrame(buffer) {
+          let encoding;
+          let type;
+          let description;
+          let data;
+          let pos = 0;
+
+          // content type
+          encoding = buffer[ pos++ ];
+          if ( encoding === 0 ) type = _extract();
+
+          // description
+          encoding = buffer[ pos++ ];
+          if ( encoding === 0 ) description = _extract();
+
+          if ( type === 'application/octet-stream' ) data = buffer.subarray(pos);
+
+          function _extract() {
+            let data = '';
+            for(; pos < buffer.length; pos++) {
+              const ch = buffer[ pos ];
+              if ( ch === 0 ) break;
+              data += String.fromCharCode(buffer[ pos ])
+            }
+            pos++;  // skip null term.
+            return data
+          }
+
+          return { type, description, data }
+        }
+      }
+    }
+    return null
+  },
+
+  setSeratoTags: function(newPath) {
+
+  },
+
   /**
    * Calc a MD5 hash for the media file referenced in this instance.
    * The hash is also stored as a property (`instance.hash`).

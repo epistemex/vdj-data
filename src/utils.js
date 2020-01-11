@@ -15,6 +15,10 @@ const videoExt = [ '.mp4', '.m4v', '.mov', '.mpg', '.mkv', '.ogv', '.wmv', '.web
 //const audioExt = [ '.mp3', '.wav', '.flac', '.aac', '.ogg', '.aif', '.aiff', '.m4a', '.wma' ];
 const karaokeExt = [ '.kfn', '.kok', '.txk', '.kar' ]; // .cdg is checked separately
 
+// filtering for jIndex
+const tbli = 'àáâãäåæçèéêëíîïðñòóôõöøúûüýāăąćĉčďēęěĝğĥīİıĵńňōőœřśŝşšţťūŭůűŵŷźżžșț¡¿';
+const tblo = 'aaaaaaaceeeeiiionoooooouuuyaaacccdeeegghiiijnnooerssssttuuuuwyzzzst!?';
+
 const entityTable = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;', '\'': '&apos;' };
 const entityTableFrom = { 'amp': '&', 'quot': '"', 'lt': '<', 'gt': '>', 'apos': '\'' };
 
@@ -262,13 +266,19 @@ function getMediaTypes(path) {
 // Jaccard
 
 function toBigrams(txt, preFilter = false) {
-  if ( preFilter ) txt = txt.replace(/\s-\s|[-()_&+.,]/gi, ' ');
+  if ( preFilter ) {
+    const rx = new RegExp(`[${ tbli }]`, 'gi');
+    txt = txt.replace(rx, c => tblo[ tbli.indexOf(c) ]).replace(/[^a-zA-z0-9]/gi, ' ');
+  }
+
   if ( txt.length < 2 ) return [ txt ];
+
   const bigrams = new Set();
   for(let i = 0; i < txt.length - 1; i++) {
     bigrams.add(txt.substr(i, 2))
   }
-  return [ ...bigrams ].sort()
+
+  return [ ...bigrams ].sort();
 }
 
 function jIndex(a, b) {

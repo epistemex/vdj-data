@@ -243,14 +243,15 @@ Song.prototype = {
   similarity: function(song, options) {
     options = Object.assign({}, {
       includeRemix: true,
-      bigramsCount: 3
+      bigramsCount: 3,
+      preFilter   : false
     }, options);
 
     if ( !song ) return 0;
 
     const format = `%artist %title${ options.includeRemix ? ' %remix' : '' }`;
-    const b1 = utils.toBigrams(this.toString(format));
-    const b2 = utils.toBigrams(song.toString(format));
+    const b1 = utils.toBigrams(this.toString(format), options.preFilter);
+    const b2 = utils.toBigrams(song.toString(format), options.preFilter);
 
     if ( b1.length < options.bigramsCount || b2.length < options.bigramsCount ) return 0;
     return utils.jIndex(b1, b2);

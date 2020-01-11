@@ -1,7 +1,7 @@
 vdj-data
 ========
 
-JavaScript based scripting API for a variety of VirtualDJ data files.
+JavaScript and Node.js based scripting API for a variety of VirtualDJ data files.
 
 Features
 --------
@@ -24,9 +24,9 @@ Features
     - Add, change or remove POIs
     - Extract every tag from a supported media file (cover art, user tags, native tags etc.)
     - Export song information as XML or JSON
-- AcoustID (WIP)
+- AcoustID
     - Produce AcoustID audio fingerprint for audio content independent of filename, type or encoding.
-    - Compare audio fingerprints to find duplicate songs.
+    - Compare audio fingerprints to find duplicate songs.  (WIP)
 - Playlists
     - Load existing playlists (VDJ m3u)
     - Create new playlists
@@ -50,10 +50,12 @@ Features
     - Load and parse cue files
     - Convert to SRT, playlists for cloud services etc.
 - Import/Export:
-    - (todo) Import Serato data from file tags
+    - (WIP) Import Serato data from file tags
     - (todo) Export as Serato file tags
+    - (todo) Import data from Mixxx
+    - (todo) Export data to Mixxx
 - System utilities (Windows only at the moment):
-    - Get all drives with VDJ database on them
+    - Get all drives with a VDJ database on them
     - Check if VirtualDJ is running.
 - Backup, restore databases (as well as optionally settings, samples, plugins ) 
 - Windows and MacOS (the latter does not enjoy full support at this time regarding
@@ -162,4 +164,4 @@ package and use it in your private and personal projects.
 
 Disclaimer: this project is unofficial and not affiliated with Atomix.
 
-(c) Silverspex 2019-2020
+© Silverspex 2019-2020

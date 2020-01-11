@@ -262,7 +262,7 @@ function getMediaTypes(path) {
 // Jaccard
 
 function toBigrams(txt, preFilter = false) {
-  if ( preFilter ) txt = txt.replace(/(\s-\s|\(|\)|_|&|\+)/gi, ' ');
+  if ( preFilter ) txt = txt.replace(/\s-\s|[-()_&+.,]/gi, ' ');
   if ( txt.length < 2 ) return [ txt ];
   const bigrams = new Set();
   for(let i = 0; i < txt.length - 1; i++) {
@@ -272,7 +272,8 @@ function toBigrams(txt, preFilter = false) {
 }
 
 function jIndex(a, b) {
-  return intersection(a, b).length / union(a, b).length;
+  const ul = union(a, b).length;
+  return ul ? intersection(a, b).length / ul : 0;
 }
 
 function intersection(a, b) {

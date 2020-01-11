@@ -12,7 +12,7 @@ const fs = require('fs');
 const Path = require('path');
 
 const videoExt = [ '.mp4', '.m4v', '.mov', '.mpg', '.mkv', '.ogv', '.wmv', '.webm' ];
-const audioExt = [ '.mp3', '.wav', '.flac', '.aac', '.ogg', '.aif', '.aiff', '.m4a', '.wma' ];
+//const audioExt = [ '.mp3', '.wav', '.flac', '.aac', '.ogg', '.aif', '.aiff', '.m4a', '.wma' ];
 const karaokeExt = [ '.kfn', '.kok', '.txk', '.kar' ]; // .cdg is checked separately
 
 const entityTable = { '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;', '\'': '&apos;' };
@@ -58,9 +58,9 @@ function toBool(o) {return isDef(o) ? o === '1' : null;}
 
 function fromBool(b) {return b ? '1' : '0';}
 
-function toBPM(o) {return isDef(o) ? 1 / toFloat(o) * 60 : null;}
+function toBPM(o) {return isDef(o) ? 60 / toFloat(o) : null;}
 
-function fromBPM(bpm) {return 1 / (bpm / 60);}
+function fromBPM(bpm) {return 60 / bpm}
 
 /**
  * Compare floating point numbers to be the same using epsilon margin.
@@ -198,17 +198,15 @@ function camelCase(s) {
  * @returns {Promise<*|null>}
  */
 async function getFileTags(path) {
-  const mm = require('music-metadata-browser');
+  const mm = require('music-metadata');
   let meta = null;
   let rs;
 
   try {
     rs = fs.createReadStream(path);
-    meta = await mm.parseNodeStream(rs);
+    meta = await mm.parseStream(rs);
   }
-  catch(err) {
-    debug(err)
-  }
+  catch(err) {debug(err)}
   if ( rs ) rs.close();
   return meta
 }
@@ -261,6 +259,30 @@ function getMediaTypes(path) {
   };
 }
 
+// Jaccard
+
+function toBigrams(txt, preFilter = false) {
+  if ( preFilter ) txt = txt.replace(/(\s-\s|\(|\)|_|&|\+)/gi, ' ');
+  if ( txt.length < 2 ) return [ txt ];
+  const bigrams = new Set();
+  for(let i = 0; i < txt.length - 1; i++) {
+    bigrams.add(txt.substr(i, 2))
+  }
+  return [ ...bigrams ].sort()
+}
+
+function jIndex(a, b) {
+  return intersection(a, b).length / union(a, b).length;
+}
+
+function intersection(a, b) {
+  return a.filter(e => ~b.indexOf(e));
+}
+
+function union(a, b) {
+  return [ ...(new Set(a.concat(b))) ];
+}
+
 module.exports = {
   toEntities,
   fromEntities,
@@ -289,5 +311,7 @@ module.exports = {
   loadFile,
   loadFilePart,
   saveFile,
-  getMediaTypes
+  getMediaTypes,
+  toBigrams,
+  jIndex
 };

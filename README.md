@@ -19,6 +19,7 @@ Features
     - Load new songs from disk optionally including parsing tag information
     - Verify song path
     - Advanced filename cleaner (BETA)
+    - Uses the Jaccard index algorithm to compare similarity between two song titles.
     - Extract tags from filename
     - Change and update any property (infos, tags, scan etc.)
     - Add, change or remove POIs

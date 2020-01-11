@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getFramesList">getFramesList</a></li><li><a href="global.html#getid3">getid3</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#makeFrame">makeFrame</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li><li><a href="global.html#writeTag">writeTag</a></li>
 				</ul>
 			</li>
 			
@@ -2268,6 +2268,9 @@ using the raw flag.</p>
     <dd>
         
 <span class="param-type">*</span>
+|
+
+<span class="param-type">null</span>
 
 
 
@@ -2817,6 +2820,290 @@ If invalid path or unsupported type, a null is returned.</p>
     <dd>
         
 <span class="param-type">Promise.&lt;(*|null)></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getFramesList"><span class="type-signature"></span>getFramesList(jTag)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>List all frames within a Tag with offset, type and size.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>jTag</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>buffer holding the complete Tag</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getid3"><span class="type-signature"></span>getid3(filename, options)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filename</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>file name of file to parse for tags</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <ul>
+<li>Object with key info, tags: array holding all tags found based on options</li>
+</ul>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
 
 
 
@@ -3790,6 +4077,140 @@ Produces a list of Song objects for found items.</p>
             
 <hr>
 <dt>
+    <h4 class="name" id="makeFrame"><span class="type-signature"></span>makeFrame(json)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Converts a JSON representation of a Tag into a binary Tag that can directly
+be written to a file. The version is derived from the JSON <code>version</code> field.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Buffer</p>
+</div>
+
+
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="readDirectory"><span class="type-signature"></span>readDirectory(path)</h4>
     
     
@@ -4283,6 +4704,165 @@ this package using <code>vdj.backup()</code>.</p>
     
 </dd>
 
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="writeTag"><span class="type-signature"></span>writeTag(filename, tags, options)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Write tags to MP3 file. Tags is an array of tags or a single tag that should
+be embedded in the MP3 file that filename points to.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filename</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tags</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
         </dl>
     
 
@@ -4339,7 +4919,7 @@ this package using <code>vdj.backup()</code>.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Wed Jan 8th 2020
+		on Sat Jan 11th 2020
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

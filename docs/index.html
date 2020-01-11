@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li>
+					<li><a href="global.html#backup">backup</a></li><li><a href="global.html#compareFingerprints">compareFingerprints</a></li><li><a href="global.html#compareFingerprintsOffset">compareFingerprintsOffset</a></li><li><a href="global.html#eq">eq</a></li><li><a href="global.html#FILE">FILE</a></li><li><a href="global.html#FOLDER">FOLDER</a></li><li><a href="global.html#getAudioFingerprint">getAudioFingerprint</a></li><li><a href="global.html#getDrivePaths">getDrivePaths</a></li><li><a href="global.html#getDrives">getDrives</a></li><li><a href="global.html#getFileTags">getFileTags</a></li><li><a href="global.html#getFramesList">getFramesList</a></li><li><a href="global.html#getid3">getid3</a></li><li><a href="global.html#getIgnoredDrives">getIgnoredDrives</a></li><li><a href="global.html#getVDJFolders">getVDJFolders</a></li><li><a href="global.html#getVDJHome">getVDJHome</a></li><li><a href="global.html#isRunning">isRunning</a></li><li><a href="global.html#loadAllDatabases">loadAllDatabases</a></li><li><a href="global.html#loadDatabase">loadDatabase</a></li><li><a href="global.html#lookupPaths">lookupPaths</a></li><li><a href="global.html#makeFrame">makeFrame</a></li><li><a href="global.html#readDirectory">readDirectory</a></li><li><a href="global.html#readDirectoryRecursive">readDirectoryRecursive</a></li><li><a href="global.html#restore">restore</a></li><li><a href="global.html#writeTag">writeTag</a></li>
 				</ul>
 			</li>
 			
@@ -94,7 +94,7 @@
 
     <section class="readme-section">
         <article><h1>vdj-data</h1>
-<p>JavaScript based scripting API for a variety of VirtualDJ data files.</p>
+<p>JavaScript and Node.js based scripting API for a variety of VirtualDJ data files.</p>
 <h2>Features</h2>
 <ul>
 <li>Databases:
@@ -113,7 +113,8 @@
 <li>Parse, add, remove Song objects</li>
 <li>Load new songs from disk optionally including parsing tag information</li>
 <li>Verify song path</li>
-<li>Advanced filename cleaner</li>
+<li>Advanced filename cleaner (BETA)</li>
+<li>Uses the Jaccard index algorithm to compare similarity between two song titles.</li>
 <li>Extract tags from filename</li>
 <li>Change and update any property (infos, tags, scan etc.)</li>
 <li>Add, change or remove POIs</li>
@@ -121,10 +122,10 @@
 <li>Export song information as XML or JSON</li>
 </ul>
 </li>
-<li>AcoustID (WIP)
+<li>AcoustID
 <ul>
 <li>Produce AcoustID audio fingerprint for audio content independent of filename, type or encoding.</li>
-<li>Compare audio fingerprints to find duplicate songs.</li>
+<li>Compare audio fingerprints to find duplicate songs.  (WIP)</li>
 </ul>
 </li>
 <li>Playlists
@@ -144,7 +145,7 @@
 <li>Change ranges, beatgrid, loop/drop modes etc.</li>
 <li>Repair malformed samples (addresses VDJ specific bug).</li>
 <li>Create new samples from scratch</li>
-<li>Add any supported media (via the free ffmpeg/ffprobe. See <a href="http://ffmpeg.org/">ffmpeg.org</a>)</li>
+<li>Add or replace with almost any type of media (using ffmpeg)</li>
 <li>Set PNG thumb image</li>
 <li>Export with modifications</li>
 </ul>
@@ -163,13 +164,15 @@
 </li>
 <li>Import/Export:
 <ul>
-<li>(todo) Import Serato data from file tags</li>
+<li>(WIP) Import Serato data from file tags</li>
 <li>(todo) Export as Serato file tags</li>
+<li>(todo) Import data from Mixxx</li>
+<li>(todo) Export data to Mixxx</li>
 </ul>
 </li>
 <li>System utilities (Windows only at the moment):
 <ul>
-<li>Get all drives with VDJ database on them</li>
+<li>Get all drives with a VDJ database on them</li>
 <li>Check if VirtualDJ is running.</li>
 </ul>
 </li>
@@ -237,13 +240,14 @@ need to read, write and maintain database information is ready for use.</p>
 <p>Known issues:</p>
 <ul>
 <li>Currently system calls (detection of folder paths etc.) only works with Windows.</li>
+<li>Currently cannot detect if a <em>video</em> file is a karaoke version (<code>database.loadSongAndTags()</code>)</li>
 </ul>
 <p>Feel free to use the issue tracker to <a href="https://github.com/silverspex/vdj-data/issues">report issues</a>, feature requests.</p>
 <h2>License</h2>
 <p><strong>There is currently no license available.</strong> However, you may download and evaluate the
 package and use it in your private and personal projects.</p>
 <p>Disclaimer: this project is unofficial and not affiliated with Atomix.</p>
-<p>(c) Silverspex 2019-2020</p></article>
+<p>© Silverspex 2019-2020</p></article>
     </section>
 
 
@@ -295,7 +299,7 @@ package and use it in your private and personal projects.</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Wed Jan 8th 2020
+		on Sat Jan 11th 2020
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

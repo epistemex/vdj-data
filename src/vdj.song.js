@@ -226,6 +226,37 @@ Song.prototype = {
   },
 
   /**
+   * Uses the Jaccard algorithm to compare similarities between two song
+   * titles (artist, title and optionally remix);
+   *
+   * Note that the complexity of comparing all songs against each other is
+   * O(n2) since the Jaccard algorithm is non-transitive. When using on large
+   * databases try to pre-filter the "song-set before comparing to reduce the
+   * processing time.
+   *
+   * @param {Song} song - song to compare this instance to.
+   * @param {*} [options] - options
+   * @param {*} [options.includeRemix=true] - include the remix field in the comparision
+   * @param {*} [options.bigramsCount=3] - number of bigram elements before comparing.
+   * @returns {number}
+   */
+  similarity: function(song, options) {
+    options = Object.assign({}, {
+      includeRemix: true,
+      bigramsCount: 3
+    }, options);
+
+    if ( !song ) return 0;
+
+    const format = `%artist %title${ options.includeRemix ? ' %remix' : '' }`;
+    const b1 = utils.toBigrams(this.toString(format));
+    const b2 = utils.toBigrams(song.toString(format));
+
+    if ( b1.length < options.bigramsCount || b2.length < options.bigramsCount ) return 0;
+    return utils.jIndex(b1, b2);
+  },
+
+  /**
    * Verifies the file path.
    * @returns {boolean}
    */

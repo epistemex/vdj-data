@@ -81,14 +81,14 @@ function seratoId3(path, options = {}) {
           const unknown = view.getUint32(pos);
           pos += 4;
 
-          console.log(count, unknown);
+          //console.log(count, unknown);
 
           for(let i = 0; i < count; i++) {
             // 0:uin32 def. color
             pos += 22;
           }
 
-          console.log(pos === data.length);
+          //console.log(pos === data.length);
 
           tags.push({
             type   : 'markers',

@@ -249,7 +249,7 @@ Song.prototype = {
 
     if ( !song ) return 0;
 
-    const format = `%artist %title${ options.includeRemix ? ' %remix' : '' }`;
+    const format = `%artist %featuring %title${ options.includeRemix ? ' %remix' : '' }`;
     const b1 = utils.toBigrams(this.toString(format), options.preFilter);
     const b2 = utils.toBigrams(song.toString(format), options.preFilter);
 

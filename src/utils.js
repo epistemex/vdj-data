@@ -268,7 +268,8 @@ function getMediaTypes(path) {
 function toBigrams(txt, preFilter = false) {
   if ( preFilter ) {
     const rx = new RegExp(`[${ tbli }]`, 'gi');
-    txt = txt.replace(rx, c => tblo[ tbli.indexOf(c) ]).replace(/[^a-zA-z0-9]/gi, ' ');
+    txt = txt.replace(rx, c => tblo[ tbli.indexOf(c) ]).replace(/[^a-zA-z0-9]/gi, ' ')
+      .toLowerCase();
   }
 
   if ( txt.length < 2 ) return [ txt ];

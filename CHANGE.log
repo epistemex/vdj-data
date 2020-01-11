@@ -1,6 +1,14 @@
 Change log for vdj-data
 -----------------------
 
+0.12.0-alpha
+------------
+Add: Jaccard index algorithm to find similarities between two song titles
+Add: Serato tag support (WIP)
+Chg: Renamed Song.filePath to Song.path.
+Chg: Renamed Song.prototype.getTags() to Song.prototype.getFileTags() for better clarity.
+Imp: Improved Song.prototype.toString() when title/artist etc. is not present in tags.
+
 0.11.0-alpha
 ------------
 Add: Sample.prototype.validateTimes()

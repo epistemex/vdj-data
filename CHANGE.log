@@ -1,6 +1,10 @@
 Change log for vdj-data
 -----------------------
 
+0.12.1-alpha
+------------
+
+
 0.12.0-alpha
 ------------
 Add: Jaccard index algorithm to find similarities between two song titles

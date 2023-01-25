@@ -2,7 +2,7 @@
  *
  *  Restore module
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 
@@ -77,7 +77,7 @@ function restore(zipPath, dstPath) {
                 }
 
                 try {
-                  const data = `Restored using ${ info.name } version ${ info.version } (https://github.com/silverspex/${ info.name })\nRestored: ${ new Date }`;
+                  const data = `Restored using ${ info.name } version ${ info.version } (https://github.com/Epistemex/${ info.name })\nRestored: ${ new Date }`;
                   fs.writeFileSync(Path.join(dstPath, 'RESTORED.txt'), data, 'utf-8');
                 }
                 catch(err) {debug(err);}

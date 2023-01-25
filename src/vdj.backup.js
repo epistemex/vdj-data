@@ -2,7 +2,7 @@
  *
  *  Backup module
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 
@@ -59,7 +59,7 @@ async function backup(dstPath, dbList = [], list = [ 'Folders', 'History', 'Mapp
   // info
   zip.file(
     'README.txt',
-    `Created with ${ info.name } version ${ info.version } (https://github.com/silverspex/${ info.name })\nBackup date: ${ new Date }`
+    `Created with ${ info.name } version ${ info.version } (https://github.com/Epistemex/${ info.name })\nBackup date: ${ new Date }`
   );
 
   try {

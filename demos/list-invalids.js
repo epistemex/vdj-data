@@ -8,7 +8,7 @@
  *
  * If no path is given it will check all databases.
  *
- *  Copyright (c) 2019-2020 Silverspex
+ *  Copyright (c) 2019-2020 Epistemex
  *
  *************************************************/
 

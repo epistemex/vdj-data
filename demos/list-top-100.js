@@ -6,7 +6,7 @@
  *
  *      node list-top-100 <path-to-database.xml>
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 

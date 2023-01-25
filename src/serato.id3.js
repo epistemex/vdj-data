@@ -6,7 +6,7 @@
  *   work of Holzhaus https://github.com/Holzhaus/serato-tags with some
  *   modifications on my part.
  *
- *   Copyright (c) 2020 Silverspex
+ *   Copyright (c) 2020 Epistemex
  *
  * *********************************************************************/
 

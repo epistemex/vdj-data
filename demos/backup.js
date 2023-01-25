@@ -3,7 +3,7 @@
  *  Backup main database only (for demo)
  *  Saves zip archive to current folder.
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 

@@ -2,7 +2,7 @@
  *
  *  Tags object in Song
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 

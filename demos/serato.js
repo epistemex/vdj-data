@@ -2,7 +2,7 @@
  *
  *   List Serato tags in MP3, if any
  *
- *   Copyright (c) 2020 Silverspex
+ *   Copyright (c) 2020 Epistemex
  *
  * *********************************************************************/
 

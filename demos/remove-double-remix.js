@@ -7,7 +7,7 @@
  *
  *   node remove-double-remix <path-to-database.xml> [show|test]
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 

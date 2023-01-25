@@ -2,7 +2,7 @@
  *
  *  XML handling
  *
- *  Copyright (c) 2019 Silverspex
+ *  Copyright (c) 2019 Epistemex
  *
  *************************************/
 

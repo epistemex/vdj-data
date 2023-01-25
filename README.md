@@ -93,7 +93,7 @@ Install
 
 Run the following command in CLI to install this package into your project:
 
-    npm i silverspex/vdj-data
+    npm i Epistemex/vdj-data
 
 Examples
 --------
@@ -155,7 +155,8 @@ Known issues:
 - Currently system calls (detection of folder paths etc.) only works with Windows.
 - Currently cannot detect if a _video_ file is a karaoke version (`database.loadSongAndTags()`)
 
-Feel free to use the issue tracker to [report issues](https://github.com/silverspex/vdj-data/issues), feature requests.
+Feel free to use the issue tracker to [report issues](https://github.com/Epistemex/vdj-data/issues),
+feature requests.
 
 License
 -------
@@ -165,4 +166,4 @@ package and use it in your private and personal projects.
 
 Disclaimer: this project is unofficial and not affiliated with Atomix.
 
-© Silverspex 2019-2020
+© Epistemex 2019-2020

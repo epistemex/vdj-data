@@ -2,7 +2,7 @@
  *
  *  Song object
  *
- *  Copyright (c) 2019-2020 Silverspex
+ *  Copyright (c) 2019-2020 Epistemex
  *
  *************************************/
 
@@ -17,7 +17,7 @@ const Tags = require('./vdj.tags');
 const Infos = require('./vdj.infos');
 const Scan = require('./vdj.scan');
 const Poi = require('./vdj.poi');
-const { cleaner } = require('./cleaner');
+const { cleaner, defOptions } = require('./cleaner');
 
 const services = {
   'va': 'iDJPool',
@@ -160,7 +160,7 @@ Song.prototype = {
   },
 
   tagsToFilename: function(options) {
-
+    // todo implement tagsToFilename()
   },
 
   /**
@@ -168,11 +168,12 @@ Song.prototype = {
    * and clean up parts of the name (artist(s), title, featuring, presents, remix,
    * year etc.)
    *
-   * @param {*} [compilerOptions] - see src/cleaner for details
+   * @param {*} [compilerOptions=defOptions] - see src/cleaner for details
    * @returns {*}
    */
-  cleanName: function(compilerOptions = {}) {
-    return cleaner(Path.parse(this.path).name, compilerOptions);
+  cleanName: function(compilerOptions = defOptions) {
+    //return cleaner(Path.parse(this.path).name, compilerOptions);
+    return cleaner(Path.win32.basename(Path.parse(this.path).name), compilerOptions);
   },
 
   /**

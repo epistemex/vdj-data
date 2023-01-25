@@ -2,7 +2,7 @@
  *
  *  Drives (Windows)
  *
- *  Copyright (c) 2018-2019 Silverspex
+ *  Copyright (c) 2018-2019 Epistemex
  *
  *************************************/
 

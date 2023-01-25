@@ -2,7 +2,7 @@
  *
  *  VDJSample object
  *
- *  Copyright (c) 2019-2020 Silverspex
+ *  Copyright (c) 2019-2020 Epistemex
  *
  *************************************/
 

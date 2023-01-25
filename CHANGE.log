@@ -69,4 +69,4 @@ Add: cascade ignorePath setting for Sample.write()
 - Add: Audio fingerprinting (AcoustID) available via vdj.utils.getAudioFingerprint() for Windows/Mac
 - Upd: meta tagger updated to v2.0.0
 
-(c) 2019-2020 silverspex
+(c) 2019-2020 Epistemex

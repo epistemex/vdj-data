@@ -9,7 +9,7 @@ Features
 - Databases:
     - Load, parse or create new database.xml files for VirtualDJ
     - Merge, split databases respecting ignoreDrives (Windows) and available drives
-    - Search for songs by title, artist etc, or by file path
+    - Search for songs by title, artist etc., or by file path
     - Verify song paths
     - Import, export, update using scripting
     - Export entire database and songs as XML or JSON

@@ -97,7 +97,7 @@ Install
 
 Run the following command in CLI to install this package into your project:
 
-    npm i Epistemex/vdj-data
+    npm i https://github.com/epistemex/vdj-data
 
 Examples
 --------

@@ -58,20 +58,24 @@ Features
 - System utilities (Windows only at the moment):
     - Get all drives with a VDJ database on them
     - Check if VirtualDJ is running.
-- Backup, restore databases (as well as optionally settings, samples, plugins ) 
-- Windows and MacOS (the latter does not enjoy full support at this time regarding
-auto-detection of paths etc., but should work on data level once loaded manually).
+- Backup, restore databases (as well as optionally settings, samples, plugins )
+- Windows and MacOS (the latter does not enjoy full support at this time regarding auto-detection of
+  paths etc., but should work on data level once loaded manually).
+
+_Help keep the project alive by supporting the developer:_
+
+[![PayPalMe](https://github.com/epistemex/transformation-matrix-js/assets/70324091/04203267-58f0-402b-9589-e2dee6e7c510)](https://paypal.me/KenNil)
 
 Who Is This For?
 ----------------
 
-If you want to make anything from simple singleton scripts, which do one specific
-thing, to more complex workflows and pipelines that combine online services, local
-conversion software, automatic tagging and so forth, then this is for you!
+If you want to make anything from simple scripts, which do one specific thing, to more complex
+workflows and pipelines that combine online services, local conversion software, automatic tagging
+and so forth, then this is for you!
 
-You can alternatively use this package as a building block to make software
-handling VDJ data, and you can easily build graphical front-ends using HTML and
-for example a local server, or Electron etc.
+You can alternatively use this package as a building block to make software handling VDJ data, and
+you can easily build graphical front-ends using HTML and for example a local server, or Electron
+etc.
 
 Prerequisites
 -------------
@@ -152,18 +156,19 @@ need to read, write and maintain database information is ready for use.
 
 Known issues:
 
-- Currently system calls (detection of folder paths etc.) only works with Windows.
+- Currently, system calls (detection of folder paths etc.) only works with Windows.
 - Currently cannot detect if a _video_ file is a karaoke version (`database.loadSongAndTags()`)
+- Since the project hasn't been updated since 2020 there might be new file features/data not covered
+  by this current version. **Be careful when writing back XML files, for now.**
 
-Feel free to use the issue tracker to [report issues](https://github.com/Epistemex/vdj-data/issues),
+Feel free to use the issue tracker to [report issues](https://github.com/epistemex/vdj-data/issues),
 feature requests.
 
 License
 -------
 
-**There is currently no license available.** However, you may download and evaluate the
-package and use it in your private and personal projects.
+GPL 3.0
 
 Disclaimer: this project is unofficial and not affiliated with Atomix.
 
-© Epistemex 2019-2020
+© Epistemex 2019-2020, 2024
